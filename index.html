@@ -634,7 +634,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -1071,11 +1071,7 @@ window.doRegister = async function() {
 
 window.doGoogle = async function() {
   try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-    const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) await initUserDoc(user, user.displayName || 'Champion');
+    await signInWithRedirect(auth, googleProvider);
   } catch(e) {
     showAuthError(t('errorGeneral'));
   }
@@ -1101,6 +1097,16 @@ async function initUserDoc(user, name) {
 }
 
 // ─── AUTH STATE ────────────────────────────────────────────────
+// Handle Google redirect result
+getRedirectResult(auth).then(async (result) => {
+  if (result && result.user) {
+    const user = result.user;
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) await initUserDoc(user, user.displayName || 'Champion');
+  }
+}).catch(() => {});
+
 onAuthStateChanged(auth, async (user) => {
   hideLoading();
   if (user) {
