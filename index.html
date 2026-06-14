@@ -671,26 +671,71 @@ function showAuthError(msg){const el=document.getElementById('auth-error');el.te
 function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-password').value;
+  if(!email||!pass){showAuthError('Bitte E-Mail und Passwort eingeben.');return;}
   const btn=document.getElementById('btn-login');btn.disabled=true;
+  btn.textContent='...';
   auth.signInWithEmailAndPassword(email,pass)
-    .catch(e=>{showAuthError(t('errorEmail'));btn.disabled=false;});
+    .catch(e=>{
+      console.error('Login error:',e.code,e.message);
+      btn.disabled=false;btn.textContent=t('login');
+      if(e.code==='auth/user-not-found'||e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'){
+        showAuthError('E-Mail oder Passwort falsch.');
+      } else if(e.code==='auth/invalid-email'){
+        showAuthError('Ungültige E-Mail Adresse.');
+      } else if(e.code==='auth/too-many-requests'){
+        showAuthError('Zu viele Versuche. Bitte warten.');
+      } else {
+        showAuthError(e.message||t('errorGeneral'));
+      }
+    });
 }
 
 function doRegister(){
   const name=document.getElementById('reg-name').value.trim();
   const email=document.getElementById('reg-email').value.trim();
   const pass=document.getElementById('reg-password').value;
+  if(!name||!email||!pass){showAuthError('Bitte alle Felder ausfüllen.');return;}
+  if(pass.length<6){showAuthError('Passwort mindestens 6 Zeichen.');return;}
   const btn=document.getElementById('btn-register');btn.disabled=true;
+  btn.textContent='...';
   auth.createUserWithEmailAndPassword(email,pass)
     .then(cred=>{
       return cred.user.updateProfile({displayName:name})
         .then(()=>initUserDoc(cred.user,name));
     })
-    .catch(e=>{showAuthError(t('errorGeneral'));btn.disabled=false;});
+    .catch(e=>{
+      console.error('Register error:',e.code,e.message);
+      btn.disabled=false;btn.textContent=t('createAccount');
+      if(e.code==='auth/email-already-in-use'){
+        showAuthError('E-Mail bereits registriert. Bitte anmelden.');
+      } else if(e.code==='auth/invalid-email'){
+        showAuthError('Ungültige E-Mail Adresse.');
+      } else if(e.code==='auth/weak-password'){
+        showAuthError('Passwort zu schwach (min. 6 Zeichen).');
+      } else {
+        showAuthError(e.message||t('errorGeneral'));
+      }
+    });
 }
 
 function doGoogle(){
-  auth.signInWithRedirect(googleProvider).catch(e=>showAuthError(t('errorGeneral')));
+  auth.signInWithPopup(googleProvider)
+    .then(result=>{
+      const u=result.user;
+      db.collection('users').doc(u.uid).get().then(snap=>{
+        if(!snap.exists)initUserDoc(u,u.displayName||'Champion');
+      });
+    })
+    .catch(e=>{
+      console.error('Google error:',e.code,e.message);
+      if(e.code==='auth/popup-blocked'){
+        showAuthError('Popup blockiert! Bitte Popup-Blocker deaktivieren.');
+      } else if(e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
+        // user closed popup silently
+      } else {
+        showAuthError(e.message||t('errorGeneral'));
+      }
+    });
 }
 
 function doLogout(){auth.signOut();}
@@ -702,15 +747,6 @@ function initUserDoc(user,name){
     disclaimerAccepted:false,activeProgram:null
   },{merge:true});
 }
-
-auth.getRedirectResult().then(result=>{
-  if(result&&result.user){
-    const u=result.user;
-    db.collection('users').doc(u.uid).get().then(snap=>{
-      if(!snap.exists)initUserDoc(u,u.displayName||'Champion');
-    });
-  }
-}).catch(()=>{});
 
 auth.onAuthStateChanged(async user=>{
   hideLoading();
