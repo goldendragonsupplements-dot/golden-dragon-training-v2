@@ -352,14 +352,7 @@ input:focus,select:focus{border-color:var(--gold)}
      PROGRAMS
 ══════════════════════════════════════════════════ -->
 <div id="s-programs" class="screen">
-  <div class="catbar-wrap">
-    <div class="catbar" id="prog-catbar"></div>
-  </div>
-  <div class="search-bar">
-    <span>🔍</span>
-    <input type="text" id="prog-search" placeholder="Programme suchen..." oninput="filterProgs()">
-  </div>
-  <div class="prog-grid" id="prog-list"></div>
+  <div id="programs-content"></div>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -1008,35 +1001,95 @@ function renderHome(){
 
 // ══ PROGRAMS ═════════════════════════════════════════════════
 let filterCat='all', filterSearch='';
-function openCat(catId){activeCat=catId;goTo('programs');}
-function renderPrograms(){
-  // catbar
-  const bar=document.getElementById('prog-catbar');
-  bar.innerHTML=`<div class="catpill ${activeCat==='all'?'on':''}" onclick="setCat('all')">${lang==='de'?'Alle':lang==='en'?'All':lang==='hr'?'Sve':lang==='pl'?'Wszystkie':lang==='ru'?'Все':'Tümü'}</div>`+
-  CATS.map(c=>`<div class="catpill ${activeCat===c.id?'on':''}" onclick="setCat('${c.id}')">${c.icon} ${c[lang]||c.de}</div>`).join('');
-  document.getElementById('prog-search').placeholder=t('searchPh');
-  filterProgs();
+function openCat(catId){
+  activeCat=catId;
+  goTo('programs');
 }
-function setCat(id){activeCat=id;renderPrograms();}
-function filterProgs(){
-  filterSearch=document.getElementById('prog-search').value.toLowerCase();
-  const list=PROGRAMS.filter(p=>{
-    const catOk=activeCat==='all'||p.cat===activeCat;
-    const srchOk=!filterSearch||p.name.toLowerCase().includes(filterSearch)||(p.goal[lang]||p.goal.de).toLowerCase().includes(filterSearch);
-    return catOk&&srchOk;
-  });
-  const el=document.getElementById('prog-list');
-  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🏋️</div><p>Keine Programme gefunden.</p></div>`;return;}
-  el.innerHTML=list.map(p=>`
-    <div class="prog-card" onclick="openProg('${p.id}')">
-      <div class="prog-badge">${p.icon} ${p.level[lang]||p.level.de}</div>
-      <div class="prog-name">${p.name}</div>
-      <div class="prog-meta">
-        <span>📅 ${p.weeks} ${t('weeks')}</span>
-        <span>🔄 ${p.dpw} ${t('dpw')}</span>
-        <span>🏋️ ${p.equipment[lang]||p.equipment.de}</span>
+
+function programText(key){
+  const map={
+    all:{de:'Alle Kategorien',en:'All categories',hr:'Sve kategorije',pl:'Wszystkie kategorie',ru:'Все категории',tr:'Tüm kategoriler'},
+    fitness:{de:'🐉 Fitness Programme',en:'🐉 Fitness Programs',hr:'🐉 Fitness programi',pl:'🐉 Programy fitness',ru:'🐉 Фитнес программы',tr:'🐉 Fitness Programları'},
+    rehab:{de:'🦴 Rehabilitation',en:'🦴 Rehabilitation',hr:'🦴 Rehabilitacija',pl:'🦴 Rehabilitacja',ru:'🦴 Реабилитация',tr:'🦴 Rehabilitasyon'},
+    choose:{de:'Wähle zuerst eine Kategorie.',en:'Choose a category first.',hr:'Prvo odaberi kategoriju.',pl:'Najpierw wybierz kategorię.',ru:'Сначала выберите категорию.',tr:'Önce bir kategori seç.'},
+    backCats:{de:'Zurück zu Kategorien',en:'Back to categories',hr:'Natrag na kategorije',pl:'Wróć do kategorii',ru:'Назад к категориям',tr:'Kategorilere dön'},
+    noPrograms:{de:'Für diese Kategorie sind noch keine Programme vorhanden.',en:'No programs in this category yet.',hr:'Za ovu kategoriju još nema programa.',pl:'Brak programów w tej kategorii.',ru:'В этой категории пока нет программ.',tr:'Bu kategoride henüz program yok.'},
+    open:{de:'Öffnen',en:'Open',hr:'Otvori',pl:'Otwórz',ru:'Открыть',tr:'Aç'},
+    coming:{de:'Weitere Programme kommen später.',en:'More programs coming later.',hr:'Dodatni programi dolaze kasnije.',pl:'Więcej programów później.',ru:'Другие программы появятся позже.',tr:'Diğer programlar daha sonra gelecek.'}
+  };
+  return (map[key] && (map[key][lang] || map[key].de)) || key;
+}
+
+function renderPrograms(){
+  const root=document.getElementById('programs-content');
+  if(!root) return;
+
+  const rehabIds=['spine','sciatica','mobility','posture','rehab'];
+  const fitnessCats=CATS.filter(c=>!rehabIds.includes(c.id));
+  const rehabCats=CATS.filter(c=>rehabIds.includes(c.id));
+
+  if(activeCat==='all'){
+    const section=(title,cats)=>`
+      <div style="padding:16px 16px 0">
+        <div class="sec-title">${title}</div>
+        <div style="display:grid;grid-template-columns:1fr;gap:10px;padding-bottom:8px">
+          ${cats.map(c=>`
+            <div class="prog-card" onclick="setCat('${c.id}')" style="display:flex;align-items:center;gap:14px;padding:18px">
+              <div style="font-size:30px;width:38px;text-align:center">${c.icon}</div>
+              <div style="flex:1">
+                <div class="prog-name" style="font-size:17px;margin-bottom:3px">${c[lang]||c.de}</div>
+                <div style="font-size:12px;color:var(--muted);line-height:1.35">${(c.desc&& (c.desc[lang]||c.desc.de))||''}</div>
+              </div>
+              <div style="color:var(--gold);font-size:22px;font-weight:900">›</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    root.innerHTML=`
+      <div class="detail-header" style="padding-bottom:14px">
+        <div class="home-title" style="text-align:left;font-size:24px">${t('navProg')}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45">${programText('choose')}</div>
       </div>
-    </div>`).join('');
+      ${section(programText('fitness'), fitnessCats)}
+      ${section(programText('rehab'), rehabCats)}
+    `;
+    return;
+  }
+
+  const cat=CATS.find(c=>c.id===activeCat);
+  const list=PROGRAMS.filter(p=>p.cat===activeCat);
+  const catTitle=cat ? `${cat.icon} ${cat[lang]||cat.de}` : programText('all');
+  const catDesc=cat && cat.desc ? (cat.desc[lang]||cat.desc.de) : '';
+
+  root.innerHTML=`
+    <div class="detail-header">
+      <button class="back-btn" onclick="setCat('all')">← <span>${programText('backCats')}</span></button>
+      <div class="home-title" style="text-align:left;font-size:24px">${catTitle}</div>
+      ${catDesc?`<p style="font-size:13px;color:#aaa;line-height:1.6;margin-top:8px">${catDesc}</p>`:''}
+    </div>
+    <div class="prog-grid" style="padding-top:16px">
+      ${list.length?list.map(p=>`
+        <div class="prog-card" onclick="openProg('${p.id}')">
+          <div class="prog-badge">${p.icon} ${p.level[lang]||p.level.de}</div>
+          <div class="prog-name" style="font-size:17px">${p.name}</div>
+          <div class="prog-meta">
+            <span>📅 ${p.weeks} ${t('weeks')}</span>
+            <span>🔄 ${p.dpw} ${t('dpw')}</span>
+            <span>🏋️ ${p.equipment[lang]||p.equipment.de}</span>
+          </div>
+        </div>`).join(''):`<div class="empty"><div class="empty-icon">🐉</div><p>${programText('noPrograms')}</p><p style="font-size:12px;margin-top:8px;color:var(--muted)">${programText('coming')}</p></div>`}
+    </div>
+  `;
+}
+
+function setCat(id){
+  activeCat=id;
+  renderPrograms();
+  window.scrollTo(0,0);
+}
+
+function filterProgs(){
+  renderPrograms();
 }
 
 // ══ PROGRAM DETAIL ═══════════════════════════════════════════
