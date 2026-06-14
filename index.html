@@ -748,17 +748,34 @@ function initUserDoc(user,name){
   },{merge:true});
 }
 
-auth.onAuthStateChanged(async user=>{
+auth.onAuthStateChanged(user=>{
   hideLoading();
   if(user){
     currentUser=user;
-    const snap=await db.collection('users').doc(user.uid).get();
-    const data=snap.data()||{};
-    currentLang=data.language||'de';
+    currentLang='de';
     applyTranslations();
-    if(!data.disclaimerAccepted){showScreen('disclaimer');document.getElementById('bottom-nav').style.display='none';}
-    else{loadUserData();showScreen('home');}
-  }else{currentUser=null;showScreen('auth');document.getElementById('bottom-nav').style.display='none';}
+    // Try to get user data but don't block on it
+    db.collection('users').doc(user.uid).get().then(snap=>{
+      const data=snap.exists?snap.data():{};
+      currentLang=data.language||'de';
+      applyTranslations();
+      if(!data.disclaimerAccepted){
+        showScreen('disclaimer');
+        document.getElementById('bottom-nav').style.display='none';
+      } else {
+        loadUserData();
+        showScreen('home');
+      }
+    }).catch(()=>{
+      // If Firestore fails, still show disclaimer
+      showScreen('disclaimer');
+      document.getElementById('bottom-nav').style.display='none';
+    });
+  } else {
+    currentUser=null;
+    showScreen('auth');
+    document.getElementById('bottom-nav').style.display='none';
+  }
 });
 
 function checkDisclaimer(){const a=document.getElementById('check-medical').checked;const b=document.getElementById('check-dsgvo').checked;document.getElementById('btn-accept-disclaimer').disabled=!(a&&b);}
