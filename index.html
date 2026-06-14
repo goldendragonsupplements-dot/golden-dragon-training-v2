@@ -638,7 +638,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAZ9rA89gZUotn2Ol6gyor22WJsaHfExno",
-  authDomain: "golden-dragon-training-app.firebaseapp.com",
+  authDomain: "inspiring-brioche-c31830.netlify.app",
   projectId: "golden-dragon-training-app",
   storageBucket: "golden-dragon-training-app.firebasestorage.app",
   messagingSenderId: "450159603529",
@@ -719,24 +719,17 @@ function doRegister(){
 }
 
 function doGoogle(){
-  auth.signInWithPopup(googleProvider)
-    .then(result=>{
-      const u=result.user;
-      db.collection('users').doc(u.uid).get().then(snap=>{
-        if(!snap.exists)initUserDoc(u,u.displayName||'Champion');
-      });
-    })
-    .catch(e=>{
-      console.error('Google error:',e.code,e.message);
-      if(e.code==='auth/popup-blocked'){
-        showAuthError('Popup blockiert! Bitte Popup-Blocker deaktivieren.');
-      } else if(e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
-        // user closed popup silently
-      } else {
-        showAuthError(e.message||t('errorGeneral'));
-      }
-    });
+  auth.signInWithRedirect(googleProvider);
 }
+
+auth.getRedirectResult().then(result=>{
+  if(result&&result.user){
+    const u=result.user;
+    db.collection('users').doc(u.uid).get().then(snap=>{
+      if(!snap.exists)initUserDoc(u,u.displayName||'Champion');
+    });
+  }
+}).catch(e=>console.error('Redirect result error:',e));
 
 function doLogout(){auth.signOut();}
 
