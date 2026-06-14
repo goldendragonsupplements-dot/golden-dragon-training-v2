@@ -302,9 +302,12 @@ input:focus,select:focus{border-color:var(--gold)}
     <div class="home-title">Golden Dragon</div>
     <div class="home-slogan">FUEL YOUR STRENGTH</div>
   </div>
-  <div class="home-body">
+  <!-- WELCOME HERO -->
+  <div style="background:linear-gradient(180deg,#1a1000,#0a0a0a);border-bottom:1px solid rgba(201,168,76,.2);padding:20px 16px">
+    <p style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px" id="rl-welcome">Willkommen zurück</p>
+    <h2 class="gold" style="font-size:24px;font-weight:900;margin:4px 0 14px" id="home-name">Champion</h2>
     <!-- RANK CARD -->
-    <div class="rank-card" onclick="goTo('progress')">
+    <div class="rank-card" onclick="goTo('progress')" style="margin-bottom:0;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.2)">
       <div class="rank-dragon" id="home-rank-icon">🥉</div>
       <div class="rank-info">
         <div class="rank-label" id="rl-rank">DEIN RANG</div>
@@ -313,28 +316,35 @@ input:focus,select:focus{border-color:var(--gold)}
         <div class="rank-progress-txt" id="home-rank-txt">0 / 5 Trainings</div>
       </div>
     </div>
-    <!-- STATS -->
-    <div class="stats-row">
-      <div class="stat-box"><div class="stat-n" id="st-w">0</div><div class="stat-l" id="stl-w">Trainings</div></div>
-      <div class="stat-box"><div class="stat-n" id="st-d">0</div><div class="stat-l" id="stl-d">Tage</div></div>
-      <div class="stat-box"><div class="stat-n" id="st-m">0</div><div class="stat-l" id="stl-m">Minuten</div></div>
-    </div>
-    <!-- QUICK ACTIONS -->
-    <div class="quick-grid">
-      <div class="quick-card" onclick="goTo('quiz')">
-        <div class="qc-icon">🎯</div>
-        <div class="qc-title" id="qc-quiz">Smart Quiz</div>
-        <div class="qc-sub" id="qc-quiz-sub">Finde dein Programm</div>
-      </div>
-      <div class="quick-card" onclick="goTo('programs')">
-        <div class="qc-icon">💪</div>
-        <div class="qc-title" id="qc-prog">Programme</div>
-        <div class="qc-sub" id="qc-prog-sub">Alle Trainingspläne</div>
-      </div>
-    </div>
-    <!-- CATEGORIES -->
-    <div class="sec-title" id="hl-cats">KATEGORIEN</div>
-    <div class="cats-grid" id="home-cats" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" style="padding:14px 16px;margin:0;gap:8px">
+    <div class="stat-box"><div class="stat-n" id="st-w">0</div><div class="stat-l" id="stl-w">Trainings</div></div>
+    <div class="stat-box"><div class="stat-n" id="st-d">0</div><div class="stat-l" id="stl-d">Tage</div></div>
+    <div class="stat-box"><div class="stat-n" id="st-m">0</div><div class="stat-l" id="stl-m">Minuten</div></div>
+  </div>
+
+  <!-- SMART QUIZ BANNER -->
+  <div style="margin:0 16px 16px;background:linear-gradient(135deg,#1a1000,#0d0d0d);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:18px">
+    <div style="font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px" id="qc-quiz-lbl">PAMETNI KVIZ</div>
+    <div style="font-size:17px;font-weight:900;color:var(--gold2);margin-bottom:6px" id="qc-quiz">Pronađi svoj program</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:14px" id="qc-quiz-sub">Odgovori na pitanja i aplikacija preporučuje najbolji program.</div>
+    <button class="btn" onclick="goTo('quiz')" id="qc-quiz-btn" style="margin-top:0">Pokreni kviz 🎯</button>
+  </div>
+
+  <!-- QUICK START HORIZONTAL -->
+  <div style="padding:0 16px;margin-bottom:8px">
+    <div class="sec-title" id="hl-quick">BRZI START</div>
+  </div>
+  <div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none" id="home-quick">
+    <!-- filled by renderQuickCats() -->
+  </div>
+
+  <!-- ALL CATEGORIES -->
+  <div style="padding:0 16px">
+    <div class="sec-title" id="hl-cats">KATEGORIJE</div>
+    <div class="cats-grid" id="home-cats" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding-bottom:20px"></div>
   </div>
 </div>
 
@@ -946,10 +956,6 @@ auth.onAuthStateChanged(user=>{
   }
 });
 function afterLogin(){
-  const name=me.displayName||'Champion';
-  document.getElementById('prof-av').textContent=name.charAt(0).toUpperCase();
-  document.getElementById('prof-name').textContent=name;
-  document.getElementById('prof-email').textContent=me.email||'';
   renderHome();
   show('s-home');
   document.getElementById('nb-home').classList.add('on');
@@ -958,12 +964,38 @@ function afterLogin(){
 // ══ HOME ═════════════════════════════════════════════════════
 function renderHome(){
   if(!me)return;
+  const name=me.displayName||'Champion';
+  document.getElementById('home-name').textContent=name;
+  document.getElementById('prof-av').textContent=name.charAt(0).toUpperCase();
+  document.getElementById('prof-name').textContent=name;
+  document.getElementById('prof-email').textContent=me.email||'';
+
+  // Quick start cats (first 4)
+  const quickCats=CATS.slice(0,4);
+  const qg=document.getElementById('home-quick');
+  if(qg) qg.innerHTML=quickCats.map(c=>`
+    <div onclick="openCat('${c.id}')" style="flex-shrink:0;background:var(--card);border:1px solid #1e1e1e;border-radius:14px;padding:14px 16px;min-width:140px;cursor:pointer">
+      <div style="font-size:28px;margin-bottom:8px">${c.icon}</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text)">${c[lang]||c.de}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${(c.desc&&c.desc[lang])||c.desc.de}</div>
+      <div style="margin-top:10px;background:var(--gold);color:#000;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:800;display:inline-block;cursor:pointer">${lang==='hr'?'Otvori':lang==='en'?'Open':lang==='pl'?'Otwórz':lang==='ru'?'Открыть':lang==='tr'?'Aç':'Öffnen'}</div>
+    </div>`).join('');
+
+  // All cats grid
+  const g=document.getElementById('home-cats');
+  if(g) g.innerHTML=CATS.map(c=>`
+    <div style="background:var(--card);border:1px solid #1e1e1e;border-radius:14px;padding:16px;cursor:pointer;transition:.15s" onclick="openCat('${c.id}')" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''">
+      <div style="font-size:24px;margin-bottom:8px">${c.icon}</div>
+      <div style="font-size:13px;font-weight:800;color:#f0f0f0">${c[lang]||c.de}</div>
+      <div style="font-size:11px;color:#666;margin-top:3px">${(c.desc&&c.desc[lang])||c.desc.de}</div>
+    </div>`).join('');
+
   db.collection('users').doc(me.uid).collection('workoutLogs').get().then(s=>{
     const wkts=s.size;
     let min=0; s.forEach(d=>min+=(d.data().durationMin||0));
     document.getElementById('st-w').textContent=wkts;
-    document.getElementById('st-d').textContent=Math.round(min/30);
     document.getElementById('st-m').textContent=min;
+    document.getElementById('st-d').textContent=Math.round(min/30);
     const rank=getRank(wkts);
     const rname=getRankName(rank);
     document.getElementById('home-rank-icon').textContent=rank.icon;
@@ -972,14 +1004,6 @@ function renderHome(){
     document.getElementById('home-rank-bar').style.width=Math.max(5,pct)+'%';
     document.getElementById('home-rank-txt').textContent=wkts+' / '+rank.max+' '+t('statW');
   }).catch(()=>{});
-  // render cats
-  const g=document.getElementById('home-cats');
-  g.innerHTML=CATS.map(c=>`
-    <div style="background:var(--card);border:1px solid #1e1e1e;border-radius:14px;padding:16px;cursor:pointer;transition:.15s" onclick="openCat('${c.id}')" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform=''">
-      <div style="font-size:24px;margin-bottom:8px">${c.icon}</div>
-      <div style="font-size:13px;font-weight:800;color:#f0f0f0">${c[lang]||c.de}</div>
-      <div style="font-size:11px;color:#666;margin-top:3px">${c.desc[lang]||c.desc.de}</div>
-    </div>`).join('');
 }
 
 // ══ PROGRAMS ═════════════════════════════════════════════════
