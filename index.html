@@ -632,11 +632,10 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyAZ9rA89gZUotn2Ol6gyor22WJsaHfExno",
   authDomain: "golden-dragon-training-app.firebaseapp.com",
@@ -646,512 +645,145 @@ const firebaseConfig = {
   appId: "1:450159603529:web:f7c3d443805b0b6041b498",
   measurementId: "G-FB86D4FDWL"
 };
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // ─── TRANSLATIONS ───────────────────────────────────────────────
 const T = {
-  de: {
-    login:'Anmelden', register:'Registrieren', or:'oder', googleBtn:'Mit Google anmelden',
-    emailLabel:'E-Mail', passwordLabel:'Passwort', nameLabel:'Name', createAccount:'Konto erstellen',
-    discTitle:'Medizinischer Haftungsausschluss', discH1:'Wichtiger Hinweis',
-    discP1:'Golden Dragon Training bietet allgemeine Fitnessinformationen. Die Inhalte ersetzen keine medizinische Beratung.',
-    discH2:'Gesundheitliche Risiken', discP2:'Konsultieren Sie vor Beginn einen Arzt, insbesondere bei Vorerkrankungen.',
-    discH3:'Eigenverantwortung', discP3:'Sie trainieren auf eigene Verantwortung.',
-    checkMedical:'Ich habe den medizinischen Haftungsausschluss gelesen und akzeptiere ihn.',
-    checkDsgvo:'Ich stimme der Datenschutzerklärung (DSGVO) zu.',
-    btnAccept:'Zustimmen & Weiter',
-    greeting:'Willkommen zurück', statW:'Trainings', statD:'Tage', statM:'Minuten',
-    catTitle:'PROGRAMME', catBeg:'Anfänger', catBegD:'Grundlagen & Einsteiger',
-    catInt:'Fortgeschritten', catIntD:'Nächste Stufe', catAdv:'Profi', catAdvD:'Hochintensiv',
-    catDrv:'LKW-Fahrer', catDrvD:'Ohne Geräte möglich', catWom:'Frauen', catWomD:'Fettverbrennung & Straffung',
-    catSpi:'Wirbelsäule', catSpiD:'Rücken & Haltung', catHom:'Zuhause', catHomD:'Kein Gerät nötig',
-    catHot:'Hotel', catHotD:'Auf Reisen trainieren', catGym:'Fitnessstudio', catGymD:'Vollständiges Equipment',
-    catBoxD:'Kampfsport & Kondition', catMil:'Military', catMilD:'Taktisches Training', catCalD:'Körpergewicht & Street',
-    history:'Verlauf', profile:'Profil', back:'Zurück',
-    navHome:'Start', navProg:'Programme', navQuiz:'Quiz', navHist:'Verlauf', navProf:'Profil',
-    quizTitle:'Finde dein Programm', quizSub:'Beantworte 7 kurze Fragen',
-    q0:'Was beschreibt dich am besten?', q0m:'👨 Männlich', q0f:'👩 Weiblich', q0o:'🧑 Divers',
-    q1:'Wie alt bist du?', q2:'Wie ist deine Trainingserfahrung?',
-    q2b:'🟢 Anfänger (unter 1 Jahr)', q2i:'🟡 Fortgeschritten (1–3 Jahre)', q2a:'🔴 Erfahren (3+ Jahre)',
-    q3:'Was ist dein Hauptziel?', q3f:'🔥 Fettverbrennung', q3m:'💪 Muskelaufbau', q3s:'🦴 Rücken & Haltung',
-    q4:'Wo trainierst du hauptsächlich?', q4h:'🏠 Zuhause', q4g:'🏋️ Fitnessstudio', q4t:'🚛 LKW / Hotel', q4p:'🌳 Draußen',
-    q5:'Welches Equipment hast du?', q5n:'❌ Kein Equipment', q5d:'🏋️ Kurzhanteln', q5b:'🔴 Widerstandsbänder', q5f:'✅ Volles Studio',
-    q6:'Hast du gesundheitliche Einschränkungen?', q6n:'✅ Keine', q6b:'🦴 Rückenprobleme', q6k:'🦵 Knieprobleme', q6h:'❤️ Herzprobleme',
-    next:'Weiter →', btnResult:'Programm finden 🐉', resultTitle:'Dein empfohlenes Programm',
-    btnStartRec:'Programm starten 💪', btnLater:'Später entscheiden',
-    findProgram:'Programm finden', quizSub2:'Smart Quiz starten',
-    language:'Sprache', legal:'Rechtliches', logout:'Abmelden',
-    btnToday:'Heutiges Training starten 💪', selectLang:'Sprache auswählen',
-    empty:'Kein Verlauf', emptyDesc:'Starte dein erstes Training!',
-    warmup:'Warm-Up', main:'Haupttraining', cooldown:'Cool Down',
-    weeks:'Wochen', daysPerWeek:'Tage/Woche',
-    deleteConfirm:'Löschen?', deleted:'Gelöscht',
-    errorEmail:'Ungültige E-Mail oder Passwort.',
-    errorGeneral:'Ein Fehler ist aufgetreten.',
-    saved:'Gespeichert!', langDe:'Deutsch'
-  },
-  en: {
-    login:'Login', register:'Register', or:'or', googleBtn:'Continue with Google',
-    emailLabel:'Email', passwordLabel:'Password', nameLabel:'Name', createAccount:'Create Account',
-    discTitle:'Medical Disclaimer', discH1:'Important Notice',
-    discP1:'Golden Dragon Training provides general fitness information. Content does not replace medical advice.',
-    discH2:'Health Risks', discP2:'Consult a doctor before starting, especially with pre-existing conditions.',
-    discH3:'Personal Responsibility', discP3:'You train at your own risk.',
-    checkMedical:'I have read and accept the medical disclaimer.',
-    checkDsgvo:'I agree to the Privacy Policy (GDPR).',
-    btnAccept:'Accept & Continue',
-    greeting:'Welcome back', statW:'Workouts', statD:'Days', statM:'Minutes',
-    catTitle:'PROGRAMS', catBeg:'Beginners', catBegD:'Basics & Starters',
-    catInt:'Intermediate', catIntD:'Next Level', catAdv:'Advanced', catAdvD:'High Intensity',
-    catDrv:'Truck Drivers', catDrvD:'No equipment needed', catWom:'Women', catWomD:'Fat Loss & Toning',
-    catSpi:'Spine', catSpiD:'Back & Posture', catHom:'Home', catHomD:'No equipment needed',
-    catHot:'Hotel', catHotD:'Train while travelling', catGym:'Gym', catGymD:'Full equipment',
-    catBoxD:'Combat sports & conditioning', catMil:'Military', catMilD:'Tactical training', catCalD:'Bodyweight & Street',
-    history:'History', profile:'Profile', back:'Back',
-    navHome:'Home', navProg:'Programs', navQuiz:'Quiz', navHist:'History', navProf:'Profile',
-    quizTitle:'Find Your Program', quizSub:'Answer 7 short questions',
-    q0:'What describes you best?', q0m:'👨 Male', q0f:'👩 Female', q0o:'🧑 Other',
-    q1:'How old are you?', q2:'What is your training experience?',
-    q2b:'🟢 Beginner (under 1 year)', q2i:'🟡 Intermediate (1–3 years)', q2a:'🔴 Experienced (3+ years)',
-    q3:'What is your main goal?', q3f:'🔥 Fat Loss', q3m:'💪 Muscle Building', q3s:'🦴 Back & Posture',
-    q4:'Where do you mainly train?', q4h:'🏠 Home', q4g:'🏋️ Gym', q4t:'🚛 Truck / Hotel', q4p:'🌳 Outdoors',
-    q5:'What equipment do you have?', q5n:'❌ No equipment', q5d:'🏋️ Dumbbells', q5b:'🔴 Resistance Bands', q5f:'✅ Full Gym',
-    q6:'Do you have health limitations?', q6n:'✅ None', q6b:'🦴 Back problems', q6k:'🦵 Knee problems', q6h:'❤️ Heart problems',
-    next:'Next →', btnResult:'Find Program 🐉', resultTitle:'Your Recommended Program',
-    btnStartRec:'Start Program 💪', btnLater:'Decide Later',
-    findProgram:'Find Program', quizSub2:'Start Smart Quiz',
-    language:'Language', legal:'Legal', logout:'Sign Out',
-    btnToday:'Start Today\'s Workout 💪', selectLang:'Select Language',
-    empty:'No history', emptyDesc:'Start your first workout!',
-    warmup:'Warm-Up', main:'Main Workout', cooldown:'Cool Down',
-    weeks:'Weeks', daysPerWeek:'Days/Week',
-    errorEmail:'Invalid email or password.', errorGeneral:'An error occurred.',
-    saved:'Saved!', langDe:'German'
-  },
-  hr: {
-    login:'Prijava', register:'Registracija', or:'ili', googleBtn:'Nastavi s Googleom',
-    emailLabel:'E-mail', passwordLabel:'Lozinka', nameLabel:'Ime', createAccount:'Stvori račun',
-    discTitle:'Medicinska izjava o odricanju', discH1:'Važna napomena',
-    discP1:'Golden Dragon Training pruža opće fitnes informacije. Sadržaj ne zamjenjuje medicinski savjet.',
-    discH2:'Zdravstveni rizici', discP2:'Posavjetujte se s liječnikom prije početka, posebno ako imate zdravstvenih problema.',
-    discH3:'Osobna odgovornost', discP3:'Trenirate na vlastitu odgovornost.',
-    checkMedical:'Pročitao/la sam i prihvaćam medicinsku izjavu o odricanju.',
-    checkDsgvo:'Slažem se s Politikom privatnosti (GDPR).',
-    btnAccept:'Prihvati i nastavi',
-    greeting:'Dobrodošli natrag', statW:'Treninzi', statD:'Dani', statM:'Minute',
-    catTitle:'PROGRAMI', catBeg:'Početnici', catBegD:'Osnove i početak',
-    catInt:'Napredni', catIntD:'Sljedeća razina', catAdv:'Profesionalci', catAdvD:'Visoki intenzitet',
-    catDrv:'Vozači kamiona', catDrvD:'Bez opreme', catWom:'Žene', catWomD:'Gubitak masti & tonus',
-    catSpi:'Kralježnica', catSpiD:'Leđa & držanje', catHom:'Kod kuće', catHomD:'Bez opreme',
-    catHot:'Hotel', catHotD:'Trenirajte na putovanju', catGym:'Teretana', catGymD:'Puna oprema',
-    catBoxD:'Borilački sport & kondicija', catMil:'Vojska', catMilD:'Taktički trening', catCalD:'Težina tijela & ulica',
-    history:'Povijest', profile:'Profil', back:'Natrag',
-    navHome:'Početna', navProg:'Programi', navQuiz:'Quiz', navHist:'Povijest', navProf:'Profil',
-    quizTitle:'Pronađi svoj program', quizSub:'Odgovori na 7 kratkih pitanja',
-    q0:'Što te najbolje opisuje?', q0m:'👨 Muško', q0f:'👩 Žensko', q0o:'🧑 Ostalo',
-    q1:'Koliko imaš godina?', q2:'Kakvo je tvoje iskustvo s treningom?',
-    q2b:'🟢 Početnik (ispod 1 godine)', q2i:'🟡 Napredni (1–3 godine)', q2a:'🔴 Iskusan (3+ godine)',
-    q3:'Koji je tvoj glavni cilj?', q3f:'🔥 Gubitak masti', q3m:'💪 Izgradnja mišića', q3s:'🦴 Leđa & držanje',
-    q4:'Gdje uglavnom treniraš?', q4h:'🏠 Kod kuće', q4g:'🏋️ Teretana', q4t:'🚛 Kamion / Hotel', q4p:'🌳 Vani',
-    q5:'Kakvu opremu imaš?', q5n:'❌ Bez opreme', q5d:'🏋️ Bučice', q5b:'🔴 Elastične trake', q5f:'✅ Puna teretana',
-    q6:'Imaš li zdravstvenih ograničenja?', q6n:'✅ Nema', q6b:'🦴 Problemi s leđima', q6k:'🦵 Problemi s koljenom', q6h:'❤️ Srčani problemi',
-    next:'Dalje →', btnResult:'Pronađi program 🐉', resultTitle:'Preporučeni program',
-    btnStartRec:'Pokreni program 💪', btnLater:'Odluči kasnije',
-    findProgram:'Pronađi program', quizSub2:'Pokreni Smart Quiz',
-    language:'Jezik', legal:'Pravno', logout:'Odjava',
-    btnToday:'Pokreni današnji trening 💪', selectLang:'Odaberi jezik',
-    empty:'Nema povijesti', emptyDesc:'Pokreni prvi trening!',
-    warmup:'Zagrijavanje', main:'Glavni trening', cooldown:'Cool Down',
-    weeks:'Tjedna', daysPerWeek:'Dana/tjedan',
-    errorEmail:'Nevažeći email ili lozinka.', errorGeneral:'Došlo je do pogreške.',
-    saved:'Spremljeno!', langDe:'Njemački'
-  },
-  pl: {
-    login:'Zaloguj się', register:'Rejestracja', or:'lub', googleBtn:'Kontynuuj z Google',
-    greeting:'Witaj z powrotem', statW:'Treningi', statD:'Dni', statM:'Minuty',
-    catTitle:'PROGRAMY', history:'Historia', profile:'Profil', back:'Wróć',
-    navHome:'Start', navProg:'Programy', navQuiz:'Quiz', navHist:'Historia', navProf:'Profil',
-    logout:'Wyloguj', btnAccept:'Akceptuj i kontynuuj', selectLang:'Wybierz język',
-    checkMedical:'Przeczytałem/am i akceptuję zastrzeżenie medyczne.',
-    checkDsgvo:'Zgadzam się z Polityką prywatności (RODO).',
-    discTitle:'Zastrzeżenie medyczne', next:'Dalej →', btnToday:'Rozpocznij dzisiejszy trening 💪',
-    empty:'Brak historii', emptyDesc:'Rozpocznij pierwszy trening!',
-    warmup:'Rozgrzewka', main:'Trening główny', cooldown:'Cool Down',
-    weeks:'Tygodni', daysPerWeek:'Dni/tydzień',
-    errorEmail:'Nieprawidłowy email lub hasło.', errorGeneral:'Wystąpił błąd.',
-  },
-  ru: {
-    login:'Войти', register:'Регистрация', or:'или', googleBtn:'Войти через Google',
-    greeting:'Добро пожаловать', statW:'Тренировки', statD:'Дней', statM:'Минут',
-    catTitle:'ПРОГРАММЫ', history:'История', profile:'Профиль', back:'Назад',
-    navHome:'Главная', navProg:'Программы', navQuiz:'Тест', navHist:'История', navProf:'Профиль',
-    logout:'Выйти', btnAccept:'Принять и продолжить', selectLang:'Выбрать язык',
-    checkMedical:'Я прочитал(а) и принимаю медицинский отказ от ответственности.',
-    checkDsgvo:'Я согласен(а) с Политикой конфиденциальности.',
-    discTitle:'Медицинский отказ от ответственности', next:'Далее →', btnToday:'Начать сегодняшнюю тренировку 💪',
-    empty:'Нет истории', emptyDesc:'Начните первую тренировку!',
-    warmup:'Разминка', main:'Основная тренировка', cooldown:'Cool Down',
-    weeks:'Недель', daysPerWeek:'Дней/неделю',
-    errorEmail:'Неверный email или пароль.', errorGeneral:'Произошла ошибка.',
-  },
-  tr: {
-    login:'Giriş', register:'Kayıt Ol', or:'veya', googleBtn:'Google ile devam et',
-    greeting:'Tekrar hoş geldiniz', statW:'Antrenman', statD:'Gün', statM:'Dakika',
-    catTitle:'PROGRAMLAR', history:'Geçmiş', profile:'Profil', back:'Geri',
-    navHome:'Ana', navProg:'Programlar', navQuiz:'Quiz', navHist:'Geçmiş', navProf:'Profil',
-    logout:'Çıkış', btnAccept:'Kabul Et ve Devam Et', selectLang:'Dil Seç',
-    checkMedical:'Tıbbi sorumluluk reddi beyanını okudum ve kabul ediyorum.',
-    checkDsgvo:'Gizlilik Politikasını (GDPR) kabul ediyorum.',
-    discTitle:'Tıbbi Sorumluluk Reddi', next:'İleri →', btnToday:'Bugünkü antrenmanı başlat 💪',
-    empty:'Geçmiş yok', emptyDesc:'İlk antrenmanınızı başlatın!',
-    warmup:'Isınma', main:'Ana Antrenman', cooldown:'Cool Down',
-    weeks:'Hafta', daysPerWeek:'Gün/hafta',
-    errorEmail:'Geçersiz e-posta veya şifre.', errorGeneral:'Bir hata oluştu.',
-  }
+  de: { login:'Anmelden', register:'Registrieren', or:'oder', googleBtn:'Mit Google anmelden', emailLabel:'E-Mail', passwordLabel:'Passwort', nameLabel:'Name', createAccount:'Konto erstellen', discTitle:'Medizinischer Haftungsausschluss', discH1:'Wichtiger Hinweis', discP1:'Golden Dragon Training bietet allgemeine Fitnessinformationen. Die Inhalte ersetzen keine medizinische Beratung.', discH2:'Gesundheitliche Risiken', discP2:'Konsultieren Sie vor Beginn einen Arzt, insbesondere bei Vorerkrankungen.', discH3:'Eigenverantwortung', discP3:'Sie trainieren auf eigene Verantwortung.', checkMedical:'Ich habe den medizinischen Haftungsausschluss gelesen und akzeptiere ihn.', checkDsgvo:'Ich stimme der Datenschutzerklärung (DSGVO) zu.', btnAccept:'Zustimmen & Weiter', greeting:'Willkommen zurück', statW:'Trainings', statD:'Tage', statM:'Minuten', catTitle:'PROGRAMME', catBeg:'Anfänger', catBegD:'Grundlagen & Einsteiger', catInt:'Fortgeschritten', catIntD:'Nächste Stufe', catAdv:'Profi', catAdvD:'Hochintensiv', catDrv:'LKW-Fahrer', catDrvD:'Ohne Geräte möglich', catWom:'Frauen', catWomD:'Fettverbrennung & Straffung', catSpi:'Wirbelsäule', catSpiD:'Rücken & Haltung', catHom:'Zuhause', catHomD:'Kein Gerät nötig', catHot:'Hotel', catHotD:'Auf Reisen trainieren', catGym:'Fitnessstudio', catGymD:'Vollständiges Equipment', catBoxD:'Kampfsport & Kondition', catMil:'Military', catMilD:'Taktisches Training', catCalD:'Körpergewicht & Street', history:'Verlauf', profile:'Profil', back:'Zurück', navHome:'Start', navProg:'Programme', navQuiz:'Quiz', navHist:'Verlauf', navProf:'Profil', quizTitle:'Finde dein Programm', quizSub:'Beantworte 7 kurze Fragen', q0:'Was beschreibt dich am besten?', q0m:'👨 Männlich', q0f:'👩 Weiblich', q0o:'🧑 Divers', q1:'Wie alt bist du?', q2:'Wie ist deine Trainingserfahrung?', q2b:'🟢 Anfänger (unter 1 Jahr)', q2i:'🟡 Fortgeschritten (1–3 Jahre)', q2a:'🔴 Erfahren (3+ Jahre)', q3:'Was ist dein Hauptziel?', q3f:'🔥 Fettverbrennung', q3m:'💪 Muskelaufbau', q3s:'🦴 Rücken & Haltung', q4:'Wo trainierst du hauptsächlich?', q4h:'🏠 Zuhause', q4g:'🏋️ Fitnessstudio', q4t:'🚛 LKW / Hotel', q4p:'🌳 Draußen', q5:'Welches Equipment hast du?', q5n:'❌ Kein Equipment', q5d:'🏋️ Kurzhanteln', q5b:'🔴 Widerstandsbänder', q5f:'✅ Volles Studio', q6:'Hast du gesundheitliche Einschränkungen?', q6n:'✅ Keine', q6b:'🦴 Rückenprobleme', q6k:'🦵 Knieprobleme', q6h:'❤️ Herzprobleme', next:'Weiter →', btnResult:'Programm finden 🐉', resultTitle:'Dein empfohlenes Programm', btnStartRec:'Programm starten 💪', btnLater:'Später entscheiden', findProgram:'Programm finden', quizSub2:'Smart Quiz starten', language:'Sprache', legal:'Rechtliches', logout:'Abmelden', btnToday:'Heutiges Training starten 💪', selectLang:'Sprache auswählen', empty:'Kein Verlauf', emptyDesc:'Starte dein erstes Training!', warmup:'Warm-Up', main:'Haupttraining', cooldown:'Cool Down', weeks:'Wochen', daysPerWeek:'Tage/Woche', deleted:'Gelöscht', errorEmail:'Ungültige E-Mail oder Passwort.', errorGeneral:'Ein Fehler ist aufgetreten.', saved:'Gespeichert!' },
+  en: { login:'Login', register:'Register', or:'or', googleBtn:'Continue with Google', emailLabel:'Email', passwordLabel:'Password', nameLabel:'Name', createAccount:'Create Account', discTitle:'Medical Disclaimer', checkMedical:'I have read and accept the medical disclaimer.', checkDsgvo:'I agree to the Privacy Policy (GDPR).', btnAccept:'Accept & Continue', greeting:'Welcome back', statW:'Workouts', statD:'Days', statM:'Minutes', catTitle:'PROGRAMS', catBeg:'Beginners', catBegD:'Basics & Starters', catInt:'Intermediate', catIntD:'Next Level', catAdv:'Advanced', catAdvD:'High Intensity', catDrv:'Truck Drivers', catDrvD:'No equipment needed', catWom:'Women', catWomD:'Fat Loss & Toning', catSpi:'Spine', catSpiD:'Back & Posture', catHom:'Home', catHomD:'No equipment needed', catHot:'Hotel', catHotD:'Train while travelling', catGym:'Gym', catGymD:'Full equipment', catBoxD:'Combat sports & conditioning', catMil:'Military', catMilD:'Tactical training', catCalD:'Bodyweight & Street', history:'History', profile:'Profile', back:'Back', navHome:'Home', navProg:'Programs', navQuiz:'Quiz', navHist:'History', navProf:'Profile', quizTitle:'Find Your Program', quizSub:'Answer 7 short questions', q0:'What describes you best?', q0m:'👨 Male', q0f:'👩 Female', q0o:'🧑 Other', q1:'How old are you?', q2:'What is your training experience?', q2b:'🟢 Beginner (under 1 year)', q2i:'🟡 Intermediate (1–3 years)', q2a:'🔴 Experienced (3+ years)', q3:'What is your main goal?', q3f:'🔥 Fat Loss', q3m:'💪 Muscle Building', q3s:'🦴 Back & Posture', q4:'Where do you mainly train?', q4h:'🏠 Home', q4g:'🏋️ Gym', q4t:'🚛 Truck / Hotel', q4p:'🌳 Outdoors', q5:'What equipment do you have?', q5n:'❌ No equipment', q5d:'🏋️ Dumbbells', q5b:'🔴 Resistance Bands', q5f:'✅ Full Gym', q6:'Do you have health limitations?', q6n:'✅ None', q6b:'🦴 Back problems', q6k:'🦵 Knee problems', q6h:'❤️ Heart problems', next:'Next →', btnResult:'Find Program 🐉', resultTitle:'Your Recommended Program', btnStartRec:'Start Program 💪', btnLater:'Decide Later', findProgram:'Find Program', quizSub2:'Start Smart Quiz', language:'Language', legal:'Legal', logout:'Sign Out', btnToday:"Start Today's Workout 💪", selectLang:'Select Language', empty:'No history', emptyDesc:'Start your first workout!', warmup:'Warm-Up', main:'Main Workout', cooldown:'Cool Down', weeks:'Weeks', daysPerWeek:'Days/Week', deleted:'Deleted', errorEmail:'Invalid email or password.', errorGeneral:'An error occurred.', saved:'Saved!' },
+  hr: { login:'Prijava', register:'Registracija', or:'ili', googleBtn:'Nastavi s Googleom', emailLabel:'E-mail', passwordLabel:'Lozinka', nameLabel:'Ime', createAccount:'Stvori račun', discTitle:'Medicinska izjava', checkMedical:'Pročitao/la sam i prihvaćam medicinsku izjavu.', checkDsgvo:'Slažem se s Politikom privatnosti.', btnAccept:'Prihvati i nastavi', greeting:'Dobrodošli natrag', statW:'Treninzi', statD:'Dani', statM:'Minute', catTitle:'PROGRAMI', catBeg:'Početnici', catBegD:'Osnove i početak', catInt:'Napredni', catIntD:'Sljedeća razina', catAdv:'Profesionalci', catAdvD:'Visoki intenzitet', catDrv:'Vozači kamiona', catDrvD:'Bez opreme', catWom:'Žene', catWomD:'Gubitak masti & tonus', catSpi:'Kralježnica', catSpiD:'Leđa & držanje', catHom:'Kod kuće', catHomD:'Bez opreme', catHot:'Hotel', catHotD:'Trenirajte na putovanju', catGym:'Teretana', catGymD:'Puna oprema', catBoxD:'Borilački sport', catMil:'Vojska', catMilD:'Taktički trening', catCalD:'Težina tijela', history:'Povijest', profile:'Profil', back:'Natrag', navHome:'Početna', navProg:'Programi', navQuiz:'Quiz', navHist:'Povijest', navProf:'Profil', quizTitle:'Pronađi program', quizSub:'Odgovori 7 pitanja', q0:'Što te opisuje?', q0m:'👨 Muško', q0f:'👩 Žensko', q0o:'🧑 Ostalo', q1:'Koliko imaš godina?', q2:'Iskustvo s treningom?', q2b:'🟢 Početnik', q2i:'🟡 Napredni', q2a:'🔴 Iskusan', q3:'Glavni cilj?', q3f:'🔥 Gubitak masti', q3m:'💪 Mišići', q3s:'🦴 Leđa', q4:'Gdje treniraš?', q4h:'🏠 Kod kuće', q4g:'🏋️ Teretana', q4t:'🚛 Kamion/Hotel', q4p:'🌳 Vani', q5:'Oprema?', q5n:'❌ Nema', q5d:'🏋️ Bučice', q5b:'🔴 Trake', q5f:'✅ Puna teretana', q6:'Zdravstvena ograničenja?', q6n:'✅ Nema', q6b:'🦴 Leđa', q6k:'🦵 Koljeno', q6h:'❤️ Srce', next:'Dalje →', btnResult:'Pronađi program 🐉', resultTitle:'Preporučeni program', btnStartRec:'Pokreni program 💪', btnLater:'Odluči kasnije', findProgram:'Pronađi program', quizSub2:'Smart Quiz', language:'Jezik', legal:'Pravno', logout:'Odjava', btnToday:'Pokreni trening 💪', selectLang:'Odaberi jezik', empty:'Nema povijesti', emptyDesc:'Pokreni prvi trening!', warmup:'Zagrijavanje', main:'Glavni trening', cooldown:'Cool Down', weeks:'Tjedna', daysPerWeek:'Dana/tjedan', deleted:'Obrisano', errorEmail:'Pogrešan email ili lozinka.', errorGeneral:'Došlo je do pogreške.', saved:'Spremljeno!' },
+  pl: { login:'Zaloguj', register:'Rejestracja', or:'lub', googleBtn:'Kontynuuj z Google', checkMedical:'Przeczytałem zastrzeżenie medyczne.', checkDsgvo:'Zgadzam się z Polityką prywatności.', btnAccept:'Akceptuj i kontynuuj', greeting:'Witaj z powrotem', statW:'Treningi', statD:'Dni', statM:'Minuty', catTitle:'PROGRAMY', history:'Historia', profile:'Profil', back:'Wróć', navHome:'Start', navProg:'Programy', navQuiz:'Quiz', navHist:'Historia', navProf:'Profil', logout:'Wyloguj', next:'Dalej →', btnToday:'Rozpocznij trening 💪', selectLang:'Wybierz język', empty:'Brak historii', emptyDesc:'Rozpocznij trening!', warmup:'Rozgrzewka', main:'Trening', cooldown:'Cool Down', weeks:'Tygodni', daysPerWeek:'Dni/tydzień', deleted:'Usunięto', errorEmail:'Nieprawidłowy email.', errorGeneral:'Wystąpił błąd.', saved:'Zapisano!' },
+  ru: { login:'Войти', register:'Регистрация', or:'или', googleBtn:'Войти через Google', checkMedical:'Я принимаю медицинский отказ.', checkDsgvo:'Я согласен с Политикой конфиденциальности.', btnAccept:'Принять и продолжить', greeting:'Добро пожаловать', statW:'Тренировки', statD:'Дней', statM:'Минут', catTitle:'ПРОГРАММЫ', history:'История', profile:'Профиль', back:'Назад', navHome:'Главная', navProg:'Программы', navQuiz:'Тест', navHist:'История', navProf:'Профиль', logout:'Выйти', next:'Далее →', btnToday:'Начать тренировку 💪', selectLang:'Выбрать язык', empty:'Нет истории', emptyDesc:'Начните тренировку!', warmup:'Разминка', main:'Тренировка', cooldown:'Cool Down', weeks:'Недель', daysPerWeek:'Дней/нед.', deleted:'Удалено', errorEmail:'Неверный email.', errorGeneral:'Произошла ошибка.', saved:'Сохранено!' },
+  tr: { login:'Giriş', register:'Kayıt Ol', or:'veya', googleBtn:'Google ile devam et', checkMedical:'Tıbbi sorumluluk reddi beyanını kabul ediyorum.', checkDsgvo:'Gizlilik Politikasını kabul ediyorum.', btnAccept:'Kabul Et ve Devam Et', greeting:'Tekrar hoş geldiniz', statW:'Antrenman', statD:'Gün', statM:'Dakika', catTitle:'PROGRAMLAR', history:'Geçmiş', profile:'Profil', back:'Geri', navHome:'Ana', navProg:'Programlar', navQuiz:'Quiz', navHist:'Geçmiş', navProf:'Profil', logout:'Çıkış', next:'İleri →', btnToday:'Antrenmanı başlat 💪', selectLang:'Dil Seç', empty:'Geçmiş yok', emptyDesc:'İlk antrenmanı başlat!', warmup:'Isınma', main:'Antrenman', cooldown:'Cool Down', weeks:'Hafta', daysPerWeek:'Gün/hafta', deleted:'Silindi', errorEmail:'Geçersiz e-posta.', errorGeneral:'Bir hata oluştu.', saved:'Kaydedildi!' }
 };
 
-// ─── PROGRAMS DATA ───────────────────────────────────────────────
 const PROGRAMS = [
-  {
-    id: 'truck-driver-beginner',
-    category: 'drivers',
-    icon: '🚛',
-    nameKey: 'Truck Driver Beginner – 3 Monate',
-    level: 'Anfänger',
-    weeks: 12,
-    daysPerWeek: 3,
-    equipment: 'Kein Gerät',
-    goal: 'Gesundheit & Mobilität',
-    phases: [
-      {
-        name: 'Phase 1 – Fundament', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 (Mo)', warmup: [{name:'Neck Rolls',detail:'2×10'},{name:'Shoulder Circles',detail:'2×10'},{name:'Hip Circles',detail:'2×10'},{name:'Leg Swings',detail:'2×10 je Seite'}], main: [{name:'Wall Push-Up',detail:'3×15'},{name:'Bodyweight Squat',detail:'3×15'},{name:'Standing Back Extension',detail:'3×12'},{name:'Plank',detail:'3×20 Sek.'},{name:'Standing Calf Raise',detail:'3×20'}], cooldown: [{name:'Child\'s Pose',detail:'30 Sek.'},{name:'Cat-Cow Stretch',detail:'10 Wdh.'},{name:'Standing Quad Stretch',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 2 (Mi)', warmup: [{name:'Arm Circles',detail:'2×10'},{name:'Torso Rotation',detail:'2×10'},{name:'March in Place',detail:'60 Sek.'}], main: [{name:'Incline Push-Up',detail:'3×12'},{name:'Reverse Lunge',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×15'},{name:'Side Plank',detail:'2×20 Sek. je Seite'},{name:'Dead Bug',detail:'3×8 je Seite'}], cooldown: [{name:'Pigeon Pose',detail:'30 Sek. je Seite'},{name:'Doorway Chest Stretch',detail:'30 Sek.'},{name:'Seated Forward Fold',detail:'30 Sek.'}] },
-          { day: 'Tag 3 (Fr)', warmup: [{name:'Jumping Jacks',detail:'30 Sek.'},{name:'Hip Flexor Stretch',detail:'20 Sek. je Seite'},{name:'Spiderman Stretch',detail:'5 je Seite'}], main: [{name:'Diamond Push-Up',detail:'3×10'},{name:'Step-Up (Stufe/Trittbrett)',detail:'3×12 je Seite'},{name:'Superman Hold',detail:'3×10'},{name:'Mountain Climber',detail:'3×20 Sek.'},{name:'Calf Raise (einbeinig)',detail:'2×15 je Seite'}], cooldown: [{name:'Downward Dog',detail:'30 Sek.'},{name:'Thread the Needle',detail:'20 Sek. je Seite'},{name:'Lying Hip Stretch',detail:'30 Sek. je Seite'}] }
-        ]
-      },
-      {
-        name: 'Phase 2 – Aufbau', weeks: '5-8',
-        workouts: [
-          { day: 'Tag 1 (Mo)', warmup: [{name:'World\'s Greatest Stretch',detail:'5 je Seite'},{name:'Inchworm',detail:'5 Wdh.'},{name:'Hip Circle',detail:'10 je Seite'}], main: [{name:'Push-Up',detail:'4×12'},{name:'Bulgarian Split Squat (Stuhl)',detail:'3×10 je Seite'},{name:'Dumbbell Row (Koffer)',detail:'3×12 je Seite'},{name:'Plank Shoulder Tap',detail:'3×10 je Seite'},{name:'Tricep Dip (Stuhl)',detail:'3×12'}], cooldown: [{name:'Chest Opener',detail:'30 Sek.'},{name:'Hip Flexor Lunge Stretch',detail:'30 Sek. je Seite'},{name:'Seated Spinal Twist',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 2 (Mi)', warmup: [{name:'Leg Swings',detail:'10 je Seite'},{name:'Arm Cross Stretch',detail:'10 je Seite'},{name:'Ankle Circles',detail:'10 je Seite'}], main: [{name:'Wide Push-Up',detail:'4×10'},{name:'Reverse Lunge + Knee Drive',detail:'3×10 je Seite'},{name:'Glute Bridge March',detail:'3×12 je Seite'},{name:'Side Plank Hip Dip',detail:'3×10 je Seite'},{name:'Bear Crawl',detail:'3×20 Sek.'}], cooldown: [{name:'Cobra Stretch',detail:'30 Sek.'},{name:'Figure-4 Stretch',detail:'30 Sek. je Seite'},{name:'Neck Side Stretch',detail:'20 Sek. je Seite'}] },
-          { day: 'Tag 3 (Fr)', warmup: [{name:'High Knees',detail:'30 Sek.'},{name:'Butt Kicks',detail:'30 Sek.'},{name:'Torso Rotation',detail:'10 je Seite'}], main: [{name:'Decline Push-Up (Bett)',detail:'3×10'},{name:'Pistol Squat Assist',detail:'3×8 je Seite'},{name:'Superman Pulls',detail:'3×12'},{name:'Mountain Climber',detail:'3×30 Sek.'},{name:'Jump Squat (leise)',detail:'3×10'}], cooldown: [{name:'Forward Fold',detail:'45 Sek.'},{name:'Pigeon Pose',detail:'45 Sek. je Seite'},{name:'Child\'s Pose',detail:'45 Sek.'}] }
-        ]
-      },
-      {
-        name: 'Phase 3 – Stärke', weeks: '9-12',
-        workouts: [
-          { day: 'Tag 1 (Mo)', warmup: [{name:'Dynamic Lunge Stretch',detail:'5 je Seite'},{name:'Arm Swing',detail:'10 je Seite'},{name:'Jumping Jack',detail:'30 Sek.'}], main: [{name:'Push-Up Pyramid',detail:'1-2-3-2-1'},{name:'Single-Leg Squat',detail:'3×8 je Seite'},{name:'Plank-to-Downward Dog',detail:'3×10'},{name:'Side Plank + Hip Raise',detail:'3×10 je Seite'},{name:'Tricep Push-Up',detail:'3×10'}], cooldown: [{name:'Full Body Stretch',detail:'2 Min.'},{name:'Deep Breathing',detail:'1 Min.'}] },
-          { day: 'Tag 2 (Mi)', warmup: [{name:'Inchworm to Push-Up',detail:'5 Wdh.'},{name:'Hip Flexor Stretch',detail:'20 Sek.'},{name:'March in Place',detail:'60 Sek.'}], main: [{name:'Diamond Push-Up',detail:'4×12'},{name:'Lateral Lunge',detail:'3×12 je Seite'},{name:'Reverse Hyper Extension',detail:'3×15'},{name:'Dead Bug',detail:'3×10 je Seite'},{name:'Explosive Push-Up',detail:'3×8'}], cooldown: [{name:'Doorway Stretch',detail:'30 Sek.'},{name:'Seated Forward Fold',detail:'45 Sek.'},{name:'Lying Hip Rotation',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 3 (Fr)', warmup: [{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Arm Circle',detail:'10 je Seite'}], main: [{name:'Push-Up Combo',detail:'3×10+5+5'},{name:'Jump Squat',detail:'3×12'},{name:'Superman + Row',detail:'3×12'},{name:'Plank Combo',detail:'3×45 Sek.'},{name:'Burpee (angepasst)',detail:'3×8'}], cooldown: [{name:'Child\'s Pose',detail:'45 Sek.'},{name:'Pigeon Pose',detail:'45 Sek. je Seite'},{name:'Spinal Twist',detail:'30 Sek. je Seite'}] }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'golden-dragon-beginner',
-    category: 'beginners',
-    icon: '🐉',
-    nameKey: 'Golden Dragon Beginner – 3 Monate',
-    level: 'Anfänger',
-    weeks: 12,
-    daysPerWeek: 3,
-    equipment: 'Kurzhanteln optional',
-    goal: 'Muskelaufbau & Fitness',
-    phases: [
-      {
-        name: 'Phase 1 – Grundlagen', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 – Oberkörper', warmup: [{name:'Arm Circles',detail:'2×20'},{name:'Shoulder Rolls',detail:'2×15'},{name:'Chest Opener',detail:'30 Sek.'}], main: [{name:'Push-Up',detail:'3×10'},{name:'Dumbbell Row',detail:'3×10 je Seite'},{name:'Dumbbell Shoulder Press',detail:'3×10'},{name:'Bicep Curl',detail:'3×12'},{name:'Tricep Kickback',detail:'3×12'}], cooldown: [{name:'Doorway Chest Stretch',detail:'30 Sek.'},{name:'Cross-Body Shoulder Stretch',detail:'20 Sek. je Seite'},{name:'Tricep Stretch',detail:'20 Sek. je Seite'}] },
-          { day: 'Tag 2 – Unterkörper', warmup: [{name:'Leg Swings',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Bodyweight Squat',detail:'10 Wdh.'}], main: [{name:'Goblet Squat',detail:'3×12'},{name:'Romanian Deadlift',detail:'3×10'},{name:'Reverse Lunge',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×15'},{name:'Calf Raise',detail:'3×20'}], cooldown: [{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek. je Seite'},{name:'Calf Stretch',detail:'20 Sek. je Seite'}] },
-          { day: 'Tag 3 – Core & Cardio', warmup: [{name:'High Knees',detail:'30 Sek.'},{name:'Jumping Jacks',detail:'30 Sek.'},{name:'Torso Rotation',detail:'10 je Seite'}], main: [{name:'Plank',detail:'3×30 Sek.'},{name:'Dead Bug',detail:'3×10 je Seite'},{name:'Bicycle Crunch',detail:'3×15 je Seite'},{name:'Mountain Climber',detail:'3×30 Sek.'},{name:'Burpee',detail:'3×8'}], cooldown: [{name:'Child\'s Pose',detail:'45 Sek.'},{name:'Cobra Stretch',detail:'30 Sek.'},{name:'Seated Spinal Twist',detail:'30 Sek. je Seite'}] }
-        ]
-      },
-      {
-        name: 'Phase 2 – Progression', weeks: '5-8',
-        workouts: [
-          { day: 'Tag 1 – Push', warmup: [{name:'Band Pull-Apart',detail:'2×15'},{name:'Shoulder Circle',detail:'2×10'},{name:'Push-Up Hold',detail:'3 Wdh.'}], main: [{name:'Dumbbell Bench Press',detail:'4×10'},{name:'Incline Dumbbell Press',detail:'3×10'},{name:'Lateral Raise',detail:'3×12'},{name:'Overhead Press',detail:'3×10'},{name:'Tricep Dip',detail:'3×12'}], cooldown: [{name:'Pec Stretch',detail:'30 Sek. je Seite'},{name:'Overhead Tricep Stretch',detail:'20 Sek. je Seite'},{name:'Child\'s Pose',detail:'30 Sek.'}] },
-          { day: 'Tag 2 – Pull & Legs', warmup: [{name:'Cat-Cow',detail:'10 Wdh.'},{name:'Inchworm',detail:'5 Wdh.'},{name:'Hip Flexor Stretch',detail:'20 Sek.'}], main: [{name:'Dumbbell Row',detail:'4×10 je Seite'},{name:'Renegade Row',detail:'3×8 je Seite'},{name:'Romanian Deadlift',detail:'4×10'},{name:'Bulgarian Split Squat',detail:'3×10 je Seite'},{name:'Bicep Curl',detail:'3×12'}], cooldown: [{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Pigeon Pose',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 3 – Core & HIIT', warmup: [{name:'Jumping Jack',detail:'30 Sek.'},{name:'High Knee',detail:'30 Sek.'},{name:'Butt Kick',detail:'30 Sek.'}], main: [{name:'Weighted Plank',detail:'3×40 Sek.'},{name:'Russian Twist',detail:'3×15 je Seite'},{name:'Leg Raise',detail:'3×12'},{name:'HIIT: Jump Squat',detail:'4×20 Sek.'},{name:'HIIT: Mountain Climber',detail:'4×20 Sek.'}], cooldown: [{name:'Forward Fold',detail:'45 Sek.'},{name:'Cobra',detail:'30 Sek.'},{name:'Spinal Twist',detail:'30 Sek. je Seite'}] }
-        ]
-      },
-      {
-        name: 'Phase 3 – Stärke & Definition', weeks: '9-12',
-        workouts: [
-          { day: 'Tag 1 – Heavy Upper', warmup: [{name:'Band Activation',detail:'2×15'},{name:'Arm Swing',detail:'2×15'},{name:'Push-Up Warm-Up',detail:'10 Wdh.'}], main: [{name:'Dumbbell Press',detail:'4×8'},{name:'Arnold Press',detail:'3×10'},{name:'Bent-Over Row',detail:'4×8 je Seite'},{name:'Hammer Curl',detail:'3×10'},{name:'Skull Crusher',detail:'3×10'}], cooldown: [{name:'Chest Stretch',detail:'30 Sek.'},{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Deep Breathing',detail:'1 Min.'}] },
-          { day: 'Tag 2 – Heavy Lower', warmup: [{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Bodyweight Squat',detail:'15 Wdh.'}], main: [{name:'Dumbbell Squat',detail:'4×10'},{name:'Romanian Deadlift',detail:'4×10'},{name:'Walking Lunge',detail:'3×12 je Seite'},{name:'Single-Leg Glute Bridge',detail:'3×12 je Seite'},{name:'Standing Calf Raise',detail:'4×20'}], cooldown: [{name:'Quad Stretch',detail:'30 Sek.'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Figure-4 Stretch',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 3 – Core & Cardio', warmup: [{name:'High Knees',detail:'45 Sek.'},{name:'Jumping Jacks',detail:'45 Sek.'},{name:'Arm Circle',detail:'10 je Seite'}], main: [{name:'Plank Variations',detail:'4×45 Sek.'},{name:'Ab Wheel / Dragon Flag Assist',detail:'3×8'},{name:'Bicycle Crunch',detail:'3×20 je Seite'},{name:'HIIT Circuit',detail:'5 Runden × 30 Sek.'},{name:'Burpee',detail:'3×10'}], cooldown: [{name:'Full Body Stretch',detail:'3 Min.'},{name:'Meditation Breathing',detail:'1 Min.'}] }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'spine-posture',
-    category: 'spine',
-    icon: '🦴',
-    nameKey: 'Spine & Posture – 3 Monate',
-    level: 'Alle Level',
-    weeks: 12,
-    daysPerWeek: 4,
-    equipment: 'Matte, Widerstandsband',
-    goal: 'Rückengesundheit & Haltung',
-    phases: [
-      {
-        name: 'Phase 1 – Mobilität & Aktivierung', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 – Oberer Rücken', warmup: [{name:'Cat-Cow',detail:'2×10'},{name:'Neck Roll',detail:'2×8'},{name:'Chest Opener',detail:'30 Sek.'}], main: [{name:'Wall Angel',detail:'3×12'},{name:'Band Pull-Apart',detail:'3×15'},{name:'Prone Y-T-W',detail:'3×10 je'},{name:'Chin Tuck',detail:'3×15'},{name:'Seated Row (Band)',detail:'3×15'}], cooldown: [{name:'Doorway Stretch',detail:'30 Sek.'},{name:'Upper Trap Stretch',detail:'20 Sek. je Seite'},{name:'Thread the Needle',detail:'20 Sek. je Seite'}] },
-          { day: 'Tag 2 – Unterer Rücken', warmup: [{name:'Hip Circle',detail:'10 je Seite'},{name:'Pelvic Tilt',detail:'2×10'},{name:'Glute Activation',detail:'10 Knirschen'}], main: [{name:'Bird Dog',detail:'3×10 je Seite'},{name:'Dead Bug',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×15'},{name:'Superman Hold',detail:'3×10'},{name:'Clamshell',detail:'3×15 je Seite'}], cooldown: [{name:'Child\'s Pose',detail:'45 Sek.'},{name:'Pigeon Pose',detail:'30 Sek. je Seite'},{name:'Knee-to-Chest',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 3 – Core Stability', warmup: [{name:'March in Place',detail:'60 Sek.'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Flexor Stretch',detail:'20 Sek.'}], main: [{name:'Plank',detail:'3×30 Sek.'},{name:'Side Plank',detail:'3×20 Sek. je Seite'},{name:'Pallof Press (Band)',detail:'3×12 je Seite'},{name:'Dead Bug',detail:'3×8 je Seite'},{name:'Hollow Body Hold',detail:'3×20 Sek.'}], cooldown: [{name:'Seated Forward Fold',detail:'45 Sek.'},{name:'Cobra',detail:'30 Sek.'},{name:'Spinal Twist',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 4 – Mobility Day', warmup: [{name:'Full Body Roll-Out',detail:'5 Min.'},{name:'Breathing Exercise',detail:'2 Min.'}], main: [{name:'Hip 90/90 Stretch',detail:'2 Min. je Seite'},{name:'Thoracic Extension (Rolle)',detail:'2 Min.'},{name:'Doorway Chest Stretch',detail:'3×30 Sek.'},{name:'Hamstring Stretch',detail:'3×30 Sek. je Seite'},{name:'Piriformis Stretch',detail:'3×30 Sek. je Seite'}], cooldown: [{name:'Savasana',detail:'3 Min.'},{name:'Deep Breathing',detail:'2 Min.'}] }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'women-fatloss',
-    category: 'women',
-    icon: '👩',
-    nameKey: 'Women Fat Loss & Conditioning – 3 Monate',
-    level: 'Anfänger bis Mittel',
-    weeks: 12,
-    daysPerWeek: 4,
-    equipment: 'Kurzhanteln, Widerstandsband',
-    goal: 'Fettverbrennung & Straffung',
-    phases: [
-      {
-        name: 'Phase 1 – Aktivierung', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 – Lower Body', warmup: [{name:'Hip Circle',detail:'10 je Seite'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Bodyweight Squat',detail:'10 Wdh.'}], main: [{name:'Goblet Squat',detail:'3×15'},{name:'Reverse Lunge',detail:'3×12 je Seite'},{name:'Glute Bridge',detail:'3×20'},{name:'Lateral Band Walk',detail:'3×15 je Seite'},{name:'Calf Raise',detail:'3×20'}], cooldown: [{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Pigeon Pose',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 2 – Upper Body', warmup: [{name:'Arm Circle',detail:'2×10'},{name:'Shoulder Roll',detail:'2×10'},{name:'Cat-Cow',detail:'10 Wdh.'}], main: [{name:'Push-Up (angepasst)',detail:'3×12'},{name:'Dumbbell Row',detail:'3×12 je Seite'},{name:'Lateral Raise',detail:'3×12'},{name:'Bicep Curl',detail:'3×15'},{name:'Tricep Extension',detail:'3×15'}], cooldown: [{name:'Chest Stretch',detail:'30 Sek.'},{name:'Shoulder Stretch',detail:'20 Sek. je Seite'},{name:'Child\'s Pose',detail:'30 Sek.'}] },
-          { day: 'Tag 3 – Cardio & Core', warmup: [{name:'Jumping Jack',detail:'30 Sek.'},{name:'High Knee',detail:'30 Sek.'},{name:'Butt Kick',detail:'30 Sek.'}], main: [{name:'Plank',detail:'3×30 Sek.'},{name:'Russian Twist',detail:'3×15 je Seite'},{name:'HIIT: Squat Jump',detail:'4×20 Sek.'},{name:'HIIT: Mountain Climber',detail:'4×20 Sek.'},{name:'HIIT: Jump Lunge',detail:'3×15 Sek.'}], cooldown: [{name:'Forward Fold',detail:'45 Sek.'},{name:'Cobra',detail:'30 Sek.'},{name:'Seated Twist',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 4 – Full Body', warmup: [{name:'World\'s Greatest Stretch',detail:'5 je Seite'},{name:'Inchworm',detail:'5 Wdh.'}], main: [{name:'Dumbbell Deadlift',detail:'3×12'},{name:'Push-Up',detail:'3×10'},{name:'Sumo Squat',detail:'3×15'},{name:'Band Row',detail:'3×15'},{name:'Burpee (angepasst)',detail:'3×8'}], cooldown: [{name:'Full Body Stretch',detail:'3 Min.'},{name:'Deep Breathing',detail:'1 Min.'}] }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'boxing-mma',
-    category: 'boxing',
-    icon: '🥊',
-    nameKey: 'Boxing Fitness & MMA Conditioning – 3 Monate',
-    level: 'Anfänger bis Mittel',
-    weeks: 12,
-    daysPerWeek: 4,
-    equipment: 'Handschuhe optional',
-    goal: 'Kondition & Kampfkraft',
-    phases: [
-      {
-        name: 'Phase 1 – Basics & Kondition', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 – Technik & Footwork', warmup: [{name:'Jump Rope',detail:'3 Min.'},{name:'Neck Roll',detail:'2×10'},{name:'Shoulder Rotation',detail:'2×10'}], main: [{name:'Jab-Cross (Luft)',detail:'4×2 Min. (30 Sek. Pause)'},{name:'Jab-Cross-Hook (Luft)',detail:'3×2 Min.'},{name:'Footwork Drill: In-Out',detail:'3×90 Sek.'},{name:'Push-Up',detail:'3×15'},{name:'Sprawl Drill',detail:'3×10'}], cooldown: [{name:'Shoulder Stretch',detail:'30 Sek. je Seite'},{name:'Wrist Circles',detail:'20 Wdh.'},{name:'Hip Flexor Stretch',detail:'30 Sek. je Seite'}] },
-          { day: 'Tag 2 – Kraft & Kondition', warmup: [{name:'High Knee',detail:'60 Sek.'},{name:'Butt Kick',detail:'60 Sek.'},{name:'Arm Swing',detail:'30 Sek.'}], main: [{name:'Burpee',detail:'4×10'},{name:'Mountain Climber',detail:'4×30 Sek.'},{name:'Jump Squat',detail:'3×15'},{name:'Push-Up',detail:'4×12'},{name:'Plank',detail:'3×45 Sek.'}], cooldown: [{name:'Child\'s Pose',detail:'45 Sek.'},{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Forward Fold',detail:'30 Sek.'}] },
-          { day: 'Tag 3 – Defensive & Body', warmup: [{name:'Jump Rope',detail:'3 Min.'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Neck Stretch',detail:'20 Sek. je Seite'}], main: [{name:'Slip Drill (links/rechts)',detail:'3×60 Sek.'},{name:'Body Shot Combo',detail:'3×2 Min.'},{name:'Duck & Weave',detail:'3×60 Sek.'},{name:'Core: Hanging Knee Raise',detail:'3×12'},{name:'Russian Twist',detail:'3×20 je Seite'}], cooldown: [{name:'Pigeon Pose',detail:'30 Sek. je Seite'},{name:'Spinal Twist',detail:'30 Sek. je Seite'},{name:'Breathing',detail:'2 Min.'}] },
-          { day: 'Tag 4 – Ausdauer', warmup: [{name:'Easy Jog in Place',detail:'3 Min.'},{name:'Dynamic Stretch',detail:'2 Min.'}], main: [{name:'Shadowboxing',detail:'6×2 Min. (1 Min. Pause)'},{name:'Jump Rope',detail:'3×3 Min.'},{name:'Core Circuit',detail:'3×45 Sek. je Übung'},{name:'Push-Up Pyramid',detail:'10-8-6-4-2'},{name:'Sprint in Place',detail:'4×15 Sek.'}], cooldown: [{name:'Full Body Stretch',detail:'3 Min.'},{name:'Ice Bath Mental Prep',detail:'Tiefes Atmen 2 Min.'}] }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'military-tactical',
-    category: 'military',
-    icon: '🎖️',
-    nameKey: 'Military/Tactical Beginner – 3 Monate',
-    level: 'Anfänger bis Mittel',
-    weeks: 12,
-    daysPerWeek: 5,
-    equipment: 'Kein Gerät',
-    goal: 'Kraft, Ausdauer & mentale Stärke',
-    phases: [
-      {
-        name: 'Phase 1 – Basis Fitness', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 – Push & Core', warmup: [{name:'Jumping Jack',detail:'2 Min.'},{name:'Neck Roll',detail:'10 Wdh.'},{name:'Arm Circle',detail:'10 je Seite'}], main: [{name:'Push-Up',detail:'4×15'},{name:'Sit-Up',detail:'4×20'},{name:'Plank',detail:'4×45 Sek.'},{name:'Mountain Climber',detail:'3×30 Sek.'},{name:'Diamond Push-Up',detail:'3×10'}], cooldown: [{name:'Chest Stretch',detail:'30 Sek.'},{name:'Ab Stretch',detail:'30 Sek.'},{name:'Child\'s Pose',detail:'30 Sek.'}] },
-          { day: 'Tag 2 – Legs & Cardio', warmup: [{name:'High Knee',detail:'2 Min.'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'}], main: [{name:'Squat',detail:'4×20'},{name:'Lunge',detail:'3×15 je Seite'},{name:'Glute Bridge',detail:'3×20'},{name:'Jump Squat',detail:'3×15'},{name:'Sprint in Place',detail:'6×10 Sek.'}], cooldown: [{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Calf Stretch',detail:'20 Sek. je Seite'}] },
-          { day: 'Tag 3 – Pull & Grip', warmup: [{name:'Arm Swing',detail:'30 Sek.'},{name:'Shoulder Circle',detail:'10 je Seite'},{name:'Cat-Cow',detail:'10 Wdh.'}], main: [{name:'Inverted Row (Tisch)',detail:'4×10'},{name:'Dead Hang',detail:'3×20 Sek.'},{name:'Renegade Row',detail:'3×10 je Seite'},{name:'Superman',detail:'3×12'},{name:'Plank Row',detail:'3×10 je Seite'}], cooldown: [{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Doorway Stretch',detail:'30 Sek.'},{name:'Forward Fold',detail:'30 Sek.'}] },
-          { day: 'Tag 4 – Ausdauer', warmup: [{name:'Easy Run / March',detail:'3 Min.'},{name:'Dynamic Stretch',detail:'2 Min.'}], main: [{name:'20 Min. Run / Brisk Walk',detail:'Gleichmäßiges Tempo'},{name:'Burpee',detail:'4×10'},{name:'Bear Crawl',detail:'3×20 m'},{name:'Jumping Jack',detail:'3×30'},{name:'Core Finisher',detail:'3×45 Sek.'}], cooldown: [{name:'Full Body Stretch',detail:'5 Min.'},{name:'Breathing',detail:'2 Min.'}] },
-          { day: 'Tag 5 – Aktive Erholung', warmup: [], main: [{name:'Yoga / Mobility',detail:'20 Min.'},{name:'Foam Rolling',detail:'10 Min.'}], cooldown: [{name:'Meditation',detail:'5 Min.'},{name:'Savasana',detail:'3 Min.'}] }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'calisthenics-beginner',
-    category: 'calisthenics',
-    icon: '🏃',
-    nameKey: 'Calisthenics/Street Workout Beginner – 3 Monate',
-    level: 'Anfänger',
-    weeks: 12,
-    daysPerWeek: 3,
-    equipment: 'Klimmzugstange (optional)',
-    goal: 'Körperkontrolle & Stärke',
-    phases: [
-      {
-        name: 'Phase 1 – Foundation', weeks: '1-4',
-        workouts: [
-          { day: 'Tag 1 – Push', warmup: [{name:'Arm Circle',detail:'2×15'},{name:'Shoulder Roll',detail:'2×10'},{name:'Inchworm',detail:'5 Wdh.'}], main: [{name:'Wall Push-Up',detail:'3×15'},{name:'Incline Push-Up',detail:'3×12'},{name:'Push-Up',detail:'3×10'},{name:'Tricep Dip (Stuhl)',detail:'3×12'},{name:'Pike Push-Up',detail:'3×8'}], cooldown: [{name:'Chest Stretch',detail:'30 Sek.'},{name:'Tricep Stretch',detail:'20 Sek. je Seite'},{name:'Downward Dog',detail:'30 Sek.'}] },
-          { day: 'Tag 2 – Pull & Core', warmup: [{name:'Dead Hang',detail:'3×15 Sek.'},{name:'Scapular Retraction',detail:'2×10'},{name:'Cat-Cow',detail:'10 Wdh.'}], main: [{name:'Dead Hang',detail:'3×30 Sek.'},{name:'Inverted Row',detail:'3×10'},{name:'Negative Pull-Up',detail:'3×5'},{name:'Plank',detail:'3×45 Sek.'},{name:'Leg Raise',detail:'3×10'}], cooldown: [{name:'Child\'s Pose',detail:'45 Sek.'},{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Spinal Twist',detail:'20 Sek. je Seite'}] },
-          { day: 'Tag 3 – Legs & Mobility', warmup: [{name:'Hip Circle',detail:'10 je Seite'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Squat Hold',detail:'30 Sek.'}], main: [{name:'Squat',detail:'4×15'},{name:'Bulgarian Split Squat',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×20'},{name:'Calf Raise',detail:'3×25'},{name:'Jump Squat',detail:'3×10'}], cooldown: [{name:'Pigeon Pose',detail:'45 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Hip Flexor Stretch',detail:'30 Sek. je Seite'}] }
-        ]
-      }
-    ]
-  }
+  { id:'truck-driver-beginner', category:'drivers', icon:'🚛', nameKey:'Truck Driver Beginner – 3 Monate', level:'Anfänger', weeks:12, daysPerWeek:3, equipment:'Kein Gerät', goal:'Gesundheit & Mobilität', phases:[{ name:'Phase 1 – Fundament', weeks:'1-4', workouts:[{ day:'Tag 1 (Mo)', warmup:[{name:'Neck Rolls',detail:'2×10'},{name:'Shoulder Circles',detail:'2×10'},{name:'Hip Circles',detail:'2×10'},{name:'Leg Swings',detail:'2×10 je Seite'}], main:[{name:'Wall Push-Up',detail:'3×15'},{name:'Bodyweight Squat',detail:'3×15'},{name:'Standing Back Extension',detail:'3×12'},{name:'Plank',detail:'3×20 Sek.'},{name:'Standing Calf Raise',detail:'3×20'}], cooldown:[{name:"Child's Pose",detail:'30 Sek.'},{name:'Cat-Cow Stretch',detail:'10 Wdh.'},{name:'Standing Quad Stretch',detail:'30 Sek. je Seite'}]},{ day:'Tag 2 (Mi)', warmup:[{name:'Arm Circles',detail:'2×10'},{name:'Torso Rotation',detail:'2×10'},{name:'March in Place',detail:'60 Sek.'}], main:[{name:'Incline Push-Up',detail:'3×12'},{name:'Reverse Lunge',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×15'},{name:'Side Plank',detail:'2×20 Sek. je Seite'},{name:'Dead Bug',detail:'3×8 je Seite'}], cooldown:[{name:'Pigeon Pose',detail:'30 Sek. je Seite'},{name:'Doorway Chest Stretch',detail:'30 Sek.'},{name:'Seated Forward Fold',detail:'30 Sek.'}]},{ day:'Tag 3 (Fr)', warmup:[{name:'Jumping Jacks',detail:'30 Sek.'},{name:'Hip Flexor Stretch',detail:'20 Sek. je Seite'},{name:'Spiderman Stretch',detail:'5 je Seite'}], main:[{name:'Diamond Push-Up',detail:'3×10'},{name:'Step-Up',detail:'3×12 je Seite'},{name:'Superman Hold',detail:'3×10'},{name:'Mountain Climber',detail:'3×20 Sek.'},{name:'Calf Raise (einbeinig)',detail:'2×15 je Seite'}], cooldown:[{name:'Downward Dog',detail:'30 Sek.'},{name:'Thread the Needle',detail:'20 Sek. je Seite'},{name:'Lying Hip Stretch',detail:'30 Sek. je Seite'}]}]},{ name:'Phase 2 – Aufbau', weeks:'5-8', workouts:[{ day:'Tag 1 (Mo)', warmup:[{name:"World's Greatest Stretch",detail:'5 je Seite'},{name:'Inchworm',detail:'5 Wdh.'},{name:'Hip Circle',detail:'10 je Seite'}], main:[{name:'Push-Up',detail:'4×12'},{name:'Bulgarian Split Squat',detail:'3×10 je Seite'},{name:'Dumbbell Row',detail:'3×12 je Seite'},{name:'Plank Shoulder Tap',detail:'3×10 je Seite'},{name:'Tricep Dip',detail:'3×12'}], cooldown:[{name:'Chest Opener',detail:'30 Sek.'},{name:'Hip Flexor Lunge Stretch',detail:'30 Sek. je Seite'},{name:'Seated Spinal Twist',detail:'30 Sek. je Seite'}]},{ day:'Tag 2 (Mi)', warmup:[{name:'Leg Swings',detail:'10 je Seite'},{name:'Arm Cross Stretch',detail:'10 je Seite'},{name:'Ankle Circles',detail:'10 je Seite'}], main:[{name:'Wide Push-Up',detail:'4×10'},{name:'Reverse Lunge + Knee Drive',detail:'3×10 je Seite'},{name:'Glute Bridge March',detail:'3×12 je Seite'},{name:'Side Plank Hip Dip',detail:'3×10 je Seite'},{name:'Bear Crawl',detail:'3×20 Sek.'}], cooldown:[{name:'Cobra Stretch',detail:'30 Sek.'},{name:'Figure-4 Stretch',detail:'30 Sek. je Seite'},{name:'Neck Side Stretch',detail:'20 Sek. je Seite'}]},{ day:'Tag 3 (Fr)', warmup:[{name:'High Knees',detail:'30 Sek.'},{name:'Butt Kicks',detail:'30 Sek.'},{name:'Torso Rotation',detail:'10 je Seite'}], main:[{name:'Decline Push-Up',detail:'3×10'},{name:'Pistol Squat Assist',detail:'3×8 je Seite'},{name:'Superman Pulls',detail:'3×12'},{name:'Mountain Climber',detail:'3×30 Sek.'},{name:'Jump Squat',detail:'3×10'}], cooldown:[{name:'Forward Fold',detail:'45 Sek.'},{name:'Pigeon Pose',detail:'45 Sek. je Seite'},{name:"Child's Pose",detail:'45 Sek.'}]}]},{ name:'Phase 3 – Stärke', weeks:'9-12', workouts:[{ day:'Tag 1 (Mo)', warmup:[{name:'Dynamic Lunge Stretch',detail:'5 je Seite'},{name:'Arm Swing',detail:'10 je Seite'},{name:'Jumping Jack',detail:'30 Sek.'}], main:[{name:'Push-Up Pyramid',detail:'1-2-3-2-1'},{name:'Single-Leg Squat',detail:'3×8 je Seite'},{name:'Plank-to-Downward Dog',detail:'3×10'},{name:'Side Plank + Hip Raise',detail:'3×10 je Seite'},{name:'Tricep Push-Up',detail:'3×10'}], cooldown:[{name:'Full Body Stretch',detail:'2 Min.'},{name:'Deep Breathing',detail:'1 Min.'}]},{ day:'Tag 2 (Mi)', warmup:[{name:'Inchworm to Push-Up',detail:'5 Wdh.'},{name:'Hip Flexor Stretch',detail:'20 Sek.'},{name:'March in Place',detail:'60 Sek.'}], main:[{name:'Diamond Push-Up',detail:'4×12'},{name:'Lateral Lunge',detail:'3×12 je Seite'},{name:'Reverse Hyper Extension',detail:'3×15'},{name:'Dead Bug',detail:'3×10 je Seite'},{name:'Explosive Push-Up',detail:'3×8'}], cooldown:[{name:'Doorway Stretch',detail:'30 Sek.'},{name:'Seated Forward Fold',detail:'45 Sek.'},{name:'Lying Hip Rotation',detail:'30 Sek. je Seite'}]},{ day:'Tag 3 (Fr)', warmup:[{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Arm Circle',detail:'10 je Seite'}], main:[{name:'Push-Up Combo',detail:'3×10+5+5'},{name:'Jump Squat',detail:'3×12'},{name:'Superman + Row',detail:'3×12'},{name:'Plank Combo',detail:'3×45 Sek.'},{name:'Burpee',detail:'3×8'}], cooldown:[{name:"Child's Pose",detail:'45 Sek.'},{name:'Pigeon Pose',detail:'45 Sek. je Seite'},{name:'Spinal Twist',detail:'30 Sek. je Seite'}]}]}] },
+  { id:'golden-dragon-beginner', category:'beginners', icon:'🐉', nameKey:'Golden Dragon Beginner – 3 Monate', level:'Anfänger', weeks:12, daysPerWeek:3, equipment:'Kurzhanteln optional', goal:'Muskelaufbau & Fitness', phases:[{ name:'Phase 1 – Grundlagen', weeks:'1-4', workouts:[{ day:'Tag 1 – Oberkörper', warmup:[{name:'Arm Circles',detail:'2×20'},{name:'Shoulder Rolls',detail:'2×15'},{name:'Chest Opener',detail:'30 Sek.'}], main:[{name:'Push-Up',detail:'3×10'},{name:'Dumbbell Row',detail:'3×10 je Seite'},{name:'Dumbbell Shoulder Press',detail:'3×10'},{name:'Bicep Curl',detail:'3×12'},{name:'Tricep Kickback',detail:'3×12'}], cooldown:[{name:'Doorway Chest Stretch',detail:'30 Sek.'},{name:'Cross-Body Shoulder Stretch',detail:'20 Sek. je Seite'},{name:'Tricep Stretch',detail:'20 Sek. je Seite'}]},{ day:'Tag 2 – Unterkörper', warmup:[{name:'Leg Swings',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Bodyweight Squat',detail:'10 Wdh.'}], main:[{name:'Goblet Squat',detail:'3×12'},{name:'Romanian Deadlift',detail:'3×10'},{name:'Reverse Lunge',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×15'},{name:'Calf Raise',detail:'3×20'}], cooldown:[{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek. je Seite'},{name:'Calf Stretch',detail:'20 Sek. je Seite'}]},{ day:'Tag 3 – Core & Cardio', warmup:[{name:'High Knees',detail:'30 Sek.'},{name:'Jumping Jacks',detail:'30 Sek.'},{name:'Torso Rotation',detail:'10 je Seite'}], main:[{name:'Plank',detail:'3×30 Sek.'},{name:'Dead Bug',detail:'3×10 je Seite'},{name:'Bicycle Crunch',detail:'3×15 je Seite'},{name:'Mountain Climber',detail:'3×30 Sek.'},{name:'Burpee',detail:'3×8'}], cooldown:[{name:"Child's Pose",detail:'45 Sek.'},{name:'Cobra Stretch',detail:'30 Sek.'},{name:'Seated Spinal Twist',detail:'30 Sek. je Seite'}]}]},{ name:'Phase 2 – Progression', weeks:'5-8', workouts:[{ day:'Tag 1 – Push', warmup:[{name:'Band Pull-Apart',detail:'2×15'},{name:'Shoulder Circle',detail:'2×10'},{name:'Push-Up Hold',detail:'3 Wdh.'}], main:[{name:'Dumbbell Bench Press',detail:'4×10'},{name:'Incline Dumbbell Press',detail:'3×10'},{name:'Lateral Raise',detail:'3×12'},{name:'Overhead Press',detail:'3×10'},{name:'Tricep Dip',detail:'3×12'}], cooldown:[{name:'Pec Stretch',detail:'30 Sek. je Seite'},{name:'Overhead Tricep Stretch',detail:'20 Sek. je Seite'},{name:"Child's Pose",detail:'30 Sek.'}]},{ day:'Tag 2 – Pull & Legs', warmup:[{name:'Cat-Cow',detail:'10 Wdh.'},{name:'Inchworm',detail:'5 Wdh.'},{name:'Hip Flexor Stretch',detail:'20 Sek.'}], main:[{name:'Dumbbell Row',detail:'4×10 je Seite'},{name:'Renegade Row',detail:'3×8 je Seite'},{name:'Romanian Deadlift',detail:'4×10'},{name:'Bulgarian Split Squat',detail:'3×10 je Seite'},{name:'Bicep Curl',detail:'3×12'}], cooldown:[{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Pigeon Pose',detail:'30 Sek. je Seite'}]},{ day:'Tag 3 – Core & HIIT', warmup:[{name:'Jumping Jack',detail:'30 Sek.'},{name:'High Knee',detail:'30 Sek.'},{name:'Butt Kick',detail:'30 Sek.'}], main:[{name:'Weighted Plank',detail:'3×40 Sek.'},{name:'Russian Twist',detail:'3×15 je Seite'},{name:'Leg Raise',detail:'3×12'},{name:'HIIT: Jump Squat',detail:'4×20 Sek.'},{name:'HIIT: Mountain Climber',detail:'4×20 Sek.'}], cooldown:[{name:'Forward Fold',detail:'45 Sek.'},{name:'Cobra',detail:'30 Sek.'},{name:'Spinal Twist',detail:'30 Sek. je Seite'}]}]},{ name:'Phase 3 – Stärke & Definition', weeks:'9-12', workouts:[{ day:'Tag 1 – Heavy Upper', warmup:[{name:'Band Activation',detail:'2×15'},{name:'Arm Swing',detail:'2×15'},{name:'Push-Up Warm-Up',detail:'10 Wdh.'}], main:[{name:'Dumbbell Press',detail:'4×8'},{name:'Arnold Press',detail:'3×10'},{name:'Bent-Over Row',detail:'4×8 je Seite'},{name:'Hammer Curl',detail:'3×10'},{name:'Skull Crusher',detail:'3×10'}], cooldown:[{name:'Chest Stretch',detail:'30 Sek.'},{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Deep Breathing',detail:'1 Min.'}]},{ day:'Tag 2 – Heavy Lower', warmup:[{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Bodyweight Squat',detail:'15 Wdh.'}], main:[{name:'Dumbbell Squat',detail:'4×10'},{name:'Romanian Deadlift',detail:'4×10'},{name:'Walking Lunge',detail:'3×12 je Seite'},{name:'Single-Leg Glute Bridge',detail:'3×12 je Seite'},{name:'Standing Calf Raise',detail:'4×20'}], cooldown:[{name:'Quad Stretch',detail:'30 Sek.'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Figure-4 Stretch',detail:'30 Sek. je Seite'}]},{ day:'Tag 3 – Core & Cardio', warmup:[{name:'High Knees',detail:'45 Sek.'},{name:'Jumping Jacks',detail:'45 Sek.'},{name:'Arm Circle',detail:'10 je Seite'}], main:[{name:'Plank Variations',detail:'4×45 Sek.'},{name:'Ab Wheel / Dragon Flag Assist',detail:'3×8'},{name:'Bicycle Crunch',detail:'3×20 je Seite'},{name:'HIIT Circuit',detail:'5 Runden × 30 Sek.'},{name:'Burpee',detail:'3×10'}], cooldown:[{name:'Full Body Stretch',detail:'3 Min.'},{name:'Meditation Breathing',detail:'1 Min.'}]}]}] },
+  { id:'spine-posture', category:'spine', icon:'🦴', nameKey:'Spine & Posture – 3 Monate', level:'Alle Level', weeks:12, daysPerWeek:4, equipment:'Matte, Band', goal:'Rücken & Haltung', phases:[{ name:'Phase 1 – Mobilität', weeks:'1-4', workouts:[{ day:'Tag 1 – Oberer Rücken', warmup:[{name:'Cat-Cow',detail:'2×10'},{name:'Neck Roll',detail:'2×8'},{name:'Chest Opener',detail:'30 Sek.'}], main:[{name:'Wall Angel',detail:'3×12'},{name:'Band Pull-Apart',detail:'3×15'},{name:'Prone Y-T-W',detail:'3×10 je'},{name:'Chin Tuck',detail:'3×15'},{name:'Seated Row (Band)',detail:'3×15'}], cooldown:[{name:'Doorway Stretch',detail:'30 Sek.'},{name:'Upper Trap Stretch',detail:'20 Sek. je Seite'},{name:'Thread the Needle',detail:'20 Sek. je Seite'}]},{ day:'Tag 2 – Unterer Rücken', warmup:[{name:'Hip Circle',detail:'10 je Seite'},{name:'Pelvic Tilt',detail:'2×10'},{name:'Glute Activation',detail:'10 Knirschen'}], main:[{name:'Bird Dog',detail:'3×10 je Seite'},{name:'Dead Bug',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×15'},{name:'Superman Hold',detail:'3×10'},{name:'Clamshell',detail:'3×15 je Seite'}], cooldown:[{name:"Child's Pose",detail:'45 Sek.'},{name:'Pigeon Pose',detail:'30 Sek. je Seite'},{name:'Knee-to-Chest',detail:'30 Sek. je Seite'}]},{ day:'Tag 3 – Core Stability', warmup:[{name:'March in Place',detail:'60 Sek.'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Flexor Stretch',detail:'20 Sek.'}], main:[{name:'Plank',detail:'3×30 Sek.'},{name:'Side Plank',detail:'3×20 Sek. je Seite'},{name:'Pallof Press (Band)',detail:'3×12 je Seite'},{name:'Dead Bug',detail:'3×8 je Seite'},{name:'Hollow Body Hold',detail:'3×20 Sek.'}], cooldown:[{name:'Seated Forward Fold',detail:'45 Sek.'},{name:'Cobra',detail:'30 Sek.'},{name:'Spinal Twist',detail:'30 Sek. je Seite'}]},{ day:'Tag 4 – Mobility', warmup:[{name:'Full Body Roll-Out',detail:'5 Min.'},{name:'Breathing',detail:'2 Min.'}], main:[{name:'Hip 90/90 Stretch',detail:'2 Min. je Seite'},{name:'Thoracic Extension',detail:'2 Min.'},{name:'Doorway Chest Stretch',detail:'3×30 Sek.'},{name:'Hamstring Stretch',detail:'3×30 Sek. je Seite'},{name:'Piriformis Stretch',detail:'3×30 Sek. je Seite'}], cooldown:[{name:'Savasana',detail:'3 Min.'},{name:'Deep Breathing',detail:'2 Min.'}]}]}] },
+  { id:'women-fatloss', category:'women', icon:'👩', nameKey:'Women Fat Loss & Conditioning – 3 Monate', level:'Anfänger bis Mittel', weeks:12, daysPerWeek:4, equipment:'Kurzhanteln, Band', goal:'Fettverbrennung & Straffung', phases:[{ name:'Phase 1 – Aktivierung', weeks:'1-4', workouts:[{ day:'Tag 1 – Lower Body', warmup:[{name:'Hip Circle',detail:'10 je Seite'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Bodyweight Squat',detail:'10 Wdh.'}], main:[{name:'Goblet Squat',detail:'3×15'},{name:'Reverse Lunge',detail:'3×12 je Seite'},{name:'Glute Bridge',detail:'3×20'},{name:'Lateral Band Walk',detail:'3×15 je Seite'},{name:'Calf Raise',detail:'3×20'}], cooldown:[{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Pigeon Pose',detail:'30 Sek. je Seite'}]},{ day:'Tag 2 – Upper Body', warmup:[{name:'Arm Circle',detail:'2×10'},{name:'Shoulder Roll',detail:'2×10'},{name:'Cat-Cow',detail:'10 Wdh.'}], main:[{name:'Push-Up',detail:'3×12'},{name:'Dumbbell Row',detail:'3×12 je Seite'},{name:'Lateral Raise',detail:'3×12'},{name:'Bicep Curl',detail:'3×15'},{name:'Tricep Extension',detail:'3×15'}], cooldown:[{name:'Chest Stretch',detail:'30 Sek.'},{name:'Shoulder Stretch',detail:'20 Sek. je Seite'},{name:"Child's Pose",detail:'30 Sek.'}]},{ day:'Tag 3 – Cardio & Core', warmup:[{name:'Jumping Jack',detail:'30 Sek.'},{name:'High Knee',detail:'30 Sek.'},{name:'Butt Kick',detail:'30 Sek.'}], main:[{name:'Plank',detail:'3×30 Sek.'},{name:'Russian Twist',detail:'3×15 je Seite'},{name:'HIIT: Squat Jump',detail:'4×20 Sek.'},{name:'HIIT: Mountain Climber',detail:'4×20 Sek.'},{name:'HIIT: Jump Lunge',detail:'3×15 Sek.'}], cooldown:[{name:'Forward Fold',detail:'45 Sek.'},{name:'Cobra',detail:'30 Sek.'},{name:'Seated Twist',detail:'30 Sek. je Seite'}]},{ day:'Tag 4 – Full Body', warmup:[{name:"World's Greatest Stretch",detail:'5 je Seite'},{name:'Inchworm',detail:'5 Wdh.'}], main:[{name:'Dumbbell Deadlift',detail:'3×12'},{name:'Push-Up',detail:'3×10'},{name:'Sumo Squat',detail:'3×15'},{name:'Band Row',detail:'3×15'},{name:'Burpee',detail:'3×8'}], cooldown:[{name:'Full Body Stretch',detail:'3 Min.'},{name:'Deep Breathing',detail:'1 Min.'}]}]}] },
+  { id:'boxing-mma', category:'boxing', icon:'🥊', nameKey:'Boxing Fitness & MMA Conditioning – 3 Monate', level:'Anfänger bis Mittel', weeks:12, daysPerWeek:4, equipment:'Handschuhe optional', goal:'Kondition & Kampfkraft', phases:[{ name:'Phase 1 – Basics', weeks:'1-4', workouts:[{ day:'Tag 1 – Technik', warmup:[{name:'Jump Rope',detail:'3 Min.'},{name:'Neck Roll',detail:'2×10'},{name:'Shoulder Rotation',detail:'2×10'}], main:[{name:'Jab-Cross (Luft)',detail:'4×2 Min.'},{name:'Jab-Cross-Hook',detail:'3×2 Min.'},{name:'Footwork Drill',detail:'3×90 Sek.'},{name:'Push-Up',detail:'3×15'},{name:'Sprawl Drill',detail:'3×10'}], cooldown:[{name:'Shoulder Stretch',detail:'30 Sek. je Seite'},{name:'Wrist Circles',detail:'20 Wdh.'},{name:'Hip Flexor Stretch',detail:'30 Sek. je Seite'}]},{ day:'Tag 2 – Kraft', warmup:[{name:'High Knee',detail:'60 Sek.'},{name:'Butt Kick',detail:'60 Sek.'},{name:'Arm Swing',detail:'30 Sek.'}], main:[{name:'Burpee',detail:'4×10'},{name:'Mountain Climber',detail:'4×30 Sek.'},{name:'Jump Squat',detail:'3×15'},{name:'Push-Up',detail:'4×12'},{name:'Plank',detail:'3×45 Sek.'}], cooldown:[{name:"Child's Pose",detail:'45 Sek.'},{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Forward Fold',detail:'30 Sek.'}]},{ day:'Tag 3 – Defense', warmup:[{name:'Jump Rope',detail:'3 Min.'},{name:'Hip Circle',detail:'10 je Seite'},{name:'Neck Stretch',detail:'20 Sek. je Seite'}], main:[{name:'Slip Drill',detail:'3×60 Sek.'},{name:'Body Shot Combo',detail:'3×2 Min.'},{name:'Duck & Weave',detail:'3×60 Sek.'},{name:'Hanging Knee Raise',detail:'3×12'},{name:'Russian Twist',detail:'3×20 je Seite'}], cooldown:[{name:'Pigeon Pose',detail:'30 Sek. je Seite'},{name:'Spinal Twist',detail:'30 Sek. je Seite'},{name:'Breathing',detail:'2 Min.'}]},{ day:'Tag 4 – Ausdauer', warmup:[{name:'Easy Jog',detail:'3 Min.'},{name:'Dynamic Stretch',detail:'2 Min.'}], main:[{name:'Shadowboxing',detail:'6×2 Min.'},{name:'Jump Rope',detail:'3×3 Min.'},{name:'Core Circuit',detail:'3×45 Sek.'},{name:'Push-Up Pyramid',detail:'10-8-6-4-2'},{name:'Sprint in Place',detail:'4×15 Sek.'}], cooldown:[{name:'Full Body Stretch',detail:'3 Min.'},{name:'Deep Breathing',detail:'2 Min.'}]}]}] },
+  { id:'military-tactical', category:'military', icon:'🎖️', nameKey:'Military/Tactical Beginner – 3 Monate', level:'Anfänger bis Mittel', weeks:12, daysPerWeek:5, equipment:'Kein Gerät', goal:'Kraft, Ausdauer & mentale Stärke', phases:[{ name:'Phase 1 – Basis Fitness', weeks:'1-4', workouts:[{ day:'Tag 1 – Push & Core', warmup:[{name:'Jumping Jack',detail:'2 Min.'},{name:'Neck Roll',detail:'10 Wdh.'},{name:'Arm Circle',detail:'10 je Seite'}], main:[{name:'Push-Up',detail:'4×15'},{name:'Sit-Up',detail:'4×20'},{name:'Plank',detail:'4×45 Sek.'},{name:'Mountain Climber',detail:'3×30 Sek.'},{name:'Diamond Push-Up',detail:'3×10'}], cooldown:[{name:'Chest Stretch',detail:'30 Sek.'},{name:'Ab Stretch',detail:'30 Sek.'},{name:"Child's Pose",detail:'30 Sek.'}]},{ day:'Tag 2 – Legs', warmup:[{name:'High Knee',detail:'2 Min.'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Hip Circle',detail:'10 je Seite'}], main:[{name:'Squat',detail:'4×20'},{name:'Lunge',detail:'3×15 je Seite'},{name:'Glute Bridge',detail:'3×20'},{name:'Jump Squat',detail:'3×15'},{name:'Sprint in Place',detail:'6×10 Sek.'}], cooldown:[{name:'Quad Stretch',detail:'30 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Calf Stretch',detail:'20 Sek. je Seite'}]},{ day:'Tag 3 – Pull', warmup:[{name:'Arm Swing',detail:'30 Sek.'},{name:'Shoulder Circle',detail:'10 je Seite'},{name:'Cat-Cow',detail:'10 Wdh.'}], main:[{name:'Inverted Row',detail:'4×10'},{name:'Dead Hang',detail:'3×20 Sek.'},{name:'Renegade Row',detail:'3×10 je Seite'},{name:'Superman',detail:'3×12'},{name:'Plank Row',detail:'3×10 je Seite'}], cooldown:[{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Doorway Stretch',detail:'30 Sek.'},{name:'Forward Fold',detail:'30 Sek.'}]},{ day:'Tag 4 – Ausdauer', warmup:[{name:'Easy Run',detail:'3 Min.'},{name:'Dynamic Stretch',detail:'2 Min.'}], main:[{name:'20 Min. Run/Walk',detail:'Gleichmäßiges Tempo'},{name:'Burpee',detail:'4×10'},{name:'Bear Crawl',detail:'3×20m'},{name:'Jumping Jack',detail:'3×30'},{name:'Core Finisher',detail:'3×45 Sek.'}], cooldown:[{name:'Full Body Stretch',detail:'5 Min.'},{name:'Breathing',detail:'2 Min.'}]},{ day:'Tag 5 – Erholung', warmup:[], main:[{name:'Yoga / Mobility',detail:'20 Min.'},{name:'Foam Rolling',detail:'10 Min.'}], cooldown:[{name:'Meditation',detail:'5 Min.'},{name:'Savasana',detail:'3 Min.'}]}]}] },
+  { id:'calisthenics-beginner', category:'calisthenics', icon:'🏃', nameKey:'Calisthenics/Street Workout Beginner – 3 Monate', level:'Anfänger', weeks:12, daysPerWeek:3, equipment:'Klimmzugstange optional', goal:'Körperkontrolle & Stärke', phases:[{ name:'Phase 1 – Foundation', weeks:'1-4', workouts:[{ day:'Tag 1 – Push', warmup:[{name:'Arm Circle',detail:'2×15'},{name:'Shoulder Roll',detail:'2×10'},{name:'Inchworm',detail:'5 Wdh.'}], main:[{name:'Wall Push-Up',detail:'3×15'},{name:'Incline Push-Up',detail:'3×12'},{name:'Push-Up',detail:'3×10'},{name:'Tricep Dip',detail:'3×12'},{name:'Pike Push-Up',detail:'3×8'}], cooldown:[{name:'Chest Stretch',detail:'30 Sek.'},{name:'Tricep Stretch',detail:'20 Sek. je Seite'},{name:'Downward Dog',detail:'30 Sek.'}]},{ day:'Tag 2 – Pull & Core', warmup:[{name:'Dead Hang',detail:'3×15 Sek.'},{name:'Scapular Retraction',detail:'2×10'},{name:'Cat-Cow',detail:'10 Wdh.'}], main:[{name:'Dead Hang',detail:'3×30 Sek.'},{name:'Inverted Row',detail:'3×10'},{name:'Negative Pull-Up',detail:'3×5'},{name:'Plank',detail:'3×45 Sek.'},{name:'Leg Raise',detail:'3×10'}], cooldown:[{name:"Child's Pose",detail:'45 Sek.'},{name:'Lat Stretch',detail:'30 Sek. je Seite'},{name:'Spinal Twist',detail:'20 Sek. je Seite'}]},{ day:'Tag 3 – Legs', warmup:[{name:'Hip Circle',detail:'10 je Seite'},{name:'Leg Swing',detail:'10 je Seite'},{name:'Squat Hold',detail:'30 Sek.'}], main:[{name:'Squat',detail:'4×15'},{name:'Bulgarian Split Squat',detail:'3×10 je Seite'},{name:'Glute Bridge',detail:'3×20'},{name:'Calf Raise',detail:'3×25'},{name:'Jump Squat',detail:'3×10'}], cooldown:[{name:'Pigeon Pose',detail:'45 Sek. je Seite'},{name:'Hamstring Stretch',detail:'30 Sek.'},{name:'Hip Flexor Stretch',detail:'30 Sek. je Seite'}]}]}] }
 ];
 
-// ─── STATE ─────────────────────────────────────────────────────
 let currentUser = null;
 let currentLang = 'de';
 let quizAnswers = {};
 let currentProgram = null;
-let userStats = { workouts: 0, days: 0, minutes: 0 };
 
-// ─── HELPERS ───────────────────────────────────────────────────
 function t(key) { return (T[currentLang] && T[currentLang][key]) || (T.de[key]) || key; }
 
 function showToast(msg, type='') {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + type;
+  el.textContent = msg; el.className = 'toast show ' + type;
   setTimeout(() => el.className = 'toast', 2500);
 }
 
-function hideLoading() {
-  document.getElementById('loading-screen').style.display = 'none';
-}
+function hideLoading() { document.getElementById('loading-screen').style.display = 'none'; }
 
-window.showScreen = function(name) {
+function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const navMap = {home:'nav-home', programs:'nav-programs', quiz:'nav-quiz', history:'nav-history', profile:'nav-profile'};
+  const navMap = {home:'nav-home',programs:'nav-programs',quiz:'nav-quiz',history:'nav-history',profile:'nav-profile'};
   if (navMap[name]) document.getElementById(navMap[name]).classList.add('active');
   document.getElementById('bottom-nav').style.display = ['home','programs','quiz','history','profile','program-detail'].includes(name) ? 'grid' : 'none';
-};
+}
 
-// ─── AUTH ──────────────────────────────────────────────────────
-window.switchTab = function(tab) {
-  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-};
-
-window.doLogin = async function() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value;
-  const btn = document.getElementById('btn-login');
-  btn.disabled = true;
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch(e) {
-    showAuthError(t('errorEmail'));
-    btn.disabled = false;
-  }
-};
-
-window.doRegister = async function() {
-  const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pass = document.getElementById('reg-password').value;
-  const btn = document.getElementById('btn-register');
-  btn.disabled = true;
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    await initUserDoc(cred.user, name);
-  } catch(e) {
-    showAuthError(t('errorGeneral'));
-    btn.disabled = false;
-  }
-};
-
-window.doGoogle = async function() {
-  try {
-    await signInWithRedirect(auth, googleProvider);
-  } catch(e) {
-    showAuthError(t('errorGeneral'));
-  }
-};
-
-window.doLogout = async function() {
-  await signOut(auth);
-};
+function switchTab(tab) {
+  document.getElementById('form-login').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+}
 
 function showAuthError(msg) {
   const el = document.getElementById('auth-error');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 4000);
 }
 
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const btn = document.getElementById('btn-login'); btn.disabled = true;
+  try { await auth.signInWithEmailAndPassword(email, pass); }
+  catch(e) { showAuthError(t('errorEmail')); btn.disabled = false; }
+}
+
+async function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const btn = document.getElementById('btn-register'); btn.disabled = true;
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: name });
+    await initUserDoc(cred.user, name);
+  } catch(e) { showAuthError(t('errorGeneral')); btn.disabled = false; }
+}
+
+async function doGoogle() {
+  try { await auth.signInWithRedirect(googleProvider); }
+  catch(e) { showAuthError(t('errorGeneral')); }
+}
+
+async function doLogout() { await auth.signOut(); }
+
 async function initUserDoc(user, name) {
-  await setDoc(doc(db, 'users', user.uid), {
+  await db.collection('users').doc(user.uid).set({
     displayName: name, email: user.email,
-    language: 'de', createdAt: serverTimestamp(),
+    language: 'de', createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     disclaimerAccepted: false, activeProgram: null
   }, { merge: true });
 }
 
-// ─── AUTH STATE ────────────────────────────────────────────────
-// Handle Google redirect result
-getRedirectResult(auth).then(async (result) => {
+auth.getRedirectResult().then(async (result) => {
   if (result && result.user) {
-    const user = result.user;
-    const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) await initUserDoc(user, user.displayName || 'Champion');
+    const snap = await db.collection('users').doc(result.user.uid).get();
+    if (!snap.exists) await initUserDoc(result.user, result.user.displayName || 'Champion');
   }
 }).catch(() => {});
 
-onAuthStateChanged(auth, async (user) => {
+auth.onAuthStateChanged(async (user) => {
   hideLoading();
   if (user) {
     currentUser = user;
-    const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
+    const snap = await db.collection('users').doc(user.uid).get();
     const data = snap.data() || {};
     currentLang = data.language || 'de';
     applyTranslations();
-    if (!data.disclaimerAccepted) {
-      showScreen('disclaimer');
-      document.getElementById('bottom-nav').style.display = 'none';
-    } else {
-      loadUserData();
-      showScreen('home');
-    }
+    if (!data.disclaimerAccepted) { showScreen('disclaimer'); document.getElementById('bottom-nav').style.display = 'none'; }
+    else { loadUserData(); showScreen('home'); }
   } else {
-    currentUser = null;
-    showScreen('auth');
+    currentUser = null; showScreen('auth');
     document.getElementById('bottom-nav').style.display = 'none';
   }
 });
 
-// ─── DISCLAIMER ────────────────────────────────────────────────
-window.checkDisclaimer = function() {
+function checkDisclaimer() {
   const a = document.getElementById('check-medical').checked;
   const b = document.getElementById('check-dsgvo').checked;
   document.getElementById('btn-accept-disclaimer').disabled = !(a && b);
-};
+}
 
-window.acceptDisclaimer = async function() {
+async function acceptDisclaimer() {
   if (!currentUser) return;
-  await updateDoc(doc(db, 'users', currentUser.uid), { disclaimerAccepted: true });
-  loadUserData();
-  showScreen('home');
-};
+  await db.collection('users').doc(currentUser.uid).update({ disclaimerAccepted: true });
+  loadUserData(); showScreen('home');
+}
 
-window.showDisclaimer = function() {
+function showDisclaimer() {
   document.getElementById('check-medical').checked = false;
   document.getElementById('check-dsgvo').checked = false;
   document.getElementById('btn-accept-disclaimer').disabled = true;
   showScreen('disclaimer');
-};
+}
 
-// ─── USER DATA ─────────────────────────────────────────────────
 async function loadUserData() {
   if (!currentUser) return;
   const name = currentUser.displayName || 'Champion';
@@ -1160,260 +792,162 @@ async function loadUserData() {
   document.getElementById('profile-email').textContent = currentUser.email || '';
   document.getElementById('profile-avatar').textContent = name.charAt(0).toUpperCase();
   try {
-    const logs = await getDocs(query(collection(db, 'users', currentUser.uid, 'workoutLogs'), orderBy('completedAt', 'desc')));
+    const logs = await db.collection('users').doc(currentUser.uid).collection('workoutLogs').orderBy('completedAt','desc').get();
     let totalMin = 0;
     logs.forEach(d => { totalMin += (d.data().durationMin || 0); });
-    userStats.workouts = logs.size;
-    userStats.minutes = totalMin;
     document.getElementById('stat-workouts').textContent = logs.size;
     document.getElementById('stat-min').textContent = totalMin;
     document.getElementById('stat-days').textContent = Math.round(totalMin / 30);
   } catch(e) {}
 }
 
-// ─── LANGUAGE ──────────────────────────────────────────────────
 const LANG_FLAGS = {de:'🇩🇪 DE', en:'🇬🇧 EN', hr:'🇭🇷 HR', pl:'🇵🇱 PL', ru:'🇷🇺 RU', tr:'🇹🇷 TR'};
 const LANG_NAMES = {de:'Deutsch', en:'English', hr:'Hrvatski', pl:'Polski', ru:'Русский', tr:'Türkçe'};
 
-window.showLangSelector = function() {
-  document.getElementById('lang-overlay').classList.add('show');
-};
-window.hideLangSelector = function() {
-  document.getElementById('lang-overlay').classList.remove('show');
-};
-window.setLanguage = async function(lang) {
+function showLangSelector() { document.getElementById('lang-overlay').classList.add('show'); }
+function hideLangSelector() { document.getElementById('lang-overlay').classList.remove('show'); }
+
+async function setLanguage(lang) {
   currentLang = lang;
-  if (currentUser) {
-    await updateDoc(doc(db, 'users', currentUser.uid), { language: lang });
-  }
-  applyTranslations();
-  hideLangSelector();
+  if (currentUser) await db.collection('users').doc(currentUser.uid).update({ language: lang });
+  applyTranslations(); hideLangSelector();
   document.querySelectorAll('.lang-option').forEach(el => el.classList.remove('selected'));
   document.getElementById('lang-' + lang).classList.add('selected');
   document.getElementById('lang-display').textContent = LANG_FLAGS[lang];
   document.getElementById('current-lang-label').textContent = LANG_NAMES[lang];
   showToast(t('saved'), 'success');
-};
-
-function applyTranslations() {
-  const map = {
-    't-login': 'login', 't-register': 'register', 't-or': 'or',
-    't-btn-google': 'googleBtn', 't-email-label': 'emailLabel',
-    't-password-label': 'passwordLabel', 't-name-label': 'nameLabel',
-    't-btn-login': 'login', 't-btn-register': 'createAccount',
-    't-disc-title': 'discTitle', 't-disc-h1': 'discH1', 't-disc-p1': 'discP1',
-    't-disc-h2': 'discH2', 't-disc-p2': 'discP2', 't-disc-h3': 'discH3', 't-disc-p3': 'discP3',
-    't-check-medical': 'checkMedical', 't-check-dsgvo': 'checkDsgvo', 't-btn-accept': 'btnAccept',
-    't-greeting': 'greeting', 't-stat-w': 'statW', 't-stat-d': 'statD', 't-stat-m': 'statM',
-    't-cat-title': 'catTitle', 't-cat-beg': 'catBeg', 't-cat-beg-d': 'catBegD',
-    't-cat-int': 'catInt', 't-cat-int-d': 'catIntD', 't-cat-adv': 'catAdv', 't-cat-adv-d': 'catAdvD',
-    't-cat-drv': 'catDrv', 't-cat-drv-d': 'catDrvD', 't-cat-wom': 'catWom', 't-cat-wom-d': 'catWomD',
-    't-cat-spi': 'catSpi', 't-cat-spi-d': 'catSpiD', 't-cat-hom': 'catHom', 't-cat-hom-d': 'catHomD',
-    't-cat-hot': 'catHot', 't-cat-hot-d': 'catHotD', 't-cat-gym': 'catGym', 't-cat-gym-d': 'catGymD',
-    't-cat-box-d': 'catBoxD', 't-cat-mil': 'catMil', 't-cat-mil-d': 'catMilD', 't-cat-cal-d': 'catCalD',
-    't-history': 'history', 't-profile': 'profile', 't-back': 'back', 't-back2': 'back',
-    't-nav-home': 'navHome', 't-nav-prog': 'navProg', 't-nav-quiz': 'navQuiz',
-    't-nav-hist': 'navHist', 't-nav-prof': 'navProf',
-    't-quiz-title': 'quizTitle', 't-quiz-sub': 'quizSub',
-    't-q0': 'q0', 't-q0-m': 'q0m', 't-q0-f': 'q0f', 't-q0-o': 'q0o',
-    't-q1': 'q1', 't-q2': 'q2', 't-q2-b': 'q2b', 't-q2-i': 'q2i', 't-q2-a': 'q2a',
-    't-q3': 'q3', 't-q3-f': 'q3f', 't-q3-m': 'q3m', 't-q3-s': 'q3s',
-    't-q4': 'q4', 't-q4-h': 'q4h', 't-q4-g': 'q4g', 't-q4-t': 'q4t', 't-q4-p': 'q4p',
-    't-q5': 'q5', 't-q5-n': 'q5n', 't-q5-d': 'q5d', 't-q5-b': 'q5b', 't-q5-f': 'q5f',
-    't-q6': 'q6', 't-q6-n': 'q6n', 't-q6-b': 'q6b', 't-q6-k': 'q6k', 't-q6-h': 'q6h',
-    't-result-title': 'resultTitle', 't-btn-start-rec': 'btnStartRec', 't-btn-later': 'btnLater',
-    't-find-program': 'findProgram', 't-quiz-sub2': 'quizSub2',
-    't-language': 'language', 't-legal': 'legal', 't-logout': 'logout',
-    't-btn-today': 'btnToday', 't-select-lang': 'selectLang',
-    't-btn-result': 'btnResult', 't-next': 'next',
-    't-app-name': null
-  };
-  Object.entries(map).forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    if (el && key) el.textContent = t(key);
-  });
-  document.getElementById('lang-display').textContent = LANG_FLAGS[currentLang] || '🇩🇪 DE';
-  document.getElementById('current-lang-label').textContent = LANG_NAMES[currentLang] || 'Deutsch';
 }
 
-// ─── QUIZ ──────────────────────────────────────────────────────
-window.selectQuiz = function(step, value, el) {
+function applyTranslations() {
+  const map = { 't-login':'login','t-register':'register','t-or':'or','t-btn-google':'googleBtn','t-email-label':'emailLabel','t-password-label':'passwordLabel','t-name-label':'nameLabel','t-btn-login':'login','t-btn-register':'createAccount','t-disc-title':'discTitle','t-disc-h1':'discH1','t-disc-p1':'discP1','t-disc-h2':'discH2','t-disc-p2':'discP2','t-disc-h3':'discH3','t-disc-p3':'discP3','t-check-medical':'checkMedical','t-check-dsgvo':'checkDsgvo','t-btn-accept':'btnAccept','t-greeting':'greeting','t-stat-w':'statW','t-stat-d':'statD','t-stat-m':'statM','t-cat-title':'catTitle','t-cat-beg':'catBeg','t-cat-beg-d':'catBegD','t-cat-int':'catInt','t-cat-int-d':'catIntD','t-cat-adv':'catAdv','t-cat-adv-d':'catAdvD','t-cat-drv':'catDrv','t-cat-drv-d':'catDrvD','t-cat-wom':'catWom','t-cat-wom-d':'catWomD','t-cat-spi':'catSpi','t-cat-spi-d':'catSpiD','t-cat-hom':'catHom','t-cat-hom-d':'catHomD','t-cat-hot':'catHot','t-cat-hot-d':'catHotD','t-cat-gym':'catGym','t-cat-gym-d':'catGymD','t-cat-box-d':'catBoxD','t-cat-mil':'catMil','t-cat-mil-d':'catMilD','t-cat-cal-d':'catCalD','t-history':'history','t-profile':'profile','t-back':'back','t-back2':'back','t-nav-home':'navHome','t-nav-prog':'navProg','t-nav-quiz':'navQuiz','t-nav-hist':'navHist','t-nav-prof':'navProf','t-quiz-title':'quizTitle','t-quiz-sub':'quizSub','t-q0':'q0','t-q0-m':'q0m','t-q0-f':'q0f','t-q0-o':'q0o','t-q1':'q1','t-q2':'q2','t-q2-b':'q2b','t-q2-i':'q2i','t-q2-a':'q2a','t-q3':'q3','t-q3-f':'q3f','t-q3-m':'q3m','t-q3-s':'q3s','t-q4':'q4','t-q4-h':'q4h','t-q4-g':'q4g','t-q4-t':'q4t','t-q4-p':'q4p','t-q5':'q5','t-q5-n':'q5n','t-q5-d':'q5d','t-q5-b':'q5b','t-q5-f':'q5f','t-q6':'q6','t-q6-n':'q6n','t-q6-b':'q6b','t-q6-k':'q6k','t-q6-h':'q6h','t-result-title':'resultTitle','t-btn-start-rec':'btnStartRec','t-btn-later':'btnLater','t-find-program':'findProgram','t-quiz-sub2':'quizSub2','t-language':'language','t-legal':'legal','t-logout':'logout','t-btn-today':'btnToday','t-select-lang':'selectLang','t-btn-result':'btnResult','t-next':'next' };
+  Object.entries(map).forEach(([id,key]) => { const el=document.getElementById(id); if(el&&key) el.textContent=t(key); });
+  document.getElementById('lang-display').textContent = LANG_FLAGS[currentLang]||'🇩🇪 DE';
+  document.getElementById('current-lang-label').textContent = LANG_NAMES[currentLang]||'Deutsch';
+}
+
+function selectQuiz(step, value, el) {
   quizAnswers[step] = value;
   el.closest('.quiz-options').querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
-  const nextBtn = document.getElementById('qnext-' + step);
-  if (nextBtn) nextBtn.disabled = false;
-};
+  const nb = document.getElementById('qnext-' + step); if(nb) nb.disabled = false;
+}
 
-window.nextQuiz = function(step) {
+function nextQuiz(step) {
   if (!quizAnswers[step]) return;
   document.getElementById('qstep-' + step).classList.remove('active');
-  document.getElementById('qstep-' + (step + 1)).classList.add('active');
-  const pct = Math.round(((step + 2) / 8) * 100);
-  document.getElementById('quiz-bar').style.width = pct + '%';
-};
+  document.getElementById('qstep-' + (step+1)).classList.add('active');
+  document.getElementById('quiz-bar').style.width = Math.round(((step+2)/8)*100) + '%';
+}
 
-window.prevQuiz = function(step) {
+function prevQuiz(step) {
   document.getElementById('qstep-' + step).classList.remove('active');
-  document.getElementById('qstep-' + (step - 1)).classList.add('active');
-};
+  document.getElementById('qstep-' + (step-1)).classList.add('active');
+}
 
-window.finishQuiz = function() {
+function finishQuiz() {
   const rec = recommendProgram(quizAnswers);
   document.getElementById('quiz-result-name').textContent = rec.nameKey;
   document.getElementById('qstep-6').classList.remove('active');
   document.getElementById('qstep-result').classList.add('active');
   document.getElementById('quiz-bar').style.width = '100%';
   currentProgram = rec;
-};
-
-function recommendProgram(a) {
-  if (a[4] === 'truck') return PROGRAMS.find(p => p.id === 'truck-driver-beginner');
-  if (a[3] === 'spine' || a[6] === 'back') return PROGRAMS.find(p => p.id === 'spine-posture');
-  if (a[3] === 'boxing') return PROGRAMS.find(p => p.id === 'boxing-mma');
-  if (a[3] === 'military') return PROGRAMS.find(p => p.id === 'military-tactical');
-  if (a[3] === 'calisthenics') return PROGRAMS.find(p => p.id === 'calisthenics-beginner');
-  if (a[0] === 'female') return PROGRAMS.find(p => p.id === 'women-fatloss');
-  return PROGRAMS.find(p => p.id === 'golden-dragon-beginner');
 }
 
-window.goToRecommended = function() {
-  if (currentProgram) openProgramDetail(currentProgram);
-};
+function recommendProgram(a) {
+  if (a[4]==='truck') return PROGRAMS.find(p=>p.id==='truck-driver-beginner');
+  if (a[3]==='spine'||a[6]==='back') return PROGRAMS.find(p=>p.id==='spine-posture');
+  if (a[3]==='boxing') return PROGRAMS.find(p=>p.id==='boxing-mma');
+  if (a[3]==='military') return PROGRAMS.find(p=>p.id==='military-tactical');
+  if (a[3]==='calisthenics') return PROGRAMS.find(p=>p.id==='calisthenics-beginner');
+  if (a[0]==='female') return PROGRAMS.find(p=>p.id==='women-fatloss');
+  return PROGRAMS.find(p=>p.id==='golden-dragon-beginner');
+}
 
-// ─── PROGRAMS ──────────────────────────────────────────────────
-window.openCategory = function(cat) {
-  const filtered = PROGRAMS.filter(p => p.category === cat);
-  const list = document.getElementById('programs-list');
-  if (filtered.length === 0) {
-    const catMap = {beginners:'catBeg',intermediate:'catInt',advanced:'catAdv',drivers:'catDrv',women:'catWom',spine:'catSpi',home:'catHom',hotel:'catHot',gym:'catGym',boxing:'Boxing/MMA',military:'catMil',calisthenics:'Calisthenics'};
-    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🏋️</div><div class="empty-text">${t('empty')}<br>${t('emptyDesc')}</div></div>`;
-    document.getElementById('programs-header-title').textContent = catMap[cat] ? t(catMap[cat]) : cat;
-  } else {
-    renderProgramList(filtered, cat);
-  }
+function goToRecommended() { if(currentProgram) openProgramDetail(currentProgram); }
+
+function openCategory(cat) {
+  const filtered = PROGRAMS.filter(p=>p.category===cat);
+  renderProgramList(filtered.length ? filtered : PROGRAMS);
   showScreen('programs');
-};
+}
 
-window.loadAllPrograms = function() {
-  renderProgramList(PROGRAMS, 'all');
-  document.getElementById('programs-header-title').textContent = t('navProg');
-};
+function loadAllPrograms() { renderProgramList(PROGRAMS); document.getElementById('programs-header-title').textContent = t('navProg'); }
 
-function renderProgramList(list, cat) {
-  const el = document.getElementById('programs-list');
-  el.innerHTML = list.map(p => `
+function renderProgramList(list) {
+  document.getElementById('programs-list').innerHTML = list.map(p=>`
     <div class="program-card" onclick="openProgramDetail(PROGRAMS.find(x=>x.id==='${p.id}'))">
       <div class="program-badge">${p.icon} ${p.level}</div>
       <div class="program-name">${p.nameKey}</div>
-      <div class="program-meta">
-        <span>📅 ${p.weeks} ${t('weeks')}</span>
-        <span>🔄 ${p.daysPerWeek} ${t('daysPerWeek')}</span>
-        <span>🏋️ ${p.equipment}</span>
-      </div>
+      <div class="program-meta"><span>📅 ${p.weeks} ${t('weeks')}</span><span>🔄 ${p.daysPerWeek} ${t('daysPerWeek')}</span><span>🏋️ ${p.equipment}</span></div>
     </div>`).join('');
 }
 
-window.openProgramDetail = function(prog) {
+function openProgramDetail(prog) {
   if (!prog) return;
   currentProgram = prog;
   document.getElementById('detail-title').textContent = prog.nameKey;
-  document.getElementById('detail-meta').innerHTML = `
-    <span class="meta-tag">${prog.icon} ${prog.level}</span>
-    <span class="meta-tag">📅 ${prog.weeks} ${t('weeks')}</span>
-    <span class="meta-tag">🔄 ${prog.daysPerWeek} ${t('daysPerWeek')}</span>
-    <span class="meta-tag">🏋️ ${prog.equipment}</span>
-    <span class="meta-tag">🎯 ${prog.goal}</span>`;
+  document.getElementById('detail-meta').innerHTML = `<span class="meta-tag">${prog.icon} ${prog.level}</span><span class="meta-tag">📅 ${prog.weeks} ${t('weeks')}</span><span class="meta-tag">🔄 ${prog.daysPerWeek} ${t('daysPerWeek')}</span><span class="meta-tag">🏋️ ${prog.equipment}</span><span class="meta-tag">🎯 ${prog.goal}</span>`;
   document.getElementById('btn-today').textContent = t('btnToday');
-  const phases = document.getElementById('detail-phases');
-  phases.innerHTML = prog.phases.map((ph, pi) => `
+  document.getElementById('detail-phases').innerHTML = prog.phases.map((ph,pi)=>`
     <div class="phase-block">
       <div class="phase-header" onclick="togglePhase(${pi})">
-        <div>
-          <div class="phase-title">${ph.name}</div>
-          <div class="phase-subtitle">${t('weeks')} ${ph.weeks}</div>
-        </div>
+        <div><div class="phase-title">${ph.name}</div><div class="phase-subtitle">${t('weeks')} ${ph.weeks}</div></div>
         <div class="phase-chevron" id="chevron-${pi}">▼</div>
       </div>
       <div class="phase-content" id="phase-content-${pi}">
-        ${ph.workouts.map(w => `
+        ${ph.workouts.map(w=>`
           <div class="workout-day">
             <div class="workout-day-title">${w.day}</div>
-            ${w.warmup.length ? `<div class="section-label">🔥 ${t('warmup')}</div>
-              ${w.warmup.map(e => `<div class="exercise-row"><span class="exercise-name">${e.name}</span><span class="exercise-detail">${e.detail}</span></div>`).join('')}` : ''}
+            ${w.warmup.length?`<div class="section-label">🔥 ${t('warmup')}</div>${w.warmup.map(e=>`<div class="exercise-row"><span class="exercise-name">${e.name}</span><span class="exercise-detail">${e.detail}</span></div>`).join('')}`:''}
             <div class="section-label">💪 ${t('main')}</div>
-            ${w.main.map(e => `<div class="exercise-row"><span class="exercise-name">${e.name}</span><span class="exercise-detail">${e.detail}</span></div>`).join('')}
+            ${w.main.map(e=>`<div class="exercise-row"><span class="exercise-name">${e.name}</span><span class="exercise-detail">${e.detail}</span></div>`).join('')}
             <div class="section-label">🧘 ${t('cooldown')}</div>
-            ${w.cooldown.map(e => `<div class="exercise-row"><span class="exercise-name">${e.name}</span><span class="exercise-detail">${e.detail}</span></div>`).join('')}
+            ${w.cooldown.map(e=>`<div class="exercise-row"><span class="exercise-name">${e.name}</span><span class="exercise-detail">${e.detail}</span></div>`).join('')}
           </div>`).join('')}
       </div>
     </div>`).join('');
   showScreen('program-detail');
-};
+}
 
-window.togglePhase = function(i) {
-  const content = document.getElementById('phase-content-' + i);
-  const chevron = document.getElementById('chevron-' + i);
-  content.classList.toggle('open');
-  chevron.classList.toggle('open');
-};
+function togglePhase(i) {
+  document.getElementById('phase-content-'+i).classList.toggle('open');
+  document.getElementById('chevron-'+i).classList.toggle('open');
+}
 
-window.startTodayWorkout = async function() {
-  if (!currentProgram || !currentUser) return;
-  const start = Date.now();
-  await addDoc(collection(db, 'users', currentUser.uid, 'workoutLogs'), {
-    programId: currentProgram.id,
-    programName: currentProgram.nameKey,
-    completedAt: serverTimestamp(),
-    durationMin: 45,
-    week: 1, day: 1
+async function startTodayWorkout() {
+  if (!currentProgram||!currentUser) return;
+  await db.collection('users').doc(currentUser.uid).collection('workoutLogs').add({
+    programId: currentProgram.id, programName: currentProgram.nameKey,
+    completedAt: firebase.firestore.FieldValue.serverTimestamp(), durationMin: 45, week:1, day:1
   });
-  showToast('✅ Training gespeichert!', 'success');
-  loadUserData();
-};
+  showToast('✅ Training gespeichert!','success'); loadUserData();
+}
 
-// ─── HISTORY ───────────────────────────────────────────────────
-window.loadHistory = async function() {
+async function loadHistory() {
   if (!currentUser) return;
   const el = document.getElementById('history-list');
   el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Lade...</div>';
   try {
-    const snaps = await getDocs(query(collection(db, 'users', currentUser.uid, 'workoutLogs'), orderBy('completedAt', 'desc')));
-    if (snaps.empty) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">${t('empty')}<br>${t('emptyDesc')}</div></div>`;
-      return;
-    }
-    el.innerHTML = '';
-    snaps.forEach(d => {
-      const data = d.data();
-      const date = data.completedAt?.toDate?.() || new Date();
-      const dateStr = date.toLocaleDateString(currentLang === 'de' ? 'de-DE' : 'en-US', {day:'2-digit',month:'short',year:'numeric'});
-      const div = document.createElement('div');
-      div.className = 'history-card';
-      div.innerHTML = `
-        <div class="history-icon">💪</div>
-        <div class="history-info">
-          <div class="history-name">${data.programName || 'Workout'}</div>
-          <div class="history-meta">${dateStr} • ${data.durationMin || 0} Min.</div>
-        </div>
-        <button class="history-delete" onclick="deleteLog('${d.id}', this)" title="Löschen">🗑</button>`;
+    const snaps = await db.collection('users').doc(currentUser.uid).collection('workoutLogs').orderBy('completedAt','desc').get();
+    if (snaps.empty) { el.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">${t('empty')}<br>${t('emptyDesc')}</div></div>`; return; }
+    el.innerHTML='';
+    snaps.forEach(d=>{
+      const data=d.data();
+      const date=data.completedAt?.toDate?.()||new Date();
+      const dateStr=date.toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'numeric'});
+      const div=document.createElement('div'); div.className='history-card';
+      div.innerHTML=`<div class="history-icon">💪</div><div class="history-info"><div class="history-name">${data.programName||'Workout'}</div><div class="history-meta">${dateStr} • ${data.durationMin||0} Min.</div></div><button class="history-delete" onclick="deleteLog('${d.id}',this)">🗑</button>`;
       el.appendChild(div);
     });
-  } catch(e) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--red)">Fehler beim Laden.</div>';
-  }
-};
+  } catch(e) { el.innerHTML='<div style="text-align:center;padding:40px;color:var(--red)">Fehler.</div>'; }
+}
 
-window.deleteLog = async function(id, btn) {
+async function deleteLog(id, btn) {
   if (!currentUser) return;
-  await deleteDoc(doc(db, 'users', currentUser.uid, 'workoutLogs', id));
-  btn.closest('.history-card').remove();
-  showToast(t('deleted') || 'Gelöscht', 'success');
-  loadUserData();
-};
+  await db.collection('users').doc(currentUser.uid).collection('workoutLogs').doc(id).delete();
+  btn.closest('.history-card').remove(); showToast(t('deleted'),'success'); loadUserData();
+}
 
-// ─── INIT ──────────────────────────────────────────────────────
-window.PROGRAMS = PROGRAMS;
 applyTranslations();
 </script>
 </body>
