@@ -1032,6 +1032,13 @@ function renderPrograms(){
     const section=(title,cats)=>`
       <div style="padding:16px 16px 0">
         <div class="sec-title">${title}</div>
+        ${cats.some(c=>rehabIds.includes(c.id)) ? `
+          <div class="prog-card" style="margin-bottom:10px;border:1px solid rgba(201,168,76,.35);background:linear-gradient(135deg,#1a1000,#0d0d0d);cursor:default">
+            <div style="font-size:18px;font-weight:900;color:var(--gold2);margin-bottom:5px">🦴 Antonio Jerković</div>
+            <div style="font-size:13px;color:#ccc;line-height:1.45">Centar za kralježnicu i postoperativnu rehabilitaciju</div>
+            <div style="font-size:13px;color:var(--gold);line-height:1.45">Lakoća Pokreta</div>
+          </div>
+        ` : ''}
         <div style="display:grid;grid-template-columns:1fr;gap:10px;padding-bottom:8px">
           ${cats.map(c=>`
             <div class="prog-card" onclick="setCat('${c.id}')" style="display:flex;align-items:center;gap:14px;padding:18px">
@@ -1068,6 +1075,13 @@ function renderPrograms(){
       ${catDesc?`<p style="font-size:13px;color:#aaa;line-height:1.6;margin-top:8px">${catDesc}</p>`:''}
     </div>
     <div class="prog-grid" style="padding-top:16px">
+      ${rehabIds.includes(activeCat) ? `
+        <div class="prog-card" style="margin-bottom:12px;border:1px solid rgba(201,168,76,.35);background:linear-gradient(135deg,#1a1000,#0d0d0d);cursor:default">
+          <div style="font-size:18px;font-weight:900;color:var(--gold2);margin-bottom:5px">🦴 Antonio Jerković</div>
+          <div style="font-size:13px;color:#ccc;line-height:1.45">Centar za kralježnicu i postoperativnu rehabilitaciju</div>
+          <div style="font-size:13px;color:var(--gold);line-height:1.45">Lakoća Pokreta</div>
+        </div>
+      ` : ''}
       ${list.length?list.map(p=>`
         <div class="prog-card" onclick="openProg('${p.id}')">
           <div class="prog-badge">${p.icon} ${p.level[lang]||p.level.de}</div>
