@@ -836,6 +836,23 @@ async function loadHistory(){if(!currentUser)return;const el=document.getElement
 function deleteLog(id,btn){if(!currentUser)return;db.collection('users').doc(currentUser.uid).collection('workoutLogs').doc(id).delete().then(()=>{btn.closest('.history-card').remove();showToast(t('deleted'),'success');loadUserData();});}
 
 applyTranslations();
+
+// Fix: check auth state after Firebase initializes
+setTimeout(()=>{
+  const user = firebase.auth().currentUser;
+  if(user && document.getElementById('screen-auth').classList.contains('active')){
+    currentUser = user;
+    db.collection('users').doc(user.uid).get()
+      .then(snap=>{
+        const data = snap.exists ? snap.data() : {};
+        currentLang = data.language || 'de';
+        applyTranslations();
+        if(data.disclaimerAccepted){ loadUserData(); showScreen('home'); }
+        else { showScreen('disclaimer'); document.getElementById('bottom-nav').style.display='none'; }
+      })
+      .catch(()=>{ showScreen('disclaimer'); document.getElementById('bottom-nav').style.display='none'; });
+  }
+}, 1500);
 </script>
 </body>
 </html>
