@@ -638,7 +638,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAZ9rA89gZUotn2Ol6gyor22WJsaHfExno",
-  authDomain: "inspiring-brioche-c31830.netlify.app",
+  authDomain: "golden-dragon-training-app.firebaseapp.com",
   projectId: "golden-dragon-training-app",
   storageBucket: "golden-dragon-training-app.firebasestorage.app",
   messagingSenderId: "450159603529",
@@ -719,7 +719,14 @@ function doRegister(){
 }
 
 function doGoogle(){
-  auth.signInWithRedirect(googleProvider);
+  // Try popup first, fallback to redirect
+  auth.signInWithPopup(googleProvider).catch(e=>{
+    if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'){
+      auth.signInWithRedirect(googleProvider);
+    } else if(e.code!=='auth/popup-closed-by-user'){
+      showAuthError('Google: '+e.code);
+    }
+  });
 }
 
 auth.getRedirectResult().then(result=>{
@@ -729,7 +736,7 @@ auth.getRedirectResult().then(result=>{
       if(!snap.exists)initUserDoc(u,u.displayName||'Champion');
     });
   }
-}).catch(e=>console.error('Redirect result error:',e));
+}).catch(()=>{});
 
 function doLogout(){auth.signOut();}
 
