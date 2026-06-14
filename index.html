@@ -754,7 +754,6 @@ auth.onAuthStateChanged(user=>{
     currentUser=user;
     currentLang='de';
     applyTranslations();
-    // Try to get user data but don't block on it
     db.collection('users').doc(user.uid).get().then(snap=>{
       const data=snap.exists?snap.data():{};
       currentLang=data.language||'de';
@@ -767,7 +766,6 @@ auth.onAuthStateChanged(user=>{
         showScreen('home');
       }
     }).catch(()=>{
-      // If Firestore fails, still show disclaimer
       showScreen('disclaimer');
       document.getElementById('bottom-nav').style.display='none';
     });
@@ -842,6 +840,7 @@ setTimeout(()=>{
   const user = firebase.auth().currentUser;
   if(user && document.getElementById('screen-auth').classList.contains('active')){
     currentUser = user;
+    hideLoading();
     db.collection('users').doc(user.uid).get()
       .then(snap=>{
         const data = snap.exists ? snap.data() : {};
