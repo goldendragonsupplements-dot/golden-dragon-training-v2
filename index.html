@@ -331,18 +331,30 @@ const t = k => (TR[lang]&&TR[lang][k]) || TR.de[k] || k;
 
 // ── CATEGORIES ────────────────────────────────────────────────
 const CATS = [
-  {id:'beginners',    icon:'🟢', de:'Anfänger',           en:'Beginners',          hr:'Početnici',     desc_de:'Grundlagen & sicherer Start'},
-  {id:'intermediate', icon:'🟡', de:'Fortgeschritten',    en:'Intermediate',       hr:'Napredni',      desc_de:'Nächste Stufe'},
-  {id:'advanced',     icon:'🔴', de:'Profi',              en:'Advanced',           hr:'Profesionalci', desc_de:'Hochintensiv'},
-  {id:'drivers',      icon:'🚛', de:'LKW-Fahrer',         en:'Truck Drivers',      hr:'Vozači kamiona',desc_de:'Ohne Geräte – überall trainieren'},
-  {id:'women',        icon:'👩', de:'Frauen',             en:'Women',              hr:'Žene',          desc_de:'Fettverbrennung & Straffung'},
-  {id:'spine',        icon:'🦴', de:'Wirbelsäule',        en:'Spine / Sciatica',   hr:'Kralježnica',   desc_de:'Rücken, Haltung & Ischias'},
-  {id:'home',         icon:'🏠', de:'Zuhause',            en:'Home Gym',           hr:'Kod kuće',      desc_de:'Kein Gerät nötig'},
-  {id:'gym',          icon:'🏋️', de:'Fitnessstudio',      en:'Gym',                hr:'Teretana',      desc_de:'Vollständiges Equipment'},
-  {id:'hotel',        icon:'🏨', de:'Hotel',              en:'Hotel Workout',      hr:'Hotel',         desc_de:'Auf Reisen trainieren'},
-  {id:'boxing',       icon:'🥊', de:'Boxing / MMA',       en:'Boxing / MMA',       hr:'Boxing/MMA',    desc_de:'Kampfsport & Kondition'},
-  {id:'military',     icon:'🎖️', de:'Military',           en:'Military / Tactical',hr:'Vojska',        desc_de:'Taktisches Training'},
-  {id:'calisthenics', icon:'🏃', de:'Calisthenics',       en:'Calisthenics',       hr:'Calisthenics',  desc_de:'Körpergewicht & Street Workout'},
+  {id:'beginners',    icon:'🟢', de:'Anfänger',           en:'Beginners',               hr:'Početnici',        pl:'Początkujący',       ru:'Начинающие',      tr:'Başlangıç',
+   desc:{de:'Grundlagen & sicherer Start', en:'Basics & safe start', hr:'Osnove & siguran početak', pl:'Podstawy & bezpieczny start', ru:'Основы & безопасный старт', tr:'Temel & güvenli başlangıç'}},
+  {id:'intermediate', icon:'🟡', de:'Fortgeschritten',    en:'Intermediate',             hr:'Napredni',         pl:'Średniozaawansowany', ru:'Средний уровень', tr:'Orta Seviye',
+   desc:{de:'Nächste Stufe', en:'Next level', hr:'Sljedeća razina', pl:'Następny poziom', ru:'Следующий уровень', tr:'Sonraki seviye'}},
+  {id:'advanced',     icon:'🔴', de:'Profi',              en:'Advanced',                 hr:'Profesionalci',    pl:'Zaawansowany',       ru:'Продвинутый',     tr:'İleri Seviye',
+   desc:{de:'Hochintensiv', en:'High intensity', hr:'Visoki intenzitet', pl:'Wysoka intensywność', ru:'Высокая интенсивность', tr:'Yüksek yoğunluk'}},
+  {id:'drivers',      icon:'🚛', de:'LKW-Fahrer',         en:'Truck Drivers',            hr:'Vozači kamiona',   pl:'Kierowcy TIR',       ru:'Водители',        tr:'TIR Şoförleri',
+   desc:{de:'Ohne Geräte – überall trainieren', en:'No equipment – train anywhere', hr:'Bez opreme – trenirati svugdje', pl:'Bez sprzętu – trenuj wszędzie', ru:'Без оборудования – тренируйся везде', tr:'Ekipmansız – her yerde antrenman'}},
+  {id:'women',        icon:'👩', de:'Frauen',             en:'Women',                    hr:'Žene',             pl:'Kobiety',            ru:'Женщины',         tr:'Kadınlar',
+   desc:{de:'Fettverbrennung & Straffung', en:'Fat loss & toning', hr:'Gubitak masti & tonus', pl:'Spalanie tłuszczu & ujędrnianie', ru:'Сжигание жира & подтяжка', tr:'Yağ yakımı & sıkılaştırma'}},
+  {id:'spine',        icon:'🦴', de:'Wirbelsäule',        en:'Spine / Sciatica',         hr:'Kralježnica',      pl:'Kręgosłup',          ru:'Позвоночник',     tr:'Omurga',
+   desc:{de:'Rücken, Haltung & Ischias', en:'Back, posture & sciatica', hr:'Leđa, držanje & išijas', pl:'Kręgosłup, postawa & rwa kulszowa', ru:'Спина, осанка & ишиас', tr:'Sırt, duruş & siyatik'}},
+  {id:'home',         icon:'🏠', de:'Zuhause',            en:'Home Gym',                 hr:'Kod kuće',         pl:'W domu',             ru:'Дома',            tr:'Evde',
+   desc:{de:'Kein Gerät nötig', en:'No equipment needed', hr:'Bez opreme', pl:'Bez sprzętu', ru:'Без оборудования', tr:'Ekipman gerekmez'}},
+  {id:'gym',          icon:'🏋️', de:'Fitnessstudio',      en:'Gym',                      hr:'Teretana',         pl:'Siłownia',           ru:'Тренажёрный зал', tr:'Spor Salonu',
+   desc:{de:'Vollständiges Equipment', en:'Full equipment', hr:'Puna oprema', pl:'Pełny sprzęt', ru:'Полное оборудование', tr:'Tam ekipman'}},
+  {id:'hotel',        icon:'🏨', de:'Hotel',              en:'Hotel Workout',            hr:'Hotel',            pl:'Hotel',              ru:'Отель',           tr:'Otel',
+   desc:{de:'Auf Reisen trainieren', en:'Train while travelling', hr:'Trenirati na putovanju', pl:'Trenuj w podróży', ru:'Тренируйся в путешествии', tr:'Seyahatte antrenman'}},
+  {id:'boxing',       icon:'🥊', de:'Boxing / MMA',       en:'Boxing / MMA',             hr:'Boxing / MMA',     pl:'Boks / MMA',         ru:'Бокс / ММА',      tr:'Boks / MMA',
+   desc:{de:'Kampfsport & Kondition', en:'Combat sports & conditioning', hr:'Borilački sport & kondicija', pl:'Sporty walki & kondycja', ru:'Боевые искусства & кондиция', tr:'Dövüş sporları & kondisyon'}},
+  {id:'military',     icon:'🎖️', de:'Military',           en:'Military / Tactical',      hr:'Vojska',           pl:'Wojskowy',           ru:'Военный',         tr:'Askeri',
+   desc:{de:'Taktisches Training', en:'Tactical training', hr:'Taktički trening', pl:'Trening taktyczny', ru:'Тактическая подготовка', tr:'Taktik antrenman'}},
+  {id:'calisthenics', icon:'🏃', de:'Calisthenics',       en:'Calisthenics',             hr:'Calisthenics',     pl:'Kalistenika',        ru:'Калистеника',     tr:'Kalistenik',
+   desc:{de:'Körpergewicht & Street Workout', en:'Bodyweight & street workout', hr:'Težina tijela & ulični trening', pl:'Masa ciała & street workout', ru:'Собственный вес & стрит воркаут', tr:'Vücut ağırlığı & sokak antrenmanı'}},
 ];
 
 // ── PROGRAMS ──────────────────────────────────────────────────
@@ -350,9 +362,11 @@ const PROGRAMS = [
 {
   id:'truck-beginner', cat:'drivers', icon:'🚛',
   name:'Truck Driver Beginner – 3 Monate',
-  level_de:'Anfänger', weeks:12, dpw:3, equipment_de:'Kein Gerät',
-  goal_de:'Mobilität, Rückengesundheit & Grundkraft',
-  desc_de:'Speziell für LKW-Fahrer: Trainieren in der Kabine, auf dem Parkplatz oder im Hotel. Keine Geräte nötig. Fokus auf Rücken, Hüfte, Nacken und allgemeine Mobilität.',
+  level:{de:'Anfänger',en:'Beginner',hr:'Početnik',pl:'Początkujący',ru:'Начинающий',tr:'Başlangıç'},
+  weeks:12, dpw:3,
+  equipment:{de:'Kein Gerät',en:'No equipment',hr:'Bez opreme',pl:'Bez sprzętu',ru:'Без оборудования',tr:'Ekipman yok'},
+  goal:{de:'Mobilität, Rückengesundheit & Grundkraft',en:'Mobility, back health & basic strength',hr:'Mobilnost, zdravlje leđa & osnovna snaga',pl:'Mobilność, zdrowie pleców & podstawowa siła',ru:'Мобильность, здоровье спины & базовая сила',tr:'Mobilite, sırt sağlığı & temel güç'},
+  desc:{de:'Speziell für LKW-Fahrer: Trainieren in der Kabine, auf dem Parkplatz oder im Hotel. Keine Geräte nötig. Fokus auf Rücken, Hüfte, Nacken und allgemeine Mobilität.',en:'Specially for truck drivers: train in the cab, parking lot or hotel. No equipment needed. Focus on back, hips, neck and general mobility.',hr:'Posebno za vozače kamiona: trenirajte u kabini, na parkingu ili hotelu. Bez opreme. Fokus na leđa, kuk, vrat i opću mobilnost.',pl:'Specjalnie dla kierowców TIR: trenuj w kabinie, na parkingu lub w hotelu. Bez sprzętu. Skupia się na plecach, biodrach, szyi i ogólnej mobilności.',ru:'Специально для водителей: тренируйтесь в кабине, на стоянке или в отеле. Без оборудования. Фокус на спине, бёдрах, шее и общей мобильности.',tr:'TIR şoförleri için: kamyon kabininde, parkta veya otelde antrenman yapın. Ekipman gerekmez. Sırt, kalça, boyun ve genel mobiliteye odaklanır.'},
   phases:[
     {name:'Phase 1 – Fundament', weeks:'1–4', days:[
       {day:'Tag 1 (Montag)',
@@ -401,9 +415,11 @@ const PROGRAMS = [
 {
   id:'gd-beginner', cat:'beginners', icon:'🐉',
   name:'Golden Dragon Beginner – 3 Monate',
-  level_de:'Anfänger', weeks:12, dpw:3, equipment_de:'Kurzhanteln optional',
-  goal_de:'Ganzkörperkraft, Muskelaufbau & Grundkondition',
-  desc_de:'Das Einsteigerprogramm von Golden Dragon. Aufgebaut auf 3 Phasen mit klarer Progression. Jedes Training enthält Warm-Up, Haupttraining und Cool Down.',
+  level:{de:'Anfänger',en:'Beginner',hr:'Početnik',pl:'Początkujący',ru:'Начинающий',tr:'Başlangıç'},
+  weeks:12, dpw:3,
+  equipment:{de:'Kurzhanteln optional',en:'Dumbbells optional',hr:'Bučice opcionalno',pl:'Hantle opcjonalnie',ru:'Гантели по желанию',tr:'Dambıl isteğe bağlı'},
+  goal:{de:'Ganzkörperkraft, Muskelaufbau & Grundkondition',en:'Full body strength, muscle building & conditioning',hr:'Snaga cijelog tijela, izgradnja mišića & kondicija',pl:'Siła całego ciała, budowanie mięśni & kondycja',ru:'Сила всего тела, набор мышц & кондиция',tr:'Tüm vücut gücü, kas yapımı & kondisyon'},
+  desc:{de:'Das Einsteigerprogramm von Golden Dragon. Aufgebaut auf 3 Phasen mit klarer Progression. Jedes Training enthält Warm-Up, Haupttraining und Cool Down.',en:'The Golden Dragon beginner program. Built on 3 phases with clear progression. Every workout includes Warm-Up, Main Workout and Cool Down.',hr:'Golden Dragon program za početnike. Izgrađen na 3 faze s jasnom progresijom. Svaki trening uključuje zagrijavanje, glavni trening i cool down.',pl:'Program dla początkujących Golden Dragon. Oparty na 3 fazach z wyraźną progresją. Każdy trening zawiera rozgrzewkę, trening główny i cool down.',ru:'Программа для начинающих Golden Dragon. Построена на 3 фазах с чёткой прогрессией. Каждая тренировка включает разминку, основную тренировку и заминку.',tr:'Golden Dragon başlangıç programı. 3 aşama üzerine kurulu net ilerleme ile. Her antrenman ısınma, ana antrenman ve cool down içerir.'},
   phases:[
     {name:'Phase 1 – Grundlagen', weeks:'1–4', days:[
       {day:'Tag 1 – Oberkörper',
@@ -452,9 +468,11 @@ const PROGRAMS = [
 {
   id:'women-fatloss', cat:'women', icon:'👩',
   name:'Women Fat Loss & Conditioning – 3 Monate',
-  level_de:'Anfänger bis Mittel', weeks:12, dpw:4, equipment_de:'Kurzhanteln, Widerstandsband',
-  goal_de:'Fettverbrennung, Straffung & Kondition',
-  desc_de:'Gezieltes Programm für Frauen mit 4 Trainingstagen pro Woche. Kombination aus Krafttraining und HIIT für optimale Fettverbrennung.',
+  level:{de:'Anfänger bis Mittel',en:'Beginner to intermediate',hr:'Početnik do napredni',pl:'Początkujący do średni',ru:'Начинающий до среднего',tr:'Başlangıç ile orta'},
+  weeks:12, dpw:4,
+  equipment:{de:'Kurzhanteln, Widerstandsband',en:'Dumbbells, resistance band',hr:'Bučice, elastična traka',pl:'Hantle, taśma oporowa',ru:'Гантели, резиновая лента',tr:'Dambıl, direnç bandı'},
+  goal:{de:'Fettverbrennung, Straffung & Kondition',en:'Fat loss, toning & conditioning',hr:'Gubitak masti, tonus & kondicija',pl:'Spalanie tłuszczu, ujędrnianie & kondycja',ru:'Сжигание жира, подтяжка & кондиция',tr:'Yağ yakımı, sıkılaştırma & kondisyon'},
+  desc:{de:'Gezieltes Programm für Frauen mit 4 Trainingstagen pro Woche. Kombination aus Krafttraining und HIIT für optimale Fettverbrennung.',en:'Targeted program for women with 4 training days per week. Combination of strength training and HIIT for optimal fat burning.',hr:'Ciljani program za žene s 4 dana treninga tjedno. Kombinacija treninga snage i HIIT-a za optimalno sagorijevanje masti.',pl:'Ukierunkowany program dla kobiet z 4 dniami treningowymi w tygodniu. Połączenie treningu siłowego i HIIT dla optymalnego spalania tłuszczu.',ru:'Целевая программа для женщин с 4 тренировочными днями в неделю. Сочетание силовых тренировок и HIIT для оптимального сжигания жира.',tr:'Haftada 4 antrenman günü ile kadınlar için hedefli program. Optimum yağ yakımı için güç antrenmanı ve HIIT kombinasyonu.'},
   phases:[
     {name:'Phase 1 – Aktivierung', weeks:'1–4', days:[
       {day:'Tag 1 – Lower Body',
@@ -479,9 +497,11 @@ const PROGRAMS = [
 {
   id:'spine-posture', cat:'spine', icon:'🦴',
   name:'Spine & Posture – 3 Monate',
-  level_de:'Alle Level', weeks:12, dpw:4, equipment_de:'Matte, Widerstandsband',
-  goal_de:'Wirbelsäulengesundheit, Haltung & Ischias-Linderung',
-  desc_de:'Speziell entwickelt für Menschen mit Rückenproblemen, Ischias oder schlechter Haltung. Sanfte Progression, kein Gewichtheben in Phase 1.',
+  level:{de:'Alle Level',en:'All levels',hr:'Svi nivoi',pl:'Wszystkie poziomy',ru:'Все уровни',tr:'Tüm seviyeler'},
+  weeks:12, dpw:4,
+  equipment:{de:'Matte, Widerstandsband',en:'Mat, resistance band',hr:'Prostirka, elastična traka',pl:'Mata, taśma oporowa',ru:'Коврик, резиновая лента',tr:'Minder, direnç bandı'},
+  goal:{de:'Wirbelsäulengesundheit, Haltung & Ischias-Linderung',en:'Spine health, posture & sciatica relief',hr:'Zdravlje kralježnice, držanje & olakšanje išijasa',pl:'Zdrowie kręgosłupa, postawa & łagodzenie rwy kulszowej',ru:'Здоровье позвоночника, осанка & облегчение ишиаса',tr:'Omurga sağlığı, duruş & siyatik rahatlama'},
+  desc:{de:'Speziell entwickelt für Menschen mit Rückenproblemen, Ischias oder schlechter Haltung. Sanfte Progression, kein Gewichtheben in Phase 1.',en:'Specially developed for people with back problems, sciatica or poor posture. Gentle progression, no weightlifting in Phase 1.',hr:'Posebno razvijeno za ljude s problemima s leđima, išijasom ili lošim držanjem. Blaga progresija, bez dizanja tegova u Fazi 1.',pl:'Specjalnie opracowany dla osób z problemami pleców, rwą kulszową lub złą postawą. Łagodna progresja, brak podnoszenia ciężarów w Fazie 1.',ru:'Специально разработана для людей с проблемами спины, ишиасом или плохой осанкой. Мягкая прогрессия, без тяжёлых весов в Фазе 1.',tr:'Sırt sorunları, siyatik veya kötü duruşu olan kişiler için özel olarak geliştirildi. Nazik ilerleme, 1. Aşamada ağırlık kaldırma yok.'},
   phases:[
     {name:'Phase 1 – Mobilität & Aktivierung', weeks:'1–4', days:[
       {day:'Tag 1 – Oberer Rücken',
@@ -506,9 +526,11 @@ const PROGRAMS = [
 {
   id:'boxing-mma', cat:'boxing', icon:'🥊',
   name:'Boxing Fitness & MMA Conditioning – 3 Monate',
-  level_de:'Anfänger bis Mittel', weeks:12, dpw:4, equipment_de:'Handschuhe optional',
-  goal_de:'Kondition, Kampfkraft & mentale Stärke',
-  desc_de:'Boxfitness und MMA Conditioning für Einsteiger. Shadowboxing, Footwork, Kondition und Kraft kombiniert.',
+  level:{de:'Anfänger bis Mittel',en:'Beginner to intermediate',hr:'Početnik do napredni',pl:'Początkujący do średni',ru:'Начинающий до среднего',tr:'Başlangıç ile orta'},
+  weeks:12, dpw:4,
+  equipment:{de:'Handschuhe optional',en:'Gloves optional',hr:'Rukavice opcionalno',pl:'Rękawice opcjonalnie',ru:'Перчатки по желанию',tr:'Eldiven isteğe bağlı'},
+  goal:{de:'Kondition, Kampfkraft & mentale Stärke',en:'Conditioning, combat strength & mental toughness',hr:'Kondicija, borbena snaga & mentalna snaga',pl:'Kondycja, siła bojowa & wytrzymałość mentalna',ru:'Кондиция, боевая сила & ментальная стойкость',tr:'Kondisyon, savaş gücü & zihinsel dayanıklılık'},
+  desc:{de:'Boxfitness und MMA Conditioning für Einsteiger. Shadowboxing, Footwork, Kondition und Kraft kombiniert.',en:'Boxing fitness and MMA conditioning for beginners. Shadowboxing, footwork, conditioning and strength combined.',hr:'Boks fitnes i MMA kondicija za početnike. Shadowboxing, footwork, kondicija i snaga kombinirani.',pl:'Fitness bokserski i trening kondycyjny MMA dla początkujących. Shadowboxing, footwork, kondycja i siła połączone.',ru:'Боксёрский фитнес и MMA кондиция для начинающих. Бой с тенью, работа ног, кондиция и сила в одном.',tr:'Yeni başlayanlar için boks fitness ve MMA kondisyon. Gölge boks, ayak işi, kondisyon ve güç kombinasyonu.'},
   phases:[
     {name:'Phase 1 – Basics & Kondition', weeks:'1–4', days:[
       {day:'Tag 1 – Technik & Footwork',
@@ -533,9 +555,11 @@ const PROGRAMS = [
 {
   id:'military-tactical', cat:'military', icon:'🎖️',
   name:'Military/Tactical Beginner – 3 Monate',
-  level_de:'Anfänger bis Mittel', weeks:12, dpw:5, equipment_de:'Kein Gerät',
-  goal_de:'Kraft, Ausdauer, Ruck-Vorbereitung & mentale Stärke',
-  desc_de:'Militärisches Trainingsprogramm für Einsteiger. Basiert auf klassischen Military-Übungen ohne Equipment.',
+  level:{de:'Anfänger bis Mittel',en:'Beginner to intermediate',hr:'Početnik do napredni',pl:'Początkujący do średni',ru:'Начинающий до среднего',tr:'Başlangıç ile orta'},
+  weeks:12, dpw:5,
+  equipment:{de:'Kein Gerät',en:'No equipment',hr:'Bez opreme',pl:'Bez sprzętu',ru:'Без оборудования',tr:'Ekipman yok'},
+  goal:{de:'Kraft, Ausdauer, Ruck-Vorbereitung & mentale Stärke',en:'Strength, endurance, ruck prep & mental toughness',hr:'Snaga, izdržljivost, priprema & mentalna snaga',pl:'Siła, wytrzymałość, przygotowanie & wytrzymałość mentalna',ru:'Сила, выносливость, подготовка & ментальная стойкость',tr:'Güç, dayanıklılık, hazırlık & zihinsel dayanıklılık'},
+  desc:{de:'Militärisches Trainingsprogramm für Einsteiger. Basiert auf klassischen Military-Übungen ohne Equipment.',en:'Military training program for beginners. Based on classic military exercises without equipment.',hr:'Vojni program treninga za početnike. Temeljen na klasičnim vojnim vježbama bez opreme.',pl:'Wojskowy program treningowy dla początkujących. Oparty na klasycznych ćwiczeniach wojskowych bez sprzętu.',ru:'Военная программа тренировок для начинающих. Основана на классических военных упражнениях без оборудования.',tr:'Yeni başlayanlar için askeri antrenman programı. Ekipmansız klasik askeri egzersizlere dayanır.'},
   phases:[
     {name:'Phase 1 – Basis Fitness', weeks:'1–4', days:[
       {day:'Tag 1 – Push & Core',
@@ -564,9 +588,12 @@ const PROGRAMS = [
 {
   id:'calisthenics-beginner', cat:'calisthenics', icon:'🏃',
   name:'Calisthenics / Street Workout Beginner – 3 Monate',
-  level_de:'Anfänger', weeks:12, dpw:3, equipment_de:'Klimmzugstange optional',
-  goal_de:'Körperkontrolle, Grundkraft & Street Workout Skills',
-  desc_de:'Der Einstieg in die Welt des Calisthenics. Aufgebaut auf Push, Pull und Legs mit klarer Progression Richtung Pull-Up und Dip.',
+  level:{de:'Anfänger',en:'Beginner',hr:'Početnik',pl:'Początkujący',ru:'Начинающий',tr:'Başlangıç'},
+  weeks:12, dpw:3,
+  equipment:{de:'Klimmzugstange optional',en:'Pull-up bar optional',hr:'Šipka opcionalno',pl:'Drążek opcjonalnie',ru:'Турник по желанию',tr:'Barfiks isteğe bağlı'},
+  goal:{de:'Körperkontrolle, Grundkraft & Street Workout Skills',en:'Body control, basic strength & street workout skills',hr:'Kontrola tijela, osnovna snaga & street workout vještine',pl:'Kontrola ciała, podstawowa siła & umiejętności street workout',ru:'Контроль тела, базовая сила & навыки стрит воркаута',tr:'Vücut kontrolü, temel güç & sokak antrenman becerileri'},
+  desc:{de:'Der Einstieg in die Welt des Calisthenics. Aufgebaut auf Push, Pull und Legs mit klarer Progression Richtung Pull-Up und Dip.',en:'The entry into the world of calisthenics. Built on Push, Pull and Legs with clear progression towards Pull-Up and Dip.',hr:'Uvod u svijet calsthenics-a. Izgrađen na Push, Pull i Legs s jasnom progresijom prema Pull-Up i Dip.',pl:'Wejście w świat kalisteniki. Oparty na Push, Pull i Legs z wyraźną progresją w kierunku podciągnięć i dipów.',ru:'Вход в мир калистеники. Построена на Push, Pull и Legs с чёткой прогрессией к подтягиваниям и отжиманиям на брусьях.',tr:'Kalistenik dünyasına giriş. Pull-Up ve Dip\'e doğru net ilerleme ile Push, Pull ve Legs üzerine kurulu.'},
+
   phases:[
     {name:'Phase 1 – Foundation', weeks:'1–4', days:[
       {day:'Tag 1 – Push',
@@ -701,7 +728,7 @@ function renderCats() {
     <div class="cat" onclick="openCat('${c.id}')">
       <div class="ci">${c.icon}</div>
       <div class="cn">${c[lang]||c.de}</div>
-      <div class="cd">${c.desc_de}</div>
+      <div class="cd">${(c.desc&&c.desc[lang])||c.desc.de}</div>
     </div>`).join('');
 }
 function loadStats() {
@@ -732,12 +759,12 @@ function renderProgs(catId) {
   }
   el.innerHTML = list.map(p => `
     <div class="prog-card" onclick="openProg('${p.id}')">
-      <div class="prog-badge">${p.icon} ${p.level_de}</div>
+      <div class="prog-badge">${p.icon} ${p.level[lang]||p.level.de}</div>
       <div class="prog-name">${p.name}</div>
       <div class="prog-meta">
         <span>📅 ${p.weeks} ${t('weeks')}</span>
         <span>🔄 ${p.dpw} ${t('dpw')}</span>
-        <span>🏋️ ${p.equipment_de}</span>
+        <span>🏋️ ${p.equipment[lang]||p.equipment.de}</span>
       </div>
     </div>`).join('');
 }
@@ -745,14 +772,18 @@ function openProg(id) {
   const p = PROGRAMS.find(x=>x.id===id);
   if (!p) return;
   activeProg = p;
+  const lv = p.level[lang]||p.level.de;
+  const eq = p.equipment[lang]||p.equipment.de;
+  const gl = p.goal[lang]||p.goal.de;
+  const ds = p.desc[lang]||p.desc.de;
   document.getElementById('det-name').textContent = p.name;
   document.getElementById('det-meta').innerHTML = `
-    <span class="mt">${p.icon} ${p.level_de}</span>
+    <span class="mt">${p.icon} ${lv}</span>
     <span class="mt">📅 ${p.weeks} ${t('weeks')}</span>
     <span class="mt">🔄 ${p.dpw} ${t('dpw')}</span>
-    <span class="mt">🏋️ ${p.equipment_de}</span>
-    <span class="mt">🎯 ${p.goal_de}</span>`;
-  document.getElementById('det-desc').textContent = p.desc_de;
+    <span class="mt">🏋️ ${eq}</span>
+    <span class="mt">🎯 ${gl}</span>`;
+  document.getElementById('det-desc').textContent = ds;
   document.getElementById('det-start-btn').textContent = t('startBtn');
   document.getElementById('det-phases').innerHTML = p.phases.map((ph,pi)=>`
     <div class="phase-block">
@@ -885,6 +916,8 @@ function applyLang() {
   document.getElementById('nl-quiz').textContent = t('quiz');
   document.getElementById('nl-hist').textContent = t('hist');
   document.getElementById('nl-prof').textContent = t('prof');
+  // re-render categories with new language
+  if (document.getElementById('cats-grid')) renderCats();
 }
 
 // ── AUTH STATE ────────────────────────────────────────────────
