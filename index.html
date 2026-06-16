@@ -15,16 +15,16 @@
 :root{--bg:#050505;--card:#151515;--card2:#101010;--gold:#c9a84c;--gold2:#f2d47a;--text:#f7f7f7;--muted:#999;--border:#2a2a2a;--red:#d9534f;--green:#4caf74}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
-body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+body{padding-bottom:calc(72px + env(safe-area-inset-bottom));padding-top:env(safe-area-inset-top)}
 
 /* ── SCREENS ── */
-.screen{display:none}
+.screen{display:none;padding-top:env(safe-area-inset-top)}
 .screen.on{display:block}
 #s-auth{display:none;min-height:100vh;align-items:center;justify-content:center;background:radial-gradient(ellipse at top,#1f1400 0%,#050505 65%);padding:20px}
 #s-auth.on{display:flex}
 #s-disc{display:none;min-height:100vh;flex-direction:column;padding:20px;background:var(--bg);max-width:540px;margin:0 auto}
 #s-disc.on{display:flex}
-#s-workout{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column;padding:18px;overflow-y:auto}
+#s-workout{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column;padding:0;overflow-y:auto}
 #s-workout.on{display:flex}
 #s-quiz{display:none;min-height:100vh;padding:20px;background:var(--bg);max-width:540px;margin:0 auto}
 #s-quiz.on{display:block}
@@ -118,7 +118,7 @@ input:focus,select:focus{border-color:var(--gold)}
 .prog-meta span{font-size:11px;color:var(--muted);font-weight:600}
 
 /* PROGRAM DETAIL */
-.detail-header{background:linear-gradient(180deg,#1a1000,#0d0d0d);border-bottom:1px solid rgba(201,168,76,.2);padding:20px 16px}
+.detail-header{background:linear-gradient(180deg,#1a1000,#0d0d0d);border-bottom:1px solid rgba(201,168,76,.2);padding:20px 16px;padding-top:calc(20px + env(safe-area-inset-top))}
 .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--gold);font-size:14px;font-weight:800;cursor:pointer;margin-bottom:16px;padding:0}
 .meta-tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .mtag{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:999px;padding:5px 12px;font-size:12px;color:#ccc;font-weight:600}
@@ -138,7 +138,7 @@ input:focus,select:focus{border-color:var(--gold)}
 .ex-detail{font-size:12px;color:#555;flex-shrink:0;margin-left:8px}
 
 /* WORKOUT SCREEN */
-.wkt-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #1a1a1a;flex-shrink:0;min-height:48px}
+.wkt-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));border-bottom:1px solid #1a1a1a;flex-shrink:0;min-height:48px}
 .wkt-hdr-info{display:flex;flex-direction:column}
 .wkt-hdr-title{font-size:13px;font-weight:700;color:var(--gold2)}
 .wkt-hdr-sub{font-size:11px;color:var(--muted)}
