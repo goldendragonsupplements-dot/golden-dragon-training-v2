@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GD Training">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Golden Dragon Training</title>
 <style>
 :root{--bg:#050505;--card:#151515;--card2:#101010;--gold:#c9a84c;--gold2:#f2d47a;--text:#f7f7f7;--muted:#999;--border:#2a2a2a;--red:#d9534f;--green:#4caf74}
@@ -165,8 +171,8 @@ input:focus,select:focus{border-color:var(--gold)}
 /* video card */
 .wkt-video-card{width:100%;border-radius:12px;overflow:hidden;margin-bottom:8px;background:#0c0c0c;border:1px solid #1f1f1f;position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:36px;box-sizing:border-box;max-width:100%}
 .wkt-video-card video{width:100%;height:100%;object-fit:cover}
-.wkt-play-ico{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.6);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;backdrop-filter:blur(4px)}
-.wkt-fullscreen-ico{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;cursor:pointer;backdrop-filter:blur(4px)}
+.wkt-play-ico{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15)}
+.wkt-fullscreen-ico{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;cursor:pointer;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15)}
 /* exercise info */
 .wkt-ex-name{font-size:22px;font-weight:900;color:var(--gold2);margin-bottom:2px;line-height:1.2}
 .wkt-ex-sub{font-size:12px;color:var(--muted);margin-bottom:3px}
@@ -2897,8 +2903,17 @@ function sideTimer(side){
 function nextEx(){clearInterval(wktTimer);wktStep++;loadWktStep();}
 function completeEx(){clearInterval(wktTimer);wktStep++;loadWktStep();}
 function toggleFullscreenVideo(){
-  const v=document.querySelector('#wkt-vid-reps video');
-  if(v)v.requestFullscreen?.();}
+  const v = document.querySelector('#wkt-vid-reps video');
+  if(!v) return;
+  // iOS Safari uses webkitEnterFullscreen on the video element
+  if(v.webkitEnterFullscreen){
+    v.webkitEnterFullscreen();
+    return;
+  }
+  // Android / desktop
+  const req = v.requestFullscreen || v.webkitRequestFullscreen || v.mozRequestFullScreen || v.msRequestFullscreen;
+  if(req) req.call(v);
+}
 
 function closeWorkout(){
   clearInterval(wktTimer);clearInterval(restTimer);
@@ -3332,6 +3347,50 @@ function applyLang(){
   if(document.getElementById('s-antonio')&&document.getElementById('s-antonio').classList.contains('on')) renderAntonio();
   if(document.querySelector('#s-programs.on')||document.querySelector('#programs-content')&&document.querySelector('#programs-content').innerHTML) renderPrograms();
 }
+</script>
+
+<script>
+// ── SERVICE WORKER REGISTRATION ──────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => {
+        console.log('GD SW registered:', reg.scope);
+        // Check for updates every time app opens
+        reg.update();
+      })
+      .catch(err => console.log('SW registration failed:', err));
+  });
+}
+
+// ── PROTECT localStorage FROM ACCIDENTAL WIPE ────────────────
+// Backup gd_workout_history to sessionStorage on every change
+// so if localStorage is cleared we can recover from sessionStorage
+(function protectHistory(){
+  const KEY = 'gd_workout_history';
+  const BACKUP = 'gd_wh_backup';
+  
+  // On load: if localStorage empty but sessionStorage has data, restore
+  try {
+    const ls = localStorage.getItem(KEY);
+    const ss = sessionStorage.getItem(BACKUP);
+    if((!ls || ls === '[]') && ss && ss !== '[]'){
+      localStorage.setItem(KEY, ss);
+      console.log('GD: restored workout history from session backup');
+    }
+    // Keep session backup fresh
+    if(ls) sessionStorage.setItem(BACKUP, ls);
+  } catch(e){}
+  
+  // Intercept localStorage.setItem to keep backup in sync
+  const origSet = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value){
+    origSet(key, value);
+    if(key === KEY){
+      try { sessionStorage.setItem(BACKUP, value); } catch(e){}
+    }
+  };
+})();
 </script>
 </body>
 </html>
