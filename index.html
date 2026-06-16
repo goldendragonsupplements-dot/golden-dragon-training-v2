@@ -583,6 +583,7 @@ input:focus,select:focus{border-color:var(--gold)}
     </div>
     <div class="wkt-time-ex-name" id="wkt-name-time">Plank</div>
     <div class="wkt-time-ex-sub" id="wkt-sets-time">3 × 45 sec</div>
+    <div id="wkt-time-set-label" style="font-size:16px;font-weight:800;color:var(--gold);margin-bottom:8px;display:none">Serija 1 / 3</div>
 
     <!-- Ring timer -->
     <div class="wkt-ring-wrap" id="wkt-ring-wrap">
@@ -3299,12 +3300,12 @@ function startWorkoutFromDay(progId, weekIdx, dayIdx){
         phase: programText(sectionPhaseKey[key]),
         section: sectionKey[key],
         // exerciseId: use e.id if exists, otherwise derive from video filename or name
-        exerciseId: e.id || (e.video ? e.video.split('/').pop().replace('.mp4?alt=media','').replace('%2F','') : null) || _slugify(_pL(e.n)),
+        exerciseId: e.id || (e.video ? e.video.split('/').pop().replace('.mp4?alt=media','') : _slugify(e.n&&e.n.en ? e.n.en : _pL(e.n))),
         n: _pL(e.n),
         d: typeof e.d==='string'?e.d:_pL(e.d),
         emoji: sectionEmoji[key],
         video: e.video || null,
-        time: e.time || 30
+        time: e.time || null
       });
     });
   });
@@ -3347,8 +3348,22 @@ function WORKOUT_NAME_LOOKUP(progId){
 // ══ WORKOUT ENGINE ═══════════════════════════════════════════
 
 // ── helpers ──
-function isTimeEx(d){return /sec|min|\s*s/i.test(d);}
-function parseSets(d){const m=d.match(/^(\d+)/);return m?parseInt(m[1]):3;}
+function isTimeEx(d){
+  if(/sec|min/i.test(d)) return true;
+  // Plain number = warmup count (e.g. "20", "15")
+  if(/^\d+$/.test(d.trim())) return true;
+  // "N runde/rounds x Y sek" = Farmer Walk etc.
+  if(/rund|round/i.test(d) && /sek|sec/i.test(d)) return true;
+  return false;
+}
+function parseSets(d){
+  if(/rund|round/i.test(d)) return 1;
+  // "1 serija...", "2 serije..." burnout sets
+  const serM=d.match(/^(\d+)\s*serij/i);
+  if(serM) return parseInt(serM[1]);
+  const m=d.match(/^(\d+)\s*[x×]/i);
+  return m?parseInt(m[1]):3;
+}
 function parseReps(d){const m=d.match(/[x×]\s*(\d+|Max)/i);return m?m[1]:'—';}
 function parseRest(phase){
   if(!phase)return 60;
@@ -3361,6 +3376,41 @@ function fmtTime(sec){
   sec=Math.max(0,sec);
   return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
 }
+
+// ── TIME SET LABEL ─────────────────────────────────────────────
+function _updateTimeSetLabel(){
+  const el = document.getElementById('wkt-time-set-label');
+  if(!el) return;
+  if(timeSetTotal > 1){
+    el.textContent = `Serija ${timeSetCurrent} / ${timeSetTotal}`;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// ── SOUND ──────────────────────────────────────────────────────
+let _audioCtx = null;
+function _getAudioCtx(){
+  if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return _audioCtx;
+}
+function _beep(freq=880, vol=0.3, dur=0.15){
+  try{
+    const ctx=_getAudioCtx();
+    const osc=ctx.createOscillator();
+    const gain=ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value=freq;
+    osc.type='sine';
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime+dur);
+  } catch(e){}
+}
+function _beepStart(){ _beep(880, 0.4, 0.2); }   // high beep = start
+function _beepFinish(){ _beep(660, 0.4, 0.1); setTimeout(()=>_beep(880,0.4,0.3),150); } // double beep = done
 function _setMedia(el,s){
   if(s.video){
     el.innerHTML=`<video src="${s.video}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>
@@ -3379,6 +3429,8 @@ let restSec=0, restTotal=0;
 let restTimer=null;
 let restAdvance=false;  // true=next exercise, false=next set
 let timeTotalSec=0;     // for ring calculation
+let timeSetCurrent=1;   // current set in time mode
+let timeSetTotal=1;     // total sets in time mode
 
 // ── LOAD STEP ──
 function loadWktStep(){
@@ -3435,33 +3487,41 @@ function _renderSetTable(s){
   const targetReps=parseReps(s.d);
   const logged=setLog[wktStep]||[];
   const rows=Math.max(totalSets, logged.length);
-  // Fetch previous workout results for this exercise
   const prevResults=getPrevResult(s.exerciseId);
+  // Hide KG for warmup/cooldown phases - bodyweight movements
+  const isWarmupPhase = s.section==='warmup'||s.section==='cooldown';
   let html='';
+  // Update table headers
+  document.getElementById('wl-th-kg').style.display = isWarmupPhase?'none':'';
+  document.getElementById('wl-th-prev').style.display = isWarmupPhase?'none':'';
   for(let i=0;i<rows;i++){
     const done=i<logged.length;
     const active=i===logged.length;
     const cls=done?'completed':(active?'active-row':'');
-    // PREV column: show just-done sets (within this session) OR last-workout result
     let prevTxt='—';
-    if(done && i>0 && logged[i-1]){
-      prevTxt=`<small>${logged[i-1].reps}×${logged[i-1].kg}kg<span class="wkt-prev-check"> ✓</span></small>`;
-    } else if(!done && prevResults && prevResults[i]){
-      const pr=prevResults[i];
-      prevTxt=`<small style="color:#aaa;font-weight:700">${pr.reps}×${pr.kg}kg</small>`;
+    if(!isWarmupPhase){
+      if(done && i>0 && logged[i-1]){
+        prevTxt=`<small>${logged[i-1].reps}×${logged[i-1].kg}kg<span class="wkt-prev-check"> ✓</span></small>`;
+      } else if(!done && prevResults && prevResults[i]){
+        const pr=prevResults[i];
+        prevTxt=`<small style="color:#aaa;font-weight:700">${pr.reps}×${pr.kg}kg</small>`;
+      }
     }
-    // KG placeholder: suggest last-workout kg for this set
-    const kgHint = (!done && prevResults && prevResults[i]) ? prevResults[i].kg : '0';
+    const kgHint = (!done && prevResults && prevResults[i] && !isWarmupPhase) ? prevResults[i].kg : '0';
     const repsHint = (!done && prevResults && prevResults[i]) ? prevResults[i].reps : targetReps;
+    const kgCell = isWarmupPhase
+      ? ''
+      : `<td><input class="wkt-inp" id="kg-${i}" type="number" inputmode="decimal"
+          placeholder="${done?logged[i].kg:kgHint}"
+          value="${done?logged[i].kg:''}" ${done?'disabled':''}></td>`;
+    const prevCell = isWarmupPhase ? '' : `<td class="wkt-prev">${prevTxt}</td>`;
     html+=`<tr class="${cls}" id="set-row-${i}">
       <td class="wkt-set-num">${i+1}</td>
-      <td class="wkt-prev">${prevTxt}</td>
+      ${prevCell}
       <td><input class="wkt-inp" id="reps-${i}" type="number" inputmode="numeric"
         placeholder="${done?logged[i].reps:repsHint}"
         value="${done?logged[i].reps:''}" ${done?'disabled':''}></td>
-      <td><input class="wkt-inp" id="kg-${i}" type="number" inputmode="decimal"
-        placeholder="${done?logged[i].kg:kgHint}"
-        value="${done?logged[i].kg:''}" ${done?'disabled':''}></td>
+      ${kgCell}
       <td>${done?'<span class=\'wkt-check\'>✓</span>':''}</td>
     </tr>`;
   }
@@ -3547,12 +3607,16 @@ function _startRestOverlay(advance, s){
   document.getElementById('wkt-rest-of').textContent=`od ${fmtTime(restTotal)}`;
   document.getElementById('wkt-rest-overlay').classList.add('on');
   clearInterval(restTimer);
+  _beep(440, 0.3, 0.2); // low beep = rest starts
   restTimer=setInterval(()=>{
     restSec--;
     _updateRestRing();
     document.getElementById('wkt-rest-clock').textContent=fmtTime(restSec);
+    // Countdown beeps: 3, 2, 1
+    if(restSec===3||restSec===2||restSec===1) _beep(660, 0.3, 0.08);
     if(restSec<=0){
       clearInterval(restTimer);
+      _beepFinish(); // double beep = rest over, next set
       document.getElementById('wkt-rest-overlay').classList.remove('on');
       if(restAdvance)wktStep++;
       loadWktStep();
@@ -3569,13 +3633,25 @@ function _updateRestRing(){
 function skipRest(){
   clearInterval(restTimer);
   document.getElementById('wkt-rest-overlay').classList.remove('on');
-  // just close overlay, don't advance - user stays on same exercise
+  if(!restAdvance && timeSetCurrent <= timeSetTotal){
+    // Time mode between sets: reset timer
+    setWktTimer(timeTotalSec);
+    document.getElementById('wkt-ring-of').textContent=`od ${fmtTime(timeTotalSec)}`;
+    _updateTimeRing(timeTotalSec);
+    _updateTimeSetLabel();
+  }
 }
 function finishRestTimer(){
   clearInterval(restTimer);
   document.getElementById('wkt-rest-overlay').classList.remove('on');
-  if(restAdvance)wktStep++;
-  loadWktStep();
+  if(restAdvance){wktStep++;loadWktStep();}
+  else if(timeSetCurrent <= timeSetTotal){
+    // Time mode: reset timer for next set
+    setWktTimer(timeTotalSec);
+    document.getElementById('wkt-ring-of').textContent=`od ${fmtTime(timeTotalSec)}`;
+    _updateTimeRing(timeTotalSec);
+    _updateTimeSetLabel();
+  }
 }
 function adjustRest(delta){
   restSec=Math.max(5,restSec+delta);
@@ -3596,15 +3672,41 @@ function _loadTimeMode(s){
   }
   document.getElementById('wkt-name-time').textContent=s.n;
   document.getElementById('wkt-sets-time').textContent=s.d;
-  timeTotalSec=s.time||30;
-  setWktTimer(timeTotalSec);
-  document.getElementById('wkt-ring-of').textContent=`od ${fmtTime(timeTotalSec)}`;
-  _updateTimeRing(timeTotalSec);
-  document.getElementById('wl-start-ico').textContent='▶';
-  document.getElementById('wl-start-txt').textContent='Start';
-  // unilateral
-  const uni=/each side|links|rechts|left|right|svaka|strana/i.test(s.d);
-  document.getElementById('wkt-side-btns').style.display=uni?'flex':'none';
+
+    // Check if this is a plain count (no actual timer needed)
+  const isPlainCount = /^\d+$/.test(s.d.trim());
+  if(isPlainCount){
+    document.getElementById('wkt-ring-wrap').style.display='none';
+    document.getElementById('wkt-sets-time').style.cssText='font-size:64px;font-weight:900;color:var(--gold2);margin:20px 0';
+    document.getElementById('wl-start-ico').textContent='✓';
+    document.getElementById('wl-start-txt').textContent='Gotovo';
+    document.getElementById('wkt-side-btns').style.display='none';
+  } else {
+    document.getElementById('wkt-ring-wrap').style.display='inline-flex';
+    document.getElementById('wkt-sets-time').style.cssText='font-size:13px;color:var(--muted);margin-bottom:12px';
+    // Parse sets from descriptor e.g. "3×30 sec" → 3 sets of 30s
+    const setsMatch = s.d.match(/^(\d+)\s*[x×]/i);
+    timeSetTotal = setsMatch ? parseInt(setsMatch[1]) : 1;
+    timeSetCurrent = 1;
+    // Extract seconds from descriptor if no time property
+    let autoSec = 30;
+    if(s.time){ autoSec = s.time; }
+    else {
+      const secM = s.d.match(/(\d+)\s*sec/i);
+      const minM = s.d.match(/(\d+)\s*min/i);
+      if(secM) autoSec = parseInt(secM[1]);
+      else if(minM) autoSec = parseInt(minM[1]) * 60;
+    }
+    timeTotalSec = autoSec;
+    setWktTimer(timeTotalSec);
+    document.getElementById('wkt-ring-of').textContent=`od ${fmtTime(timeTotalSec)}`;
+    _updateTimeRing(timeTotalSec);
+    _updateTimeSetLabel();
+    document.getElementById('wl-start-ico').textContent='▶';
+    document.getElementById('wl-start-txt').textContent='Start';
+    const uni=/each side|links|rechts|left|right|svaka|strana/i.test(s.d);
+    document.getElementById('wkt-side-btns').style.display=uni?'flex':'none';
+  }
 }
 function _updateTimeRing(remaining){
   const circ=439.8;
@@ -3620,23 +3722,63 @@ function setWktTimer(sec){
 }
 function startTimer(){
   clearInterval(wktTimer);
-  const startBtn=document.getElementById('wkt-start-btn');
   const isPlaying=document.getElementById('wl-start-ico').textContent==='⏸';
   if(isPlaying){
     document.getElementById('wl-start-ico').textContent='▶';
     document.getElementById('wl-start-txt').textContent='Start';
     return;
   }
+  _beepStart();
   document.getElementById('wl-start-ico').textContent='⏸';
   document.getElementById('wl-start-txt').textContent='Pauza';
   wktTimer=setInterval(()=>{
     wktSec--;
     document.getElementById('wkt-timer').textContent=fmtTime(wktSec);
     _updateTimeRing(wktSec);
+    if(wktSec===3||wktSec===2||wktSec===1) _beep(660, 0.3, 0.08);
     if(wktSec<=0){
       clearInterval(wktTimer);
+      _beepFinish();
       document.getElementById('wl-start-ico').textContent='▶';
       document.getElementById('wl-start-txt').textContent='Start';
+      // If more sets remain, show rest then next set
+      if(timeSetCurrent < timeSetTotal){
+        timeSetCurrent++;
+        // Short rest between sets (show rest overlay briefly)
+        _startRestOverlayTimeMode();
+      }
+      // else: all sets done, user clicks Vježba završena
+    }
+  },1000);
+}
+
+function _startRestOverlayTimeMode(){
+  // Show rest overlay for 30 sec between time-based sets
+  restAdvance = false;
+  restTotal = 30;
+  restSec = 30;
+  _updateRestRing();
+  document.getElementById('wkt-rest-clock').textContent = fmtTime(restSec);
+  document.getElementById('wkt-rest-of').textContent = `od ${fmtTime(restTotal)}`;
+  document.getElementById('wkt-rest-next').textContent = 'Sljedeća serija';
+  document.getElementById('wkt-rest-next-sub').textContent = `${timeSetCurrent} / ${timeSetTotal}`;
+  document.getElementById('wkt-rest-overlay').classList.add('on');
+  clearInterval(restTimer);
+  _beep(440, 0.3, 0.2);
+  restTimer = setInterval(()=>{
+    restSec--;
+    _updateRestRing();
+    document.getElementById('wkt-rest-clock').textContent = fmtTime(restSec);
+    if(restSec===3||restSec===2||restSec===1) _beep(660, 0.3, 0.08);
+    if(restSec<=0){
+      clearInterval(restTimer);
+      _beepFinish();
+      document.getElementById('wkt-rest-overlay').classList.remove('on');
+      // Reset timer for next set
+      setWktTimer(timeTotalSec);
+      document.getElementById('wkt-ring-of').textContent=`od ${fmtTime(timeTotalSec)}`;
+      _updateTimeRing(timeTotalSec);
+      _updateTimeSetLabel();
     }
   },1000);
 }
@@ -3673,7 +3815,7 @@ function finishWorkout(){
   const exercises = wktPlan.map((step, idx) => {
     const isTime = isTimeEx(step.d);
     const entry = {
-      exerciseId: step.exerciseId || _slugify(step.n),
+      exerciseId: step.exerciseId || _slugify(step.n), // stable ID from video filename or slug
       exerciseName: step.n,
       section: step.section || 'main',
       exerciseType: isTime ? 'time' : 'strength',
