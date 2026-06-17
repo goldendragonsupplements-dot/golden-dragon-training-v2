@@ -470,6 +470,7 @@ input:focus,select:focus{border-color:var(--gold)}
 
   <!-- QUICK START HORIZONTAL -->
   <div style="padding:0 16px;margin-bottom:8px">
+    <div id="home-continue-wrap"></div>
     <div class="sec-title" id="hl-quick">SCHNELLSTART</div>
   </div>
   <div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none" id="home-quick">
@@ -1338,7 +1339,13 @@ function goTo(page){
   const navMap={home:'nb-home',programs:'nb-programs',quiz:'nb-quiz',progress:'nb-progress',profile:'nb-profile'};
   if(navMap[page]) document.getElementById(navMap[page]).classList.add('on');
   if(page==='home'){renderHome();show('s-home');}
-  else if(page==='programs'){renderPrograms();show('s-programs');}
+  else if(page==='programs'){
+    // Tab tap always resets to top of programs list
+    activeCat='all'; activeProgDetail=null; activeProgSubCat=null;
+    activeProgSubCat2=null; activeWeekIdx=null; activeDayIdx=null;
+    activeBlokIdx=null; activeExerciseDetail=null;
+    renderPrograms(); show('s-programs');
+  }
   else if(page==='progress'){renderProgress();show('s-progress');}
   else if(page==='quiz'){initQuiz();show('s-quiz');}
   else if(page==='profile'){show('s-profile');}
@@ -1436,6 +1443,29 @@ function renderHome(){
   document.getElementById('prof-name').textContent=name;
   document.getElementById('prof-email').textContent=me.email||'';
 
+  // ── NASTAVI TRENING card (1 tap → direktno start) ───────────
+  try{
+    const lastDayRaw = localStorage.getItem('gd_last_day');
+    const contEl = document.getElementById('home-continue-wrap');
+    if(lastDayRaw && contEl){
+      const ld = JSON.parse(lastDayRaw);
+      const wd = WORKOUT_DATA[ld.progId];
+      if(wd){
+        const lblContinue = {hr:'NASTAVI TRENING',en:'CONTINUE WORKOUT',de:'TRAINING FORTSETZEN',pl:'KONTYNUUJ TRENING',ru:'ПРОДОЛЖИТЬ ТРЕНИРОВКУ',tr:'ANTRENMANA DEVAM'};
+        const lblStart    = {hr:'▶ Pokreni trening',en:'▶ Start workout',de:'▶ Training starten',pl:'▶ Rozpocznij',ru:'▶ Начать',tr:'▶ Başla'};
+        contEl.innerHTML = `
+          <div style="background:linear-gradient(135deg,#1a1200,#0d0d0d);border:1px solid rgba(201,168,76,.35);border-radius:16px;padding:16px;margin-bottom:18px">
+            <div style="font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">${lblContinue[lang]||lblContinue.en}</div>
+            <div style="font-size:16px;font-weight:900;color:var(--gold2);margin-bottom:2px">${ld.progName||''}</div>
+            <div style="font-size:13px;color:#aaa;margin-bottom:14px">${ld.dayName||''}</div>
+            <button onclick="resumeLastWorkout()" style="width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:900;cursor:pointer">
+              ${lblStart[lang]||lblStart.en}
+            </button>
+          </div>`;
+      } else if(contEl){ contEl.innerHTML=''; }
+    } else if(contEl){ contEl.innerHTML=''; }
+  }catch(e){}
+
   // Quick start cats (first 4)
   const quickCats=CATS.slice(0,4);
   const qg=document.getElementById('home-quick');
@@ -1477,6 +1507,16 @@ let filterCat='all', filterSearch='';
 function openCat(catId){
   activeCat=catId;
   goTo('programs');
+}
+
+function resumeLastWorkout(){
+  try{
+    const ld = JSON.parse(localStorage.getItem('gd_last_day'));
+    if(!ld || !WORKOUT_DATA[ld.progId]) return;
+    // Restore blokIdx so startWorkoutFromDay picks correct weeks array
+    activeBlokIdx = ld.blokIdx !== undefined ? ld.blokIdx : null;
+    startWorkoutFromDay(ld.progId, ld.weekIdx, ld.dayIdx);
+  }catch(e){}
 }
 
 function programText(key){
@@ -2956,6 +2996,12 @@ let activeExerciseDetail = null; // {section, idx}
 function openProgPlaceholder(progId, catId, sub1Id, sub2Id){
   activeProgDetail={progId, catId, sub1Id:sub1Id||null, sub2Id:sub2Id||null};
   activeWeekIdx=null; activeDayIdx=null; activeBlokIdx=null; activeExerciseDetail=null;
+  // Save last opened program for "Continue" button on Home
+  try{
+    localStorage.setItem('gd_last_prog', JSON.stringify({
+      progId, catId, sub1Id:sub1Id||null, sub2Id:sub2Id||null
+    }));
+  }catch(e){}
   renderPrograms();
   window.scrollTo(0,0);
 }
@@ -3312,6 +3358,17 @@ function startWorkoutFromDay(progId, weekIdx, dayIdx){
   if(!wktPlan.length) return;
   wktStep=0;
   setLog={};
+  // Save last workout day so Home screen can resume with 1 tap
+  try{
+    const wd=WORKOUT_DATA[progId];
+    const day=wd?.bloks?.[activeBlokIdx]?.weeks?.[weekIdx]?.days?.[dayIdx]
+              || wd?.weeks?.[weekIdx]?.days?.[dayIdx];
+    localStorage.setItem('gd_last_day', JSON.stringify({
+      progId, blokIdx:activeBlokIdx, weekIdx, dayIdx,
+      progName: WORKOUT_NAME_LOOKUP(progId),
+      dayName: day?._pL_day_label || (day?.dayLabel ? _pL(day.dayLabel) : '')
+    }));
+  }catch(e){}
   wktStartTime=Date.now();
   wktMeta={progId, weekIdx, dayIdx,
     progName:WORKOUT_NAME_LOOKUP(progId),
