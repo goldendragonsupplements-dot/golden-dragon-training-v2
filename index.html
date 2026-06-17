@@ -3701,16 +3701,13 @@ function _renderSetTable(s){
         prevTxt=`<small style="color:#aaa;font-weight:700">${pr.reps}×${pr.kg}kg</small>`;
       }
     }
-    // kgHint: prev workout same set → last logged set in this session → 0
+    // kgHint per set: use last LOGGED set in THIS session first, then prev workout, then 0
   const lastLoggedKg = logged.length>0 ? logged[logged.length-1].kg : null;
-  const kgHint = (!done && !isWarmupPhase)
-    ? (prevResults&&prevResults[i] ? prevResults[i].kg : (lastLoggedKg!==null ? lastLoggedKg : '0'))
-    : '0';
     const repsHint = (!done && prevResults && prevResults[i]) ? prevResults[i].reps : targetReps;
     const kgCell = isWarmupPhase
       ? ''
       : `<td><input class="wkt-inp" id="kg-${i}" type="number" inputmode="decimal"
-          placeholder="${done?logged[i].kg:kgHint}"
+          placeholder="${done ? logged[i].kg : (lastLoggedKg!==null ? lastLoggedKg : (prevResults&&prevResults[i] ? prevResults[i].kg : '0'))}"
           value="${done?logged[i].kg:''}" ${done?'disabled':''}></td>`;
     const prevCell = isWarmupPhase ? '' : `<td class="wkt-prev">${prevTxt}</td>`;
     html+=`<tr class="${cls}" id="set-row-${i}">
