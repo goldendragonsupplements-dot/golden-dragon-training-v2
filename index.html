@@ -3694,9 +3694,13 @@ function _renderSetTable(s){
     const cls=done?'completed':(active?'active-row':'');
     let prevTxt='—';
     if(!isWarmupPhase){
-      if(done && i>0 && logged[i-1]){
-        prevTxt=`<small>${logged[i-1].reps}×${logged[i-1].kg}kg<span class="wkt-prev-check"> ✓</span></small>`;
+      if(i>0 && logged[i-1]){
+        // Show the just-completed previous set from THIS session
+        const ps=logged[i-1];
+        const check=done?'':' ✓';
+        prevTxt=`<small>${ps.reps}×${ps.kg}kg<span class="wkt-prev-check">${check}</span></small>`;
       } else if(!done && prevResults && prevResults[i]){
+        // No session history yet — show previous workout result
         const pr=prevResults[i];
         prevTxt=`<small style="color:#aaa;font-weight:700">${pr.reps}×${pr.kg}kg</small>`;
       }
