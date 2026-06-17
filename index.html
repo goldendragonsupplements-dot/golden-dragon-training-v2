@@ -204,22 +204,28 @@ input:focus,select:focus{border-color:var(--gold)}
 .btn-skip-ex{background:#111;border:1px solid #222;color:#666;border-radius:12px;padding:11px;font-size:13px;cursor:pointer;width:100%;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
 
 /* ── REST TIMER OVERLAY ── */
-.wkt-rest-overlay{position:absolute;inset:0;background:#020202;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:20;padding:24px}
+.wkt-rest-overlay{position:absolute;inset:0;background:#020202;display:none;flex-direction:column;z-index:20}
 .wkt-rest-overlay.on{display:flex}
-.wkt-rest-title{font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.wkt-rest-ring-wrap{position:relative;margin:16px 0}
+/* TOP: next exercise preview */
+.wkt-rest-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:16px 16px 12px;min-height:0;overflow:hidden}
+.wkt-rest-next-label{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+#wkt-rest-video-wrap{width:100%;max-width:340px;border-radius:14px;overflow:hidden;aspect-ratio:16/9;background:#111;margin-bottom:10px;flex-shrink:0}
+#wkt-rest-video-wrap video{width:100%;height:100%;object-fit:cover}
+#wkt-rest-video-wrap .rest-no-vid{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px}
+.wkt-rest-next-name{font-size:18px;font-weight:900;color:#fff;text-align:center;margin-bottom:4px}
+.wkt-rest-next-sub{font-size:13px;color:var(--gold);font-weight:700;text-align:center}
+/* BOTTOM: timer */
+.wkt-rest-bottom{display:flex;flex-direction:column;align-items:center;padding:8px 16px 20px;border-top:1px solid #1a1a1a}
+.wkt-rest-tip{font-size:14px;font-weight:700;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.wkt-rest-ring-wrap{position:relative;margin:4px 0}
 .wkt-rest-clock-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.wkt-rest-clock{font-size:54px;font-weight:900;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1}
-.wkt-rest-of{font-size:13px;color:#444;margin-top:2px}
-.wkt-rest-next{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
-.wkt-rest-next-sub{font-size:12px;color:#555;margin-bottom:20px}
-.wkt-rest-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px}
+.wkt-rest-clock{font-size:48px;font-weight:900;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1}
+.wkt-rest-of{font-size:12px;color:#444;margin-top:2px}
+.wkt-rest-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px}
 .btn-skip-rest{background:#1a1a1a;border:1px solid #333;color:#aaa;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-finish-rest{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-weight:900;border:none;border-radius:12px;padding:14px;font-size:14px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px}
-.wkt-rest-tip{font-size:11px;color:#333;margin-top:12px;display:flex;align-items:center;gap:4px}
-.wkt-rest-adj-row{display:flex;gap:8px;margin-top:10px;margin-bottom:16px}
-.btn-adj{background:#111;border:1px solid #222;color:#888;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
-.btn-adj:hover{border-color:var(--gold);color:var(--gold)}
+.wkt-rest-adj-row{display:flex;gap:8px;margin:4px 0 8px}
+.btn-adj{background:#111;border:1px solid #222;color:#888;border-radius:8px;padding:8px 20px;font-size:14px;font-weight:700;cursor:pointer}
 
 /* ── TIME MODE ── */
 .wkt-time-mode{display:flex;flex-direction:column;flex:1;overflow-y:auto;align-items:center;padding:14px;text-align:center;-webkit-overflow-scrolling:touch}
@@ -613,36 +619,44 @@ input:focus,select:focus{border-color:var(--gold)}
 
   <!-- ─── REST OVERLAY ─── -->
   <div class="wkt-rest-overlay" id="wkt-rest-overlay">
-    <div class="wkt-rest-title" id="wl-restlbl">ODMOR</div>
-    <!-- Ring -->
-    <div class="wkt-rest-ring-wrap">
-      <svg style="transform:rotate(-90deg)" width="200" height="200" viewBox="0 0 200 200">
-        <circle fill="none" stroke="#1a1200" stroke-width="10" cx="100" cy="100" r="88"/>
-        <circle fill="none" stroke="var(--gold)" stroke-width="10" stroke-linecap="round"
-          cx="100" cy="100" r="88"
-          stroke-dasharray="552.9" id="wkt-rest-ring"
-          stroke-dashoffset="0"/>
-      </svg>
-      <div class="wkt-rest-clock-center">
-        <div class="wkt-rest-clock" id="wkt-rest-clock">01:30</div>
-        <div class="wkt-rest-of" id="wkt-rest-of">od 01:30</div>
+
+    <!-- TOP HALF: Sljedeća vježba -->
+    <div class="wkt-rest-top">
+      <div class="wkt-rest-next-label" id="wl-restlbl">ODMOR</div>
+      <div id="wkt-rest-video-wrap"></div>
+      <div class="wkt-rest-next-name" id="wkt-rest-next">Sljedeća vježba</div>
+      <div class="wkt-rest-next-sub" id="wkt-rest-next-sub"></div>
+    </div>
+
+    <!-- BOTTOM HALF: Tajmer + gumbi -->
+    <div class="wkt-rest-bottom">
+      <div class="wkt-rest-tip">💧 <span id="wl-resttip">Pijte vodu i odmorite se</span></div>
+      <div class="wkt-rest-ring-wrap">
+        <svg style="transform:rotate(-90deg)" width="160" height="160" viewBox="0 0 200 200">
+          <circle fill="none" stroke="#1a1200" stroke-width="10" cx="100" cy="100" r="88"/>
+          <circle fill="none" stroke="var(--gold)" stroke-width="10" stroke-linecap="round"
+            cx="100" cy="100" r="88"
+            stroke-dasharray="552.9" id="wkt-rest-ring"
+            stroke-dashoffset="0"/>
+        </svg>
+        <div class="wkt-rest-clock-center">
+          <div class="wkt-rest-clock" id="wkt-rest-clock">01:30</div>
+          <div class="wkt-rest-of" id="wkt-rest-of">od 01:30</div>
+        </div>
+      </div>
+      <div class="wkt-rest-adj-row">
+        <button class="btn-adj" onclick="adjustRest(-15)">−15s</button>
+        <button class="btn-adj" onclick="adjustRest(15)">+15s</button>
+      </div>
+      <div class="wkt-rest-btns">
+        <button class="btn-skip-rest" onclick="skipRest()">
+          ⏭ <span id="wl-skiprest">Preskoči odmor</span>
+        </button>
+        <button class="btn-finish-rest" onclick="finishRestTimer()">
+          ✓ <span id="wl-finishrest">Završi odmor</span>
+        </button>
       </div>
     </div>
-    <div class="wkt-rest-adj-row">
-      <button class="btn-adj" onclick="adjustRest(-15)">−15s</button>
-      <button class="btn-adj" onclick="adjustRest(15)">+15s</button>
-    </div>
-    <div class="wkt-rest-next" id="wkt-rest-next">Sljedeća serija</div>
-    <div class="wkt-rest-next-sub" id="wkt-rest-next-sub">4 / 4</div>
-    <div class="wkt-rest-btns">
-      <button class="btn-skip-rest" onclick="skipRest()">
-        ⏭ <span id="wl-skiprest">Preskoči odmor</span>
-      </button>
-      <button class="btn-finish-rest" onclick="finishRestTimer()">
-        ✓ <span id="wl-finishrest">Završi odmor</span>
-      </button>
-    </div>
-    <div class="wkt-rest-tip">💧 <span id="wl-resttip">Pijte vodu i odmorite se</span></div>
   </div>
 
 </div>
@@ -1523,14 +1537,23 @@ function renderHome(){
 
   // Quick start cats (first 4)
   const quickCats=CATS.slice(0,4);
+  const openLbl={hr:'Otvori',en:'Open',de:'Öffnen',pl:'Otwórz',ru:'Открыть',tr:'Aç'};
+  const antonioLbl={hr:'Rehabilitacija',en:'Rehabilitation',de:'Rehabilitation',pl:'Rehabilitacja',ru:'Реабилитация',tr:'Rehabilitasyon'};
+  const antonioBtnLbl={hr:'Otvori',en:'Open',de:'Öffnen',pl:'Otwórz',ru:'Открыть',tr:'Aç'};
   const qg=document.getElementById('home-quick');
   if(qg) qg.innerHTML=quickCats.map(c=>`
     <div onclick="openCat('${c.id}')" style="flex-shrink:0;background:var(--card);border:1px solid #1e1e1e;border-radius:14px;padding:14px 16px;min-width:140px;cursor:pointer">
       <div style="font-size:28px;margin-bottom:8px">${c.icon}</div>
       <div style="font-size:13px;font-weight:800;color:var(--text)">${c[lang]||c.de}</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">${(c.desc&&c.desc[lang])||c.desc.de}</div>
-      <div style="margin-top:10px;background:var(--gold);color:#000;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:800;display:inline-block;cursor:pointer">${lang==='hr'?'Otvori':lang==='en'?'Open':lang==='pl'?'Otwórz':lang==='ru'?'Открыть':lang==='tr'?'Aç':'Öffnen'}</div>
-    </div>`).join('');
+      <div style="margin-top:10px;background:var(--gold);color:#000;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:800;display:inline-block">${openLbl[lang]||openLbl.en}</div>
+    </div>`).join('')+`
+    <div onclick="openCat('rehab_spine')" style="flex-shrink:0;background:var(--card);border:1px solid #1e1e1e;border-radius:14px;padding:14px 16px;min-width:140px;cursor:pointer">
+      <div style="font-size:28px;margin-bottom:8px">🦅</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text)">Antonio</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${antonioLbl[lang]||antonioLbl.en}</div>
+      <div style="margin-top:10px;background:var(--gold);color:#000;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:800;display:inline-block">${antonioBtnLbl[lang]||antonioBtnLbl.en}</div>
+    </div>`;
 
   // Categories grid removed — available in Programs tab
 
@@ -1554,7 +1577,12 @@ function renderHome(){
 let filterCat='all', filterSearch='';
 function openCat(catId){
   activeCat=catId;
-  goTo('programs');
+  activeProgDetail=null; activeProgSubCat=null;
+  activeProgSubCat2=null; activeWeekIdx=null; activeDayIdx=null;
+  activeBlokIdx=null; activeExerciseDetail=null;
+  renderPrograms(); show('s-programs');
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('nb-programs').classList.add('on');
 }
 
 function resumeLastWorkout(){
@@ -3633,7 +3661,11 @@ function _renderSetTable(s){
         prevTxt=`<small style="color:#aaa;font-weight:700">${pr.reps}×${pr.kg}kg</small>`;
       }
     }
-    const kgHint = (!done && prevResults && prevResults[i] && !isWarmupPhase) ? prevResults[i].kg : '0';
+    // kgHint: prev workout same set → last logged set in this session → 0
+  const lastLoggedKg = logged.length>0 ? logged[logged.length-1].kg : null;
+  const kgHint = (!done && !isWarmupPhase)
+    ? (prevResults&&prevResults[i] ? prevResults[i].kg : (lastLoggedKg!==null ? lastLoggedKg : '0'))
+    : '0';
     const repsHint = (!done && prevResults && prevResults[i]) ? prevResults[i].reps : targetReps;
     const kgCell = isWarmupPhase
       ? ''
@@ -3646,7 +3678,9 @@ function _renderSetTable(s){
       ${prevCell}
       <td><input class="wkt-inp" id="reps-${i}" type="number" inputmode="numeric"
         placeholder="${done?logged[i].reps:repsHint}"
-        value="${done?logged[i].reps:''}" ${done?'disabled':''}></td>
+        value="${done?logged[i].reps:''}" ${done?'disabled':''}
+        onkeydown="if(event.key==='Enter'||event.key==='Tab'){event.preventDefault();const k=document.getElementById('kg-${i}');if(k){k.focus();k.select();}}"
+        ></td>
       ${kgCell}
       <td>${done?'<span class=\'wkt-check\'>✓</span>':''}</td>
     </tr>`;
@@ -3688,8 +3722,9 @@ function completeSetReps(){
   const repsEl=document.getElementById('reps-'+i);
   const kgEl=document.getElementById('kg-'+i);
   if(!repsEl)return;
-  const reps=parseInt(repsEl.value)||0;
-  const kg=parseFloat(kgEl.value)||0;
+  // Use placeholder if input is empty (user didn't change default)
+  const reps = parseInt(repsEl.value) || parseInt(repsEl.placeholder) || 0;
+  const kg   = parseFloat(kgEl ? kgEl.value : 0) || parseFloat(kgEl ? kgEl.placeholder : 0) || 0;
   if(!setLog[wktStep])setLog[wktStep]=[];
   setLog[wktStep].push({reps,kg});
   const totalSets=parseSets(s.d);
@@ -3721,13 +3756,35 @@ function _startRestOverlay(advance, s){
   restSec=restTotal;
   const logged=setLog[wktStep]||[];
   const totalSets=parseSets(s.d);
-  // update UI
-  const nextSet=advance?1:logged.length+1;
-  const nextMax=advance?parseSets((wktPlan[wktStep+1]||s).d):totalSets;
-  document.getElementById('wkt-rest-next').textContent=
-    advance?`Sljedeća vježba`:`Sljedeća serija`;
-  document.getElementById('wkt-rest-next-sub').textContent=
-    advance?`${wktStep+2} / ${wktPlan.length}`:`${logged.length} / ${totalSets}`;
+
+  // ── Next exercise/set info ──────────────────────────────
+  const nextStep = advance ? wktStep+1 : wktStep;
+  const nextS = wktPlan[nextStep] || s;
+  const nextSet = advance ? 1 : logged.length+1;
+  const nextMax = parseSets(nextS.d);
+
+  // Label: "Sljedeća vježba" or "Sljedeća serija"
+  const nextLabel = advance ? 'Sljedeća vježba' : 'Sljedeća serija';
+  // Sub: exercise name if advancing, set count if same exercise
+  const nextName = advance ? nextS.n : s.n;
+  const nextSub  = advance
+    ? `${nextSet} / ${nextMax} serija`
+    : `Serija ${nextSet} / ${nextMax}`;
+
+  document.getElementById('wkt-rest-next').textContent = nextName;
+  document.getElementById('wkt-rest-next-sub').textContent = nextSub;
+
+  // ── Next exercise video ─────────────────────────────────
+  const videoWrap = document.getElementById('wkt-rest-video-wrap');
+  if(nextS.video){
+    videoWrap.innerHTML = `<video src="${nextS.video}" autoplay muted loop playsinline></video>`;
+  } else {
+    videoWrap.innerHTML = `<div class="rest-no-vid">${nextS.emoji||'💪'}</div>`;
+  }
+
+  // ── Rest label ──────────────────────────────────────────
+  document.getElementById('wl-restlbl').textContent = nextLabel.toUpperCase();
+
   _updateRestRing();
   document.getElementById('wkt-rest-clock').textContent=fmtTime(restSec);
   document.getElementById('wkt-rest-of').textContent=`od ${fmtTime(restTotal)}`;
@@ -4142,11 +4199,20 @@ function showHistDetail(workoutId){
     </div>`;
   });
 
+  // Calculate total volume (kg lifted)
+  let totalVol = 0;
+  (record.exercises||[]).forEach(ex=>{
+    if(ex.exerciseType==='strength'){
+      (ex.sets||[]).forEach(s=>{ totalVol += (s.reps||0)*(s.kg||0); });
+    }
+  });
+  const volStr = totalVol > 0 ? `· 🏋️ ${totalVol.toLocaleString()} kg` : '';
+
   body.innerHTML=`
     <div style="margin-bottom:14px">
       <div style="font-size:22px;font-weight:900;color:var(--gold2);margin-bottom:4px">${record.programName||'Workout'}</div>
       ${record.workoutName&&record.workoutName!==record.programName?`<div style="font-size:14px;color:var(--muted);margin-bottom:4px">${record.workoutName}</div>`:''}
-      <div style="font-size:13px;color:#555">📅 ${ds} · ⏱ ${record.durationMin||0} min</div>
+      <div style="font-size:13px;color:#555">📅 ${ds} · ⏱ ${record.durationMin||0} min ${volStr}</div>
     </div>
     ${sectionsHtml}
     <button class="btn btn-sec" onclick="if(confirm('Obriši?')){delLocalLog('${record.workoutId}',{closest:()=>document.createElement('div')});closeHistDetail();}"
