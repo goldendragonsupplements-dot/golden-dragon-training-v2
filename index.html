@@ -3694,13 +3694,12 @@ function _renderSetTable(s){
     const cls=done?'completed':(active?'active-row':'');
     let prevTxt='—';
     if(!isWarmupPhase){
-      if(i>0 && logged[i-1]){
-        // Show the just-completed previous set from THIS session
-        const ps=logged[i-1];
-        const check=done?'':' ✓';
-        prevTxt=`<small>${ps.reps}×${ps.kg}kg<span class="wkt-prev-check">${check}</span></small>`;
+      if(done && logged[i]){
+        // This set is done — show what was logged for THIS set
+        const ps=logged[i];
+        prevTxt=`<small>${ps.reps}×${ps.kg}kg<span class="wkt-prev-check"> ✓</span></small>`;
       } else if(!done && prevResults && prevResults[i]){
-        // No session history yet — show previous workout result
+        // Not yet done — show previous workout result for this set index
         const pr=prevResults[i];
         prevTxt=`<small style="color:#aaa;font-weight:700">${pr.reps}×${pr.kg}kg</small>`;
       }
