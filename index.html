@@ -1437,9 +1437,49 @@ auth.onAuthStateChanged(user=>{
   }
 });
 function afterLogin(){
-  renderHome();
-  show('s-home');
-  document.getElementById('nb-home').classList.add('on');
+  // Sync Firebase history → localStorage on login
+  _syncFirebaseHistory().then(()=>{
+    renderHome();
+    show('s-home');
+    document.getElementById('nb-home').classList.add('on');
+  });
+}
+
+function _syncFirebaseHistory(){
+  if(!me) return Promise.resolve();
+  return db.collection('users').doc(me.uid).collection('workoutLogs')
+    .orderBy('completedAt','desc').limit(200).get()
+    .then(snaps=>{
+      if(snaps.empty) return;
+      const local = _histAll();
+      const localIds = new Set(local.map(r=>r.workoutId));
+      let added = 0;
+      snaps.forEach(doc=>{
+        const d = doc.data();
+        const wid = d.workoutId || doc.id;
+        if(!localIds.has(wid)){
+          // Parse exercises from Firebase (stored as JSON string)
+          let exs = [];
+          try{ exs = typeof d.exercises==='string' ? JSON.parse(d.exercises) : (d.exercises||[]); }catch(e){}
+          local.push({
+            workoutId: wid,
+            programId: d.programId||'',
+            programName: d.programName||'',
+            workoutName: d.workoutName||'',
+            date: d.completedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+            durationMin: d.durationMin||0,
+            exercises: exs
+          });
+          added++;
+        }
+      });
+      if(added>0){
+        // Sort newest first and save
+        local.sort((a,b)=>new Date(b.date)-new Date(a.date));
+        try{ localStorage.setItem('gd_workout_history', JSON.stringify(local.slice(0,200))); }catch(e){}
+      }
+    })
+    .catch(()=>{});
 }
 
 // ══ HOME ═════════════════════════════════════════════════════
