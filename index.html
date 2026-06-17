@@ -3707,7 +3707,7 @@ function _renderSetTable(s){
     const kgCell = isWarmupPhase
       ? ''
       : `<td><input class="wkt-inp" id="kg-${i}" type="number" inputmode="decimal"
-          placeholder="${done ? logged[i].kg : (lastLoggedKg!==null ? lastLoggedKg : (prevResults&&prevResults[i] ? prevResults[i].kg : '0'))}"
+          placeholder="${done ? logged[i].kg : (i>0 && logged[i-1] ? logged[i-1].kg : (prevResults&&prevResults[i] ? prevResults[i].kg : '0'))}"
           value="${done?logged[i].kg:''}" ${done?'disabled':''}></td>`;
     const prevCell = isWarmupPhase ? '' : `<td class="wkt-prev">${prevTxt}</td>`;
     html+=`<tr class="${cls}" id="set-row-${i}">
