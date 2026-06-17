@@ -4181,6 +4181,22 @@ function renderProgress(){
 function delLocalLog(workoutId, btn){
   _histDelete(workoutId);
   btn.closest('.hist-card').remove();
+  // Also delete from Firebase so sync doesn't bring it back
+  if(me){
+    db.collection('users').doc(me.uid).collection('workoutLogs')
+      .where('workoutId','==',workoutId).get()
+      .then(snaps=>{ snaps.forEach(d=>d.ref.delete()); })
+      .catch(()=>{});
+  }
+  // Clear last_day card if no history left for that program
+  try{
+    const lastRaw = localStorage.getItem('gd_last_day');
+    if(lastRaw){
+      const ld = JSON.parse(lastRaw);
+      const hasHist = _histAll().some(h=>h.programId===ld.progId);
+      if(!hasHist) localStorage.removeItem('gd_last_day');
+    }
+  }catch(e){}
   toast(t('saved'),'ok');
   renderHome();
 }
