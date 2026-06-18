@@ -1423,7 +1423,15 @@ function doGoogle(){
     .then(r=>saveUser(r.user,r.user.displayName||'Champion'))
     .catch(e=>{if(e.code!=='auth/popup-closed-by-user') showAerr(e.message);});
 }
-function doLogout(){auth.signOut();}
+function doLogout(){
+  // Clear local traces so the next user on this device doesn't see previous history
+  try{
+    localStorage.removeItem('gd_workout_history');
+    localStorage.removeItem('gd_last_day');
+    sessionStorage.removeItem('gd_wh_backup');
+  }catch(e){}
+  auth.signOut();
+}
 
 // ── DELETE ACCOUNT (GDPR) ──────────────────────────────────
 // Deletes all user data from Firestore, then deletes the auth account.
@@ -1446,11 +1454,12 @@ async function doDeleteAccount(){
     // 2) Delete the user profile document
     await db.collection('users').doc(uid).delete().catch(()=>{});
 
-    // 3) Clear local data
+    // 3) Clear local data (localStorage AND sessionStorage backup)
     try{
       localStorage.removeItem('gd_workout_history');
       localStorage.removeItem('gd_last_day');
       localStorage.removeItem('gd_deleted_workouts');
+      sessionStorage.removeItem('gd_wh_backup');   // also clear the protectHistory backup
     }catch(e){}
 
     // 4) Delete the auth account itself
