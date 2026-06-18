@@ -432,7 +432,7 @@ input:focus,select:focus{border-color:var(--gold)}
     <input type="checkbox" id="chk2" onchange="chkDisc()">
     <label for="chk2" id="disc-chk2">Ich stimme der Datenschutzerklärung (DSGVO) zu.</label>
   </div>
-  <button class="btn" id="disc-btn" onclick="acceptDisc()" disabled id="disc-accept">Zustimmen & Weiter</button>
+  <button class="btn" id="disc-btn" onclick="acceptDisc()" disabled>Zustimmen & Weiter</button>
 </div>
 
 <!-- ══════════════════════════════════════════════════
@@ -1499,7 +1499,10 @@ function chkDisc(){
 }
 function acceptDisc(){
   if(!me)return;
-  db.collection('users').doc(me.uid).update({disclaimerAccepted:true}).then(()=>afterLogin());
+  // Show app immediately — don't wait for network. User already consented.
+  afterLogin();
+  // Persist consent in background (set+merge so it works even if doc not yet created)
+  db.collection('users').doc(me.uid).set({disclaimerAccepted:true},{merge:true}).catch(()=>{});
 }
 
 // ══ AUTH STATE ═══════════════════════════════════════════════
