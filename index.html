@@ -1459,6 +1459,7 @@ async function doDeleteAccount(){
       localStorage.removeItem('gd_workout_history');
       localStorage.removeItem('gd_last_day');
       localStorage.removeItem('gd_deleted_workouts');
+      localStorage.removeItem('gd_disc_ok');        // reset consent for next user on this device
       sessionStorage.removeItem('gd_wh_backup');   // also clear the protectHistory backup
     }catch(e){}
 
@@ -1499,6 +1500,8 @@ function chkDisc(){
 }
 function acceptDisc(){
   if(!me)return;
+  // Remember consent locally on THIS device so we don't re-ask on next login
+  try{ localStorage.setItem('gd_disc_ok','1'); }catch(e){}
   // Show app immediately — don't wait for network. User already consented.
   afterLogin();
   // Persist consent in background (set+merge so it works even if doc not yet created)
@@ -1517,13 +1520,22 @@ auth.onAuthStateChanged(user=>{
   me=user;
   _hideSplash();
   if(user){
+    // If THIS device already recorded consent, skip the disclaimer immediately
+    let localOk=false;
+    try{ localOk = localStorage.getItem('gd_disc_ok')==='1'; }catch(e){}
     db.collection('users').doc(user.uid).get().then(snap=>{
       const d=snap.exists?snap.data():{};
       lang=d.language||'de';
       applyLang();
-      if(d.disclaimerAccepted) afterLogin();
-      else show('s-disc');
-    }).catch(()=>show('s-disc'));
+      if(d.disclaimerAccepted || localOk){
+        // make sure both stores agree for next time
+        if(localOk && !d.disclaimerAccepted){ db.collection('users').doc(user.uid).set({disclaimerAccepted:true},{merge:true}).catch(()=>{}); }
+        if(d.disclaimerAccepted && !localOk){ try{ localStorage.setItem('gd_disc_ok','1'); }catch(e){} }
+        afterLogin();
+      } else {
+        show('s-disc');
+      }
+    }).catch(()=>{ localOk ? afterLogin() : show('s-disc'); });
   } else {
     show('s-auth');
   }
