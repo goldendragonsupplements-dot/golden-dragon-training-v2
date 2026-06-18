@@ -1476,16 +1476,50 @@ function afterLogin(){
 
 function _syncFirebaseHistory(){
   if(!me) return Promise.resolve();
-  const histPromise = db.collection('users').doc(me.uid).collection('workoutLogs')
+
+  // First read the user profile to get the shared list of deleted workouts (tombstones)
+  // from OTHER devices, merge into local tombstones, AND purge them locally.
+  const profilePromise = db.collection('users').doc(me.uid).get()
+    .then(snap=>{
+      if(!snap.exists) return;
+      const d = snap.data();
+      // merge remote tombstones into local
+      if(Array.isArray(d.deletedWorkouts) && d.deletedWorkouts.length){
+        const local = _tombstoneAll();
+        let changed = false;
+        d.deletedWorkouts.forEach(id=>{ if(!local.includes(id)){ local.push(id); changed=true; } });
+        if(changed){ try{ localStorage.setItem(TOMB_KEY, JSON.stringify(local.slice(-500))); }catch(e){} }
+        // purge any locally-stored history that is now tombstoned
+        const tomb = _tombstoneSet();
+        const purged = _histAll().filter(r=>!tomb.has(r.workoutId));
+        try{ localStorage.setItem('gd_workout_history', JSON.stringify(purged)); }catch(e){}
+        // also remove tombstoned docs still living in Firebase
+        d.deletedWorkouts.forEach(id=>{
+          db.collection('users').doc(me.uid).collection('workoutLogs')
+            .where('workoutId','==',id).get()
+            .then(s=>s.forEach(doc=>doc.ref.delete())).catch(()=>{});
+          db.collection('users').doc(me.uid).collection('workoutLogs').doc(id).delete().catch(()=>{});
+        });
+      }
+      // sync lastDay too
+      if(d.lastDay) try{ localStorage.setItem('gd_last_day', JSON.stringify(d.lastDay)); }catch(e){}
+    })
+    .catch(()=>{});
+
+  // Then pull workout logs from Firebase, skipping anything tombstoned.
+  const histPromise = profilePromise.then(()=>
+    db.collection('users').doc(me.uid).collection('workoutLogs')
     .orderBy('completedAt','desc').limit(200).get()
     .then(snaps=>{
       if(snaps.empty) return;
+      const tomb = _tombstoneSet();
       const local = _histAll();
       const localIds = new Set(local.map(r=>r.workoutId));
       let added = 0;
       snaps.forEach(doc=>{
         const d = doc.data();
         const wid = d.workoutId || doc.id;
+        if(tomb.has(wid)) return;          // never resurrect a deleted workout
         if(!localIds.has(wid)){
           let exs = [];
           try{ exs = typeof d.exercises==='string' ? JSON.parse(d.exercises) : (d.exercises||[]); }catch(e){}
@@ -1501,23 +1535,18 @@ function _syncFirebaseHistory(){
           added++;
         }
       });
-      if(added>0){
-        local.sort((a,b)=>new Date(b.date)-new Date(a.date));
-        try{ localStorage.setItem('gd_workout_history', JSON.stringify(local.slice(0,200))); }catch(e){}
+      // also drop any local records that are tombstoned (cross-device delete)
+      const beforeLen = local.length;
+      const cleaned = local.filter(r=>!tomb.has(r.workoutId));
+      if(added>0 || cleaned.length!==beforeLen){
+        cleaned.sort((a,b)=>new Date(b.date)-new Date(a.date));
+        try{ localStorage.setItem('gd_workout_history', JSON.stringify(cleaned.slice(0,200))); }catch(e){}
       }
     })
-    .catch(()=>{});
+    .catch(()=>{})
+  );
 
-  // Also sync lastDay from Firebase user profile
-  const lastDayPromise = db.collection('users').doc(me.uid).get()
-    .then(snap=>{
-      if(!snap.exists) return;
-      const d = snap.data();
-      if(d.lastDay) try{ localStorage.setItem('gd_last_day', JSON.stringify(d.lastDay)); }catch(e){}
-    })
-    .catch(()=>{});
-
-  return Promise.all([histPromise, lastDayPromise]);
+  return histPromise;
 }
 function renderHome(){
   if(!me)return;
@@ -4146,6 +4175,20 @@ function _histDelete(workoutId){
   try { localStorage.setItem(LS_KEY, JSON.stringify(all)); } catch(e){}
 }
 
+// ── Tombstones: remember which workouts were deleted, so sync never resurrects them
+const TOMB_KEY = 'gd_deleted_workouts';
+function _tombstoneAll(){
+  try { return JSON.parse(localStorage.getItem(TOMB_KEY)||'[]'); } catch(e){ return []; }
+}
+function _tombstoneAdd(workoutId){
+  if(!workoutId) return;
+  const t = _tombstoneAll();
+  if(!t.includes(workoutId)){ t.push(workoutId); }
+  // keep last 500 to avoid unbounded growth
+  try { localStorage.setItem(TOMB_KEY, JSON.stringify(t.slice(-500))); } catch(e){}
+}
+function _tombstoneSet(){ return new Set(_tombstoneAll()); }
+
 // Return the most recent sets for a given exerciseId, or null
 function getPrevResult(exerciseId){
   if(!exerciseId) return null;
@@ -4216,12 +4259,21 @@ function renderProgress(){
 
 function delLocalLog(workoutId, btn){
   _histDelete(workoutId);
+  _tombstoneAdd(workoutId);   // remember it's deleted so sync never brings it back
   btn.closest('.hist-card').remove();
-  // Also delete from Firebase so sync doesn't bring it back
+  // Also delete from Firebase so sync doesn't bring it back.
+  // Match by workoutId field OR by document id (covers old records without workoutId).
   if(me){
-    db.collection('users').doc(me.uid).collection('workoutLogs')
-      .where('workoutId','==',workoutId).get()
+    const col = db.collection('users').doc(me.uid).collection('workoutLogs');
+    // 1) delete docs whose workoutId field matches
+    col.where('workoutId','==',workoutId).get()
       .then(snaps=>{ snaps.forEach(d=>d.ref.delete()); })
+      .catch(()=>{});
+    // 2) also try deleting a doc whose id equals workoutId (old-style records)
+    col.doc(workoutId).delete().catch(()=>{});
+    // 3) persist tombstone to Firebase so OTHER devices also drop it
+    db.collection('users').doc(me.uid)
+      .set({deletedWorkouts: firebase.firestore.FieldValue.arrayUnion(workoutId)}, {merge:true})
       .catch(()=>{});
   }
   // Clear last_day card if no history left for that program
