@@ -1467,13 +1467,25 @@ async function doDeleteAccount(){
     try{
       await me.delete();
     }catch(err){
-      // Firebase requires recent login to delete; if it's been too long, ask re-login
+      // Firebase requires a fresh login to delete the account.
+      // Re-authenticate automatically (Google popup) and retry — one click for the user.
       if(err && err.code === 'auth/requires-recent-login'){
-        toast(t('delReauth'),'err');
-        await auth.signOut();
-        return;
+        try{
+          await me.reauthenticateWithPopup(gp);
+          await me.delete();
+        }catch(err2){
+          // User closed the popup or re-auth failed → fall back to asking them to retry
+          if(err2 && err2.code === 'auth/popup-closed-by-user'){
+            toast(t('delReauth'),'err');
+            return;
+          }
+          toast(t('delReauth'),'err');
+          await auth.signOut().catch(()=>{});
+          return;
+        }
+      } else {
+        throw err;
       }
-      throw err;
     }
 
     // 5) Done — sign out and reload to the login screen
