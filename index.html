@@ -1432,6 +1432,14 @@ function doLogout(){
   }catch(e){}
   auth.signOut();
 }
+// Save "last training day" both locally AND to Firebase so the Home
+// "continue program" widget appears on every device, not just this one.
+function _saveLastDay(obj){
+  try{ localStorage.setItem('gd_last_day', JSON.stringify(obj)); }catch(e){}
+  try{
+    if(me) db.collection('users').doc(me.uid).set({lastDay:obj},{merge:true}).catch(()=>{});
+  }catch(e){}
+}
 
 // ── DELETE ACCOUNT (GDPR) ──────────────────────────────────
 // Deletes all user data from Firestore, then deletes the auth account.
@@ -3295,11 +3303,11 @@ function openDay(dayIdx){
       const blokWd=wd?.bloks?.[activeBlokIdx]?.weeks?.[activeWeekIdx]?.days?.[dayIdx];
       const fallWd=wd?.weeks?.[activeWeekIdx]?.days?.[dayIdx];
       const day=blokWd||fallWd;
-      localStorage.setItem('gd_last_day', JSON.stringify({
+      _saveLastDay({
         progId:pd.progId, blokIdx:activeBlokIdx, weekIdx:activeWeekIdx, dayIdx,
         progName:WORKOUT_NAME_LOOKUP(pd.progId),
         dayName:day?.dayLabel?_pL(day.dayLabel):''
-      }));
+      });
     }
   }catch(e){}
   renderPrograms();
@@ -3652,11 +3660,11 @@ function startWorkoutFromDay(progId, weekIdx, dayIdx){
     const wd=WORKOUT_DATA[progId];
     const day=wd?.bloks?.[activeBlokIdx]?.weeks?.[weekIdx]?.days?.[dayIdx]
               || wd?.weeks?.[weekIdx]?.days?.[dayIdx];
-    localStorage.setItem('gd_last_day', JSON.stringify({
+    _saveLastDay({
       progId, blokIdx:activeBlokIdx, weekIdx, dayIdx,
       progName: WORKOUT_NAME_LOOKUP(progId),
       dayName: day?._pL_day_label || (day?.dayLabel ? _pL(day.dayLabel) : '')
-    }));
+    });
   }catch(e){}
   wktStartTime=Date.now();
   wktMeta={progId, weekIdx, dayIdx,
