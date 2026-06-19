@@ -173,7 +173,7 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-side-item.active .wkt-side-item-d{color:#999}
 /* video card */
 .wkt-video-card{width:100%;border-radius:12px;overflow:hidden;margin-bottom:8px;background:#0c0c0c;border:1px solid #1f1f1f;position:relative;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:36px;box-sizing:border-box;max-width:100%}
-.wkt-video-card video{width:100%;height:100%;object-fit:cover}
+.wkt-video-card video{width:100%;height:100%;object-fit:contain}
 .wkt-play-ico{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15)}
 .wkt-fullscreen-ico{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;cursor:pointer;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15)}
 /* exercise info */
@@ -210,7 +210,7 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-rest-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:16px 16px 12px;min-height:0;overflow:hidden}
 .wkt-rest-next-label{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
 #wkt-rest-video-wrap{width:100%;max-width:340px;border-radius:14px;overflow:hidden;aspect-ratio:16/9;background:#111;margin-bottom:10px;flex-shrink:0}
-#wkt-rest-video-wrap video{width:100%;height:100%;object-fit:cover}
+#wkt-rest-video-wrap video{width:100%;height:100%;object-fit:contain}
 #wkt-rest-video-wrap .rest-no-vid{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px}
 .wkt-rest-next-name{font-size:18px;font-weight:900;color:#fff;text-align:center;margin-bottom:4px}
 .wkt-rest-next-sub{font-size:13px;color:var(--gold);font-weight:700;text-align:center}
@@ -230,7 +230,7 @@ input:focus,select:focus{border-color:var(--gold)}
 /* ── TIME MODE ── */
 .wkt-time-mode{display:flex;flex-direction:column;flex:1;overflow-y:auto;align-items:center;padding:14px;text-align:center;-webkit-overflow-scrolling:touch}
 .wkt-gif-large{width:100%;border-radius:18px;overflow:hidden;margin-bottom:12px;background:#0c0c0c;border:1px solid #1f1f1f;position:relative;display:flex;align-items:center;justify-content:center;font-size:40px}
-.wkt-gif-large video{width:100%;object-fit:cover}
+.wkt-gif-large video{width:100%;object-fit:contain}
 .wkt-time-ex-name{font-size:20px;font-weight:900;color:var(--gold2);margin-bottom:3px}
 .wkt-time-ex-sub{font-size:13px;color:var(--muted);margin-bottom:12px}
 /* ring timer */
@@ -3767,7 +3767,7 @@ function _beepStart(){ _beep(880, 0.4, 0.2); }   // high beep = start
 function _beepFinish(){ _beep(660, 0.4, 0.1); setTimeout(()=>_beep(880,0.4,0.3),150); } // double beep = done
 function _setMedia(el,s){
   if(s.video){
-    el.innerHTML=`<video src="${s.video}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>
+    el.innerHTML=`<video src="${s.video}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain"></video>
       <div class="wkt-play-ico">▶</div>
       <div class="wkt-fullscreen-ico" onclick="toggleFullscreenVideo()">⛶</div>`;
   } else {
@@ -4060,7 +4060,7 @@ function _loadTimeMode(s){
   document.getElementById('wkt-time-mode').style.display='flex';
   const gifEl=document.getElementById('wkt-gif-time');
   if(s.video){
-    gifEl.innerHTML=`<video src="${s.video}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`;
+    gifEl.innerHTML=`<video src="${s.video}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain"></video>`;
     gifEl.style.height='180px';
   } else {
     gifEl.innerHTML=`<div style="font-size:40px">${s.emoji||'⏱'}</div>`;
