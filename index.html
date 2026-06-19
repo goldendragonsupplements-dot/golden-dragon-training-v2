@@ -3909,21 +3909,32 @@ function _renderSidebar(){
 }
 
 function completeSetReps(){
-  const s=wktPlan[wktStep];
-  const i=(setLog[wktStep]||[]).length;
-  const repsEl=document.getElementById('reps-'+i);
-  const kgEl=document.getElementById('kg-'+i);
-  if(!repsEl)return;
-  // Use placeholder if input is empty (user didn't change default)
-  const reps = parseInt(repsEl.value) || parseInt(repsEl.placeholder) || 0;
-  const kg   = parseFloat(kgEl ? kgEl.value : 0) || parseFloat(kgEl ? kgEl.placeholder : 0) || 0;
-  if(!setLog[wktStep])setLog[wktStep]=[];
-  setLog[wktStep].push({reps,kg});
-  const totalSets=parseSets(s.d);
-  const advance=setLog[wktStep].length>=totalSets;
-  _renderSetTable(s);
-  _renderSidebar();
-  _startRestOverlay(advance, s);
+  try{
+    const s=wktPlan[wktStep];
+    const i=(setLog[wktStep]||[]).length;
+    const repsEl=document.getElementById('reps-'+i);
+    const kgEl=document.getElementById('kg-'+i);
+    if(!repsEl)return;
+    // Use placeholder if input is empty (user didn't change default)
+    const reps = parseInt(repsEl.value) || parseInt(repsEl.placeholder) || 0;
+    const kg   = parseFloat(kgEl ? kgEl.value : 0) || parseFloat(kgEl ? kgEl.placeholder : 0) || 0;
+    if(!setLog[wktStep])setLog[wktStep]=[];
+    setLog[wktStep].push({reps,kg});
+    const totalSets=parseSets(s.d);
+    const advance=setLog[wktStep].length>=totalSets;
+    _renderSetTable(s);
+    _renderSidebar();
+    _startRestOverlay(advance, s);
+  }catch(err){
+    // Never let a rendering error freeze the workout — advance to the next step
+    console.error('completeSetReps error:', err);
+    try{ document.getElementById('wkt-rest-overlay').classList.remove('on'); }catch(e){}
+    const s2=wktPlan[wktStep];
+    const totalSets2 = s2 ? parseSets(s2.d) : 1;
+    const logged2 = (setLog[wktStep]||[]).length;
+    if(logged2>=totalSets2){ wktStep++; }
+    loadWktStep();
+  }
 }
 
 function addSet(){
@@ -3968,10 +3979,12 @@ function _startRestOverlay(advance, s){
 
   // ── Next exercise video ─────────────────────────────────
   const videoWrap = document.getElementById('wkt-rest-video-wrap');
-  if(nextS.video){
-    videoWrap.innerHTML = `<video src="${nextS.video}" autoplay muted loop playsinline></video>`;
-  } else {
-    videoWrap.innerHTML = `<div class="rest-no-vid">${nextS.emoji||'💪'}</div>`;
+  if(videoWrap){
+    if(nextS.video){
+      videoWrap.innerHTML = `<video src="${nextS.video}" autoplay muted loop playsinline preload="auto" onerror="this.parentNode.innerHTML='<div class=\\'rest-no-vid\\'>${nextS.emoji||'💪'}</div>'"></video>`;
+    } else {
+      videoWrap.innerHTML = `<div class="rest-no-vid">${nextS.emoji||'💪'}</div>`;
+    }
   }
 
   // ── Rest label ──────────────────────────────────────────
