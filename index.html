@@ -550,7 +550,7 @@ input:focus,select:focus{border-color:var(--gold)}
 
         <!-- Exercise info -->
         <div class="wkt-ex-name" id="wkt-name-reps">Bench Press</div>
-        <div class="wkt-ex-sub" id="wkt-ex-sub">Prsa • Srednji dio</div>
+        <div class="wkt-ex-sub" id="wkt-ex-sub" style="display:none"></div>
         <div class="wkt-rest-info">
           <span class="wkt-rest-dot"></span>
           <span id="wkt-rest-info">Rest: 90 sec</span>
@@ -3818,7 +3818,8 @@ function _loadRepsMode(s){
   document.getElementById('wkt-reps-mode').style.display='flex';
   _setMedia(document.getElementById('wkt-vid-reps'),s);
   document.getElementById('wkt-name-reps').textContent=s.n;
-  document.getElementById('wkt-ex-sub').textContent=_muscleGroup(s.n);
+  // Muscle group label removed — inconsistent across exercises
+  document.getElementById('wkt-ex-sub').style.display='none';
   const restS=parseRest(s.phase);
   document.getElementById('wkt-rest-info').textContent=`${t('restWord')}: ${restS} sec`;
   _renderSetTable(s);
