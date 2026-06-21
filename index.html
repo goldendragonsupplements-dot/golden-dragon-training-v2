@@ -5135,7 +5135,10 @@ function startWorkout(){
 function startWorkoutFromDay(progId, weekIdx, dayIdx){
   const wd = WORKOUT_DATA[progId];
   if(!wd) return;
-  const day = wd.weeks[weekIdx].days[dayIdx];
+  const day = (wd.bloks && activeBlokIdx !== null)
+    ? wd.bloks[activeBlokIdx]?.weeks?.[weekIdx]?.days?.[dayIdx]
+    : wd.weeks?.[weekIdx]?.days?.[dayIdx];
+  if(!day) return;
   wktPlan=[];
   const sectionEmoji={warmup:'🔥',main:'💪',core:'🧱',cooldown:'🧘'};
   const sectionPhaseKey={warmup:'warmupLabel',main:'mainLabel',core:'coreLabel',cooldown:'cooldownLabel'};
@@ -5174,7 +5177,7 @@ function startWorkoutFromDay(progId, weekIdx, dayIdx){
   wktStartTime=Date.now();
   wktMeta={progId, weekIdx, dayIdx,
     progName:WORKOUT_NAME_LOOKUP(progId),
-    dayName:day.days?_pL(day.days[dayIdx]?.dayLabel||{}):''};
+    dayName:day.dayLabel?_pL(day.dayLabel):''};
   wktSource={progId, progName:WORKOUT_NAME_LOOKUP(progId)};
   const sw=document.getElementById('s-workout');
   sw.style.display='flex'; sw.classList.add('on');
