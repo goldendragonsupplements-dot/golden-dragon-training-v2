@@ -3421,6 +3421,17 @@ function _startRestOverlayTimeMode(){
   document.getElementById('wkt-rest-of').textContent = `od ${fmtTime(restTotal)}`;
   document.getElementById('wkt-rest-next').textContent = t('nextSetLbl');
   document.getElementById('wkt-rest-next-sub').textContent = `${timeSetCurrent} / ${timeSetTotal}`;
+  // Pauza je IZMEĐU serija iste vježbe → video sljedeće serije = trenutna vježba
+  const cur = wktPlan[wktStep];
+  const videoWrap = document.getElementById('wkt-rest-video-wrap');
+  if(videoWrap && cur){
+    if(cur.video){
+      videoWrap.innerHTML = `<video src="${cur.video}" autoplay muted loop playsinline preload="auto" onerror="this.parentNode.innerHTML='<div class=\\'rest-no-vid\\'>${cur.emoji||'💪'}</div>'"></video>`;
+    } else {
+      videoWrap.innerHTML = `<div class="rest-no-vid">${cur.emoji||'💪'}</div>`;
+    }
+  }
+  document.getElementById('wl-restlbl').textContent = t('nextSetLbl').toUpperCase();
   document.getElementById('wkt-rest-overlay').classList.add('on');
   clearInterval(restTimer);
   _beep(440, 0.3, 0.2);
