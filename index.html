@@ -3128,6 +3128,7 @@ function _renderSetTable(s){
     // 3) ciljani broj iz plana (targetReps)
     const repsHint = (!done)
       ? ( isPyramid(s.d) ? pyramidReps(s.d, i)
+          : (i>0 && logged[i-1]) ? logged[i-1].reps
           : targetReps )
       : targetReps;
     const kgCell = isWarmupPhase
