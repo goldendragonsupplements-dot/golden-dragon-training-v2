@@ -156,19 +156,19 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-main-col{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:10px 8px 0;-webkit-overflow-scrolling:touch;min-width:0}
 .wkt-sidebar{width:130px;flex-shrink:0;overflow-y:auto;border-left:1px solid #161616;background:#0a0a0a}
 /* sidebar items */
-.wkt-side-hdr{font-size:10px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;padding:10px 10px 6px;border-bottom:1px solid #1a1a1a}
-.wkt-side-item{display:flex;align-items:flex-start;gap:5px;padding:8px 8px;font-size:11px;line-height:1.3;cursor:pointer;border-bottom:1px solid #111;transition:.15s}
+.wkt-side-hdr{font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;padding:10px 10px 6px;border-bottom:1px solid #1a1a1a}
+.wkt-side-item{display:flex;align-items:flex-start;gap:5px;padding:8px 8px;font-size:13px;line-height:1.3;cursor:pointer;border-bottom:1px solid #111;transition:.15s}
 .wkt-side-item:hover{background:#111}
 .wkt-side-icon{width:16px;height:16px;border-radius:50%;border:1.5px solid #333;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px}
 .wkt-side-item.done .wkt-side-icon{background:#4caf74;border-color:#4caf74;color:#000}
 .wkt-side-item.active{background:rgba(201,168,76,.06)}
 .wkt-side-item.active .wkt-side-icon{border-color:var(--gold)}
 .wkt-side-item-text{flex:1;min-width:0}
-.wkt-side-item-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;max-width:86px}
+.wkt-side-item-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;max-width:92px}
 .wkt-side-item.done .wkt-side-item-name{color:#4caf74}
 .wkt-side-item.active .wkt-side-item-name{color:var(--gold2);font-weight:800}
 .wkt-side-item.upcoming .wkt-side-item-name{color:#555}
-.wkt-side-item-d{font-size:10px;color:#555;margin-top:1px}
+.wkt-side-item-d{font-size:12px;color:#888;margin-top:2px}
 .wkt-side-item.done .wkt-side-item-d{color:#2e7a4a}
 .wkt-side-item.active .wkt-side-item-d{color:#999}
 /* video card */
@@ -178,8 +178,8 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-fullscreen-ico{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.7);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;cursor:pointer;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15)}
 /* exercise info */
 .wkt-ex-name{font-size:22px;font-weight:900;color:var(--gold2);margin-bottom:2px;line-height:1.2}
-.wkt-ex-sub{font-size:12px;color:var(--gold,#d4af37);margin-bottom:6px;line-height:1.4;font-weight:500}
-.wkt-rest-info{font-size:12px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:4px}
+.wkt-ex-sub{font-size:14px;color:var(--gold,#d4af37);margin-bottom:6px;line-height:1.4;font-weight:600}
+.wkt-rest-info{font-size:14px;color:#bbb;margin-bottom:10px;display:flex;align-items:center;gap:4px;font-weight:600}
 .wkt-rest-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block}
 /* set table */
 .wkt-set-table{width:100%;border-collapse:collapse;margin-bottom:6px}
@@ -187,8 +187,8 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-set-table td{padding:7px 3px;text-align:center;border-bottom:1px solid #141414;vertical-align:middle}
 .wkt-set-table tr.completed td{color:#4caf74}
 .wkt-set-table tr.active-row td{background:rgba(201,168,76,.04)}
-.wkt-set-num{color:#666;font-weight:700;font-size:13px;width:26px}
-.wkt-prev{font-size:12px;color:#888;line-height:1.4;max-width:60px;font-weight:600}
+.wkt-set-num{color:#999;font-weight:700;font-size:14px;width:26px}
+.wkt-prev{font-size:13px;color:#aaa;line-height:1.4;max-width:60px;font-weight:600}
 .wkt-prev small{display:flex;align-items:center;gap:2px}
 .wkt-prev-check{color:#4caf74;font-size:11px;font-weight:700}
 .wkt-inp{width:58px;background:#141414;border:1px solid #2a2a2a;border-radius:8px;color:#fff;font-size:18px;font-weight:900;text-align:center;padding:8px 2px;-moz-appearance:textfield;transition:.2s}
@@ -213,14 +213,14 @@ input:focus,select:focus{border-color:var(--gold)}
 #wkt-rest-video-wrap video{width:100%;height:100%;object-fit:contain}
 #wkt-rest-video-wrap .rest-no-vid{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px}
 .wkt-rest-next-name{font-size:18px;font-weight:900;color:#fff;text-align:center;margin-bottom:4px}
-.wkt-rest-next-sub{font-size:13px;color:var(--gold);font-weight:700;text-align:center}
+.wkt-rest-next-sub{font-size:15px;color:var(--gold);font-weight:700;text-align:center}
 /* BOTTOM: timer */
 .wkt-rest-bottom{display:flex;flex-direction:column;align-items:center;padding:8px 16px 20px;border-top:1px solid #1a1a1a}
-.wkt-rest-tip{font-size:14px;font-weight:700;color:#888;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.wkt-rest-tip{font-size:15px;font-weight:700;color:#ccc;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .wkt-rest-ring-wrap{position:relative;margin:4px 0}
 .wkt-rest-clock-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .wkt-rest-clock{font-size:48px;font-weight:900;color:var(--gold2);font-variant-numeric:tabular-nums;line-height:1}
-.wkt-rest-of{font-size:12px;color:#444;margin-top:2px}
+.wkt-rest-of{font-size:14px;color:#999;margin-top:3px;font-weight:600}
 .wkt-rest-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px}
 .btn-skip-rest{background:#1a1a1a;border:1px solid #333;color:#aaa;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-finish-rest{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-weight:900;border:none;border-radius:12px;padding:14px;font-size:14px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -232,7 +232,7 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-gif-large{width:100%;border-radius:18px;overflow:hidden;margin-bottom:12px;background:#0c0c0c;border:1px solid #1f1f1f;position:relative;display:flex;align-items:center;justify-content:center;font-size:40px}
 .wkt-gif-large video{width:100%;object-fit:contain}
 .wkt-time-ex-name{font-size:20px;font-weight:900;color:var(--gold2);margin-bottom:3px}
-.wkt-time-ex-sub{font-size:13px;color:var(--muted);margin-bottom:12px}
+.wkt-time-ex-sub{font-size:15px;color:#bbb;margin-bottom:12px;font-weight:600}
 /* ring timer */
 .wkt-ring-wrap{position:relative;margin:4px auto 8px;display:inline-flex}
 .wkt-ring-svg{transform:rotate(-90deg)}
@@ -240,7 +240,7 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-ring-fg{fill:none;stroke:#4caf74;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
 .wkt-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .wkt-ring-timer{font-size:44px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
-.wkt-ring-of{font-size:12px;color:#444;margin-top:2px}
+.wkt-ring-of{font-size:14px;color:#999;margin-top:3px;font-weight:600}
 /* time controls */
 .wkt-time-ctrl{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:340px;margin-bottom:9px}
 .btn-time-primary{background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
@@ -631,8 +631,8 @@ input:focus,select:focus{border-color:var(--gold)}
         <div class="wkt-ring-timer" id="wkt-timer">00:45</div>
         <div class="wkt-ring-of" id="wkt-ring-of"></div>
       </div>
-      <div id="wkt-hold-hint" style="display:none;font-size:12px;color:var(--muted);margin-top:10px;text-align:center;max-width:280px;line-height:1.4"></div>
     </div>
+    <div id="wkt-hold-hint" style="display:none;font-size:15px;color:#fff;margin:12px auto 0;text-align:center;max-width:320px;line-height:1.5;font-weight:600"></div>
 
     <!-- Controls -->
     <div class="wkt-time-ctrl" style="max-width:300px">
