@@ -4017,7 +4017,7 @@ function _tombstoneSet(){ return new Set(_tombstoneAll()); }
 // 1) predlaže težinu, 2) upozori na zastoj, 3) javi novi rekord,
 // 4) preračuna deload težinu, 5) nakon treninga pokaže sažetak tjedna.
 const COACH_TR={
- hr:{up:'↑ Danas probaj {kg} kg (+{inc})',upSub:'Prošli put si u svim serijama došao do {hi} ponavljanja.',
+ hr:{up:'↑ Danas probaj {kg} kg (+{inc} kg)',upSub:'Prošli put si u svim serijama došao do {hi} ponavljanja.',
   stay:'Danas: {kg} kg',staySub:'Cilj: {lo}–{hi} ponavljanja u svim serijama. Kad uspiješ, sljedeći put ide više.',
   stayOne:'Danas: {kg} kg',stayOneSub:'Cilj: {hi} ponavljanja u svim serijama. Kad uspiješ, sljedeći put ide više.',
   deload:'Deload: {kg} kg (−15 %)',deloadSub:'Lakši tjedan, tijelo se oporavlja. Ne idi teže.',
@@ -4030,7 +4030,7 @@ const COACH_TR={
   sumUp:'napredak',sumSame:'isto',sumDown:'slabije',sumPrs:'Rekordi',sumStall:'Zastoj (sljedeći put −10 %)',
   sumFirst:'Prvi zapis za ove vježbe. Od sljedećeg treninga dobivaš usporedbu i prijedloge.',sumDeload:'Deload tjedan: usporedba se ne računa, samo se odmori.',sumOk:'U redu',
   oneDb:'(težina jedne bučice)'},
- de:{up:'↑ Heute {kg} kg versuchen (+{inc})',upSub:'Letztes Mal hast du in allen Sätzen {hi} Wdh. geschafft.',
+ de:{up:'↑ Heute {kg} kg versuchen (+{inc} kg)',upSub:'Letztes Mal hast du in allen Sätzen {hi} Wdh. geschafft.',
   stay:'Heute: {kg} kg',staySub:'Ziel: {lo}–{hi} Wdh. in allen Sätzen. Dann nächstes Mal mehr Gewicht.',
   stayOne:'Heute: {kg} kg',stayOneSub:'Ziel: {hi} Wdh. in allen Sätzen. Dann nächstes Mal mehr Gewicht.',
   deload:'Deload: {kg} kg (−15 %)',deloadSub:'Leichte Woche, der Körper erholt sich. Nicht schwerer gehen.',
@@ -4043,7 +4043,7 @@ const COACH_TR={
   sumUp:'Fortschritt',sumSame:'gleich',sumDown:'schwächer',sumPrs:'Rekorde',sumStall:'Stillstand (nächstes Mal −10 %)',
   sumFirst:'Erster Eintrag für diese Übungen. Ab dem nächsten Training gibt es Vergleich und Vorschläge.',sumDeload:'Deload-Woche: kein Vergleich, nur erholen.',sumOk:'OK',
   oneDb:'(Gewicht einer Kurzhantel)'},
- en:{up:'↑ Try {kg} kg today (+{inc})',upSub:'Last time you hit {hi} reps in every set.',
+ en:{up:'↑ Try {kg} kg today (+{inc} kg)',upSub:'Last time you hit {hi} reps in every set.',
   stay:'Today: {kg} kg',staySub:'Goal: {lo}–{hi} reps in every set. Then go heavier next time.',
   stayOne:'Today: {kg} kg',stayOneSub:'Goal: {hi} reps in every set. Then go heavier next time.',
   deload:'Deload: {kg} kg (−15%)',deloadSub:'Easy week, your body recovers. Do not go heavier.',
@@ -4056,7 +4056,7 @@ const COACH_TR={
   sumUp:'progress',sumSame:'same',sumDown:'weaker',sumPrs:'Records',sumStall:'Plateau (next time −10%)',
   sumFirst:'First log for these exercises. From the next workout you get comparisons and suggestions.',sumDeload:'Deload week: no comparison, just recover.',sumOk:'OK',
   oneDb:'(weight of one dumbbell)'},
- pl:{up:'↑ Dziś spróbuj {kg} kg (+{inc})',upSub:'Ostatnio zrobiłeś {hi} powt. w każdej serii.',
+ pl:{up:'↑ Dziś spróbuj {kg} kg (+{inc} kg)',upSub:'Ostatnio zrobiłeś {hi} powt. w każdej serii.',
   stay:'Dziś: {kg} kg',staySub:'Cel: {lo}–{hi} powt. w każdej serii. Potem następnym razem więcej.',
   stayOne:'Dziś: {kg} kg',stayOneSub:'Cel: {hi} powt. w każdej serii. Potem następnym razem więcej.',
   deload:'Deload: {kg} kg (−15%)',deloadSub:'Lekki tydzień, ciało się regeneruje. Nie idź ciężej.',
@@ -4069,7 +4069,7 @@ const COACH_TR={
   sumUp:'postęp',sumSame:'bez zmian',sumDown:'słabiej',sumPrs:'Rekordy',sumStall:'Zastój (następnym razem −10%)',
   sumFirst:'Pierwszy zapis dla tych ćwiczeń. Od następnego treningu dostaniesz porównanie i sugestie.',sumDeload:'Tydzień deload: bez porównania, tylko regeneracja.',sumOk:'OK',
   oneDb:'(ciężar jednego hantla)'},
- ru:{up:'↑ Сегодня попробуй {kg} кг (+{inc})',upSub:'В прошлый раз ты сделал {hi} повт. во всех подходах.',
+ ru:{up:'↑ Сегодня попробуй {kg} кг (+{inc} кг)',upSub:'В прошлый раз ты сделал {hi} повт. во всех подходах.',
   stay:'Сегодня: {kg} кг',staySub:'Цель: {lo}–{hi} повт. во всех подходах. Потом в следующий раз тяжелее.',
   stayOne:'Сегодня: {kg} кг',stayOneSub:'Цель: {hi} повт. во всех подходах. Потом в следующий раз тяжелее.',
   deload:'Разгрузка: {kg} кг (−15%)',deloadSub:'Лёгкая неделя, тело восстанавливается. Не утяжеляй.',
@@ -4082,7 +4082,7 @@ const COACH_TR={
   sumUp:'прогресс',sumSame:'без изменений',sumDown:'слабее',sumPrs:'Рекорды',sumStall:'Застой (в следующий раз −10%)',
   sumFirst:'Первая запись для этих упражнений. Со следующей тренировки будут сравнение и подсказки.',sumDeload:'Разгрузочная неделя: без сравнения, просто восстанавливайся.',sumOk:'OK',
   oneDb:'(вес одной гантели)'},
- tr:{up:'↑ Bugün {kg} kg dene (+{inc})',upSub:'Geçen sefer tüm setlerde {hi} tekrara ulaştın.',
+ tr:{up:'↑ Bugün {kg} kg dene (+{inc} kg)',upSub:'Geçen sefer tüm setlerde {hi} tekrara ulaştın.',
   stay:'Bugün: {kg} kg',staySub:'Hedef: tüm setlerde {lo}–{hi} tekrar. Sonra bir dahakine daha ağır.',
   stayOne:'Bugün: {kg} kg',stayOneSub:'Hedef: tüm setlerde {hi} tekrar. Sonra bir dahakine daha ağır.',
   deload:'Deload: {kg} kg (−%15)',deloadSub:'Hafif hafta, vücut toparlanıyor. Ağırlaştırma.',
@@ -4177,7 +4177,7 @@ function _coachAdvice(s){
     if(v.length>=planned && atTop.every(z=>(+z.reps)>=hr.hi)){
       const inc=_cInc(s.exerciseId,top);
       const kg=Math.round((top+inc)*10)/10;
-      return {kg,title:ct('up',{kg:_cNum(kg),inc:_cNum(inc)+' kg'}),sub:ct('upSub',range),tone:'up'};
+      return {kg,title:ct('up',{kg:_cNum(kg),inc:_cNum(inc)}),sub:ct('upSub',range),tone:'up'};
     }
     return {kg:top,title:ct(range.lo===range.hi?'stayOne':'stay',{kg:_cNum(top)}),sub:ct(range.lo===range.hi?'stayOneSub':'staySub',range),tone:'info'};
   }
@@ -4323,7 +4323,7 @@ function _renderExChart(){
   const bestLbl=`<text x="${Math.min(W-pr-2,Math.max(pl+2,X(bestI))).toFixed(1)}" y="${(Y(best)-9).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="#e8c86a">${_cNum(best)}</text>`;
   const diff=data.length>1?Math.round((data[data.length-1].y-data[0].y)*10)/10:null;
   const diffTxt=diff==null?'':`<div class="exc-diff ${diff>0?'up':(diff<0?'down':'')}">${diff>0?'↑':(diff<0?'↓':'→')} ${cht(isKg?'diffKg':'diffReps',{d:(diff>0?'+':'')+_cNum(diff)})}</div>`;
-  const rows=data.slice(-5).reverse().map(p=>`<div class="exc-row"><span>${fmtD(p.date)}</span><span>${p.sets.map(z=>(+z.kg)>0?`${z.reps}×${_cNum(+z.kg)}`:`${z.reps}`).join(' · ')}${isKg?' kg':''}</span></div>`).join('');
+  const rows=data.slice(-5).reverse().map(p=>`<div class="exc-row"><span>${fmtD(p.date)}</span><span>${p.sets.map(z=>(+z.kg)>0?`${z.reps}×${_cNum(+z.kg)}`:`${z.reps}`).join(' · ')}${isKg?(lang==='ru'?' кг':' kg'):''}</span></div>`).join('');
   const opts=list.map(x=>`<option value="${_coachEsc(x.id)}"${x.id===sel?' selected':''}>${_coachEsc(x.name)}</option>`).join('');
   wrap.innerHTML=`<select class="exc-sel" onchange="try{localStorage.setItem('gd_chart_ex',this.value)}catch(e){};_renderExChart()">${opts}</select>
     <div class="exc-card">
