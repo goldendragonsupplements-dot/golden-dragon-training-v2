@@ -179,6 +179,22 @@ input:focus,select:focus{border-color:var(--gold)}
 /* exercise info */
 .wkt-ex-name{font-size:22px;font-weight:900;color:var(--gold2);margin-bottom:2px;line-height:1.2}
 .wkt-ex-sub{font-size:14px;color:var(--gold,#d4af37);margin-bottom:6px;line-height:1.4;font-weight:600}
+.wkt-coach{flex-shrink:0;border-radius:10px;padding:8px 11px;margin-bottom:8px;background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.35)}
+.wkt-coach-up{background:rgba(60,170,100,.13);border-color:rgba(60,170,100,.5)}
+.wkt-coach-warn{background:rgba(220,120,40,.13);border-color:rgba(220,120,40,.55)}
+.wkt-coach-t{font-size:14px;font-weight:800;color:#fff;line-height:1.35}
+.wkt-coach-s{font-size:12.5px;color:#cfcfcf;line-height:1.4;margin-top:3px}
+#coach-sum{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px}
+#coach-sum .cs-card{width:100%;max-width:420px;max-height:90vh;overflow-y:auto;background:linear-gradient(160deg,#151515,#1a1200);border:1.5px solid var(--gold,#c9a84c);border-radius:16px;padding:18px}
+#coach-sum .cs-title{font-size:20px;font-weight:900;color:var(--gold2,#e8c86a);text-align:center;margin-bottom:6px}
+#coach-sum .cs-h{font-size:12px;font-weight:800;color:var(--gold,#c9a84c);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px}
+#coach-sum .cs-row{display:flex;gap:8px}
+#coach-sum .cs-n{flex:1;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 6px;text-align:center;font-size:22px;font-weight:900;color:#fff}
+#coach-sum .cs-n small{display:block;font-size:11px;font-weight:600;color:#aaa;margin-top:2px}
+#coach-sum .cs-up{color:#6fd39a} #coach-sum .cs-down{color:#f0a060}
+#coach-sum .cs-li{font-size:14px;color:#eee;padding:3px 0}
+#coach-sum .cs-p{font-size:14px;color:#ddd;line-height:1.5;margin:0}
+#coach-sum .cs-btn{width:100%;margin-top:18px;background:linear-gradient(135deg,var(--gold,#c9a84c),var(--gold2,#e8c86a));color:#000;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:900;cursor:pointer}
 .wkt-rest-info{font-size:14px;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:4px;font-weight:600}
 .wkt-rest-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block}
 /* set table */
@@ -573,6 +589,7 @@ input:focus,select:focus{border-color:var(--gold)}
         <!-- Exercise info -->
         <div class="wkt-ex-name" id="wkt-name-reps">Bench Press</div>
         <div class="wkt-ex-sub" id="wkt-ex-sub" style="display:none"></div>
+        <div class="wkt-coach" id="wkt-coach" style="display:none"></div>
         <div class="wkt-rest-info">
           <span class="wkt-rest-dot"></span>
           <span id="wkt-rest-info">Rest: 90 sec</span>
@@ -2819,7 +2836,7 @@ function startWorkout(){
   day.cooldown.forEach(e=>wktPlan.push({phase:t('cooldown'),n:e.n,d:e.d,emoji:'🧘',time:30}));
   wktStep=0;
   setLog={};
-  wktSource='legacy';
+  wktSource='legacy'; _coachPR={}; _coachKgMap={};
   const sw=document.getElementById('s-workout');
   sw.style.display='flex'; sw.classList.add('on');
   loadWktStep();
@@ -2876,7 +2893,9 @@ function startWorkoutFromDay(progId, weekIdx, dayIdx, showIntro){
     });
   }catch(e){}
   wktStartTime=Date.now();
+  _coachPR={}; _coachKgMap={};
   wktMeta={progId, weekIdx, dayIdx,
+    deload:_coachIsDeloadWeek(wd.bloks ? wd.bloks[_bi]?.weeks?.[weekIdx] : wd.weeks?.[weekIdx]),
     progName:WORKOUT_NAME_LOOKUP(progId),
     dayName:day.dayLabel?_pL(day.dayLabel):''};
   wktSource={progId, progName:WORKOUT_NAME_LOOKUP(progId)};
@@ -3079,6 +3098,7 @@ function _loadRepsMode(s){
   document.getElementById('wkt-time-mode').style.display='none';
   document.getElementById('wkt-reps-mode').style.display='flex';
   _setMedia(document.getElementById('wkt-vid-reps'),s);
+  _coachRender(s);
   // For alternating exercises, append the current active side to the name
   if(s.alt===true){
     const loggedCount=(setLog[wktStep]||[]).length;
@@ -3236,7 +3256,7 @@ function _renderSetTable(s){
     const kgCell = isWarmupPhase
       ? ''
       : `<td><input class="wkt-inp" id="kg-${i}" type="number" inputmode="decimal"
-          placeholder="${done ? logged[i].kg : (i>0 && logged[i-1] ? logged[i-1].kg : (prevResults&&prevResults[i] ? prevResults[i].kg : '0'))}"
+          placeholder="${done ? logged[i].kg : (i>0 && logged[i-1] ? logged[i-1].kg : (_coachKgMap[wktStep]!=null ? _coachKgMap[wktStep] : (prevResults&&prevResults[i] ? prevResults[i].kg : '0')))}"
           value="${done?logged[i].kg:''}" ${done?'disabled':''}></td>`;
     const prevCell = hidePrev ? '' : `<td class="wkt-prev">${prevTxt}</td>`;
     html+=`<tr class="${cls}" id="set-row-${i}">
@@ -3295,6 +3315,7 @@ function completeSetReps(){
     const kg   = parseFloat(kgEl ? kgEl.value : 0) || parseFloat(kgEl ? kgEl.placeholder : 0) || 0;
     if(!setLog[wktStep])setLog[wktStep]=[];
     setLog[wktStep].push({reps,kg});
+    _coachCheckPR(s,{reps,kg});
     const totalSets=(s.alt===true) ? _altTotalSets(s) : parseSets(s.d);
     const advance=setLog[wktStep].length>=totalSets;
     _renderSetTable(s);
@@ -3890,6 +3911,7 @@ function finishWorkout(){
       exerciseType: isTime ? 'time' : 'strength',
       descriptor: step.d
     };
+    if(wktMeta && wktMeta.deload) entry.deload = true;
     if(isTime){
       // For count-up Dragon Challenges, save the ACTUAL held time from setLog; otherwise the planned time
       const loggedSec = (setLog[idx] && setLog[idx][0] && setLog[idx][0].sec) ? setLog[idx][0].sec : null;
@@ -3926,6 +3948,8 @@ function finishWorkout(){
     exercises
   };
 
+  // Pametni trener: usporedba s prijašnjim treninzima (prije spremanja)
+  let _cmp=null; try{ _cmp=_coachCompare(exercises, !!(wktMeta&&wktMeta.deload)); }catch(e){}
   // Save to localStorage (primary, always works offline)
   _histSave(record);
 
@@ -3941,6 +3965,7 @@ function finishWorkout(){
   }
   toast(t('wktSaved'),'ok');
   renderHome();
+  if(_cmp) _coachShowSummary(_cmp, !!(wktMeta&&wktMeta.deload));
 }
 
 
@@ -3976,6 +4001,270 @@ function _tombstoneAdd(workoutId){
   try { localStorage.setItem(TOMB_KEY, JSON.stringify(t.slice(-500))); } catch(e){}
 }
 function _tombstoneSet(){ return new Set(_tombstoneAll()); }
+
+
+// ══ PAMETNI TRENER (Smart Coach) ═════════════════════════════
+// Čita povijest treninga (gd_workout_history) i za svaku vježbu:
+// 1) predlaže težinu, 2) upozori na zastoj, 3) javi novi rekord,
+// 4) preračuna deload težinu, 5) nakon treninga pokaže sažetak tjedna.
+const COACH_TR={
+ hr:{up:'↑ Danas probaj {kg} kg (+{inc})',upSub:'Prošli put si u svim serijama došao do {hi} ponavljanja.',
+  stay:'Danas: {kg} kg',staySub:'Cilj: {lo}–{hi} ponavljanja u svim serijama. Kad uspiješ, sljedeći put ide više.',
+  stayOne:'Danas: {kg} kg',stayOneSub:'Cilj: {hi} ponavljanja u svim serijama. Kad uspiješ, sljedeći put ide više.',
+  deload:'Deload: {kg} kg (−15 %)',deloadSub:'Lakši tjedan, tijelo se oporavlja. Ne idi teže.',
+  stall:'⚠️ Zastoj: 3 treninga bez napretka',stallSub:'Danas {kg} kg (−10 %) pa gradi opet. Provjeri san i prehranu.',
+  bwUp:'↑ Cilj: više ponavljanja nego prošli put',bwUpSub:'Prošli put: {reps}.',
+  bwStall:'⚠️ Zastoj: 3 treninga bez napretka',bwStallSub:'Prošli put: {reps}. Probaj sporije spuštanje ili 1 seriju više.',
+  first:'Prvi put: odaberi težinu za {lo}–{hi} čistih ponavljanja',firstOne:'Prvi put: odaberi težinu za {hi} čistih ponavljanja',
+  pr:'🏆 Novi rekord: {txt}',
+  sumTitle:'Trening gotov 💪',sumThis:'Ovaj trening',sumWeek:'Ovaj tjedan (pon–ned)',sumWkts:'treninga',sumSets:'serija',sumVol:'kg ukupno',
+  sumUp:'napredak',sumSame:'isto',sumDown:'slabije',sumPrs:'Rekordi',sumStall:'Zastoj (sljedeći put −10 %)',
+  sumFirst:'Prvi zapis za ove vježbe. Od sljedećeg treninga dobivaš usporedbu i prijedloge.',sumDeload:'Deload tjedan: usporedba se ne računa, samo se odmori.',sumOk:'U redu',
+  oneDb:'(težina jedne bučice)'},
+ de:{up:'↑ Heute {kg} kg versuchen (+{inc})',upSub:'Letztes Mal hast du in allen Sätzen {hi} Wdh. geschafft.',
+  stay:'Heute: {kg} kg',staySub:'Ziel: {lo}–{hi} Wdh. in allen Sätzen. Dann nächstes Mal mehr Gewicht.',
+  stayOne:'Heute: {kg} kg',stayOneSub:'Ziel: {hi} Wdh. in allen Sätzen. Dann nächstes Mal mehr Gewicht.',
+  deload:'Deload: {kg} kg (−15 %)',deloadSub:'Leichte Woche, der Körper erholt sich. Nicht schwerer gehen.',
+  stall:'⚠️ Stillstand: 3 Trainings ohne Fortschritt',stallSub:'Heute {kg} kg (−10 %) und neu aufbauen. Schlaf und Ernährung prüfen.',
+  bwUp:'↑ Ziel: mehr Wdh. als letztes Mal',bwUpSub:'Letztes Mal: {reps}.',
+  bwStall:'⚠️ Stillstand: 3 Trainings ohne Fortschritt',bwStallSub:'Letztes Mal: {reps}. Langsamer absenken oder 1 Satz mehr.',
+  first:'Erstes Mal: Gewicht für {lo}–{hi} saubere Wdh. wählen',firstOne:'Erstes Mal: Gewicht für {hi} saubere Wdh. wählen',
+  pr:'🏆 Neuer Rekord: {txt}',
+  sumTitle:'Training geschafft 💪',sumThis:'Dieses Training',sumWeek:'Diese Woche (Mo–So)',sumWkts:'Trainings',sumSets:'Sätze',sumVol:'kg gesamt',
+  sumUp:'Fortschritt',sumSame:'gleich',sumDown:'schwächer',sumPrs:'Rekorde',sumStall:'Stillstand (nächstes Mal −10 %)',
+  sumFirst:'Erster Eintrag für diese Übungen. Ab dem nächsten Training gibt es Vergleich und Vorschläge.',sumDeload:'Deload-Woche: kein Vergleich, nur erholen.',sumOk:'OK',
+  oneDb:'(Gewicht einer Kurzhantel)'},
+ en:{up:'↑ Try {kg} kg today (+{inc})',upSub:'Last time you hit {hi} reps in every set.',
+  stay:'Today: {kg} kg',staySub:'Goal: {lo}–{hi} reps in every set. Then go heavier next time.',
+  stayOne:'Today: {kg} kg',stayOneSub:'Goal: {hi} reps in every set. Then go heavier next time.',
+  deload:'Deload: {kg} kg (−15%)',deloadSub:'Easy week, your body recovers. Do not go heavier.',
+  stall:'⚠️ Plateau: 3 workouts without progress',stallSub:'Today {kg} kg (−10%) and build up again. Check sleep and nutrition.',
+  bwUp:'↑ Goal: more reps than last time',bwUpSub:'Last time: {reps}.',
+  bwStall:'⚠️ Plateau: 3 workouts without progress',bwStallSub:'Last time: {reps}. Try slower lowering or 1 extra set.',
+  first:'First time: pick a weight for {lo}–{hi} clean reps',firstOne:'First time: pick a weight for {hi} clean reps',
+  pr:'🏆 New record: {txt}',
+  sumTitle:'Workout done 💪',sumThis:'This workout',sumWeek:'This week (Mon–Sun)',sumWkts:'workouts',sumSets:'sets',sumVol:'kg total',
+  sumUp:'progress',sumSame:'same',sumDown:'weaker',sumPrs:'Records',sumStall:'Plateau (next time −10%)',
+  sumFirst:'First log for these exercises. From the next workout you get comparisons and suggestions.',sumDeload:'Deload week: no comparison, just recover.',sumOk:'OK',
+  oneDb:'(weight of one dumbbell)'},
+ pl:{up:'↑ Dziś spróbuj {kg} kg (+{inc})',upSub:'Ostatnio zrobiłeś {hi} powt. w każdej serii.',
+  stay:'Dziś: {kg} kg',staySub:'Cel: {lo}–{hi} powt. w każdej serii. Potem następnym razem więcej.',
+  stayOne:'Dziś: {kg} kg',stayOneSub:'Cel: {hi} powt. w każdej serii. Potem następnym razem więcej.',
+  deload:'Deload: {kg} kg (−15%)',deloadSub:'Lekki tydzień, ciało się regeneruje. Nie idź ciężej.',
+  stall:'⚠️ Zastój: 3 treningi bez postępu',stallSub:'Dziś {kg} kg (−10%) i buduj od nowa. Sprawdź sen i dietę.',
+  bwUp:'↑ Cel: więcej powtórzeń niż ostatnio',bwUpSub:'Ostatnio: {reps}.',
+  bwStall:'⚠️ Zastój: 3 treningi bez postępu',bwStallSub:'Ostatnio: {reps}. Wolniej opuszczaj lub 1 seria więcej.',
+  first:'Pierwszy raz: wybierz ciężar na {lo}–{hi} czystych powt.',firstOne:'Pierwszy raz: wybierz ciężar na {hi} czystych powt.',
+  pr:'🏆 Nowy rekord: {txt}',
+  sumTitle:'Trening zrobiony 💪',sumThis:'Ten trening',sumWeek:'Ten tydzień (pn–nd)',sumWkts:'treningi',sumSets:'serie',sumVol:'kg razem',
+  sumUp:'postęp',sumSame:'bez zmian',sumDown:'słabiej',sumPrs:'Rekordy',sumStall:'Zastój (następnym razem −10%)',
+  sumFirst:'Pierwszy zapis dla tych ćwiczeń. Od następnego treningu dostaniesz porównanie i sugestie.',sumDeload:'Tydzień deload: bez porównania, tylko regeneracja.',sumOk:'OK',
+  oneDb:'(ciężar jednego hantla)'},
+ ru:{up:'↑ Сегодня попробуй {kg} кг (+{inc})',upSub:'В прошлый раз ты сделал {hi} повт. во всех подходах.',
+  stay:'Сегодня: {kg} кг',staySub:'Цель: {lo}–{hi} повт. во всех подходах. Потом в следующий раз тяжелее.',
+  stayOne:'Сегодня: {kg} кг',stayOneSub:'Цель: {hi} повт. во всех подходах. Потом в следующий раз тяжелее.',
+  deload:'Разгрузка: {kg} кг (−15%)',deloadSub:'Лёгкая неделя, тело восстанавливается. Не утяжеляй.',
+  stall:'⚠️ Застой: 3 тренировки без прогресса',stallSub:'Сегодня {kg} кг (−10%) и наращивай снова. Проверь сон и питание.',
+  bwUp:'↑ Цель: больше повторений, чем в прошлый раз',bwUpSub:'В прошлый раз: {reps}.',
+  bwStall:'⚠️ Застой: 3 тренировки без прогресса',bwStallSub:'В прошлый раз: {reps}. Опускайся медленнее или +1 подход.',
+  first:'Первый раз: выбери вес на {lo}–{hi} чистых повт.',firstOne:'Первый раз: выбери вес на {hi} чистых повт.',
+  pr:'🏆 Новый рекорд: {txt}',
+  sumTitle:'Тренировка завершена 💪',sumThis:'Эта тренировка',sumWeek:'Эта неделя (пн–вс)',sumWkts:'трен.',sumSets:'подходов',sumVol:'кг всего',
+  sumUp:'прогресс',sumSame:'без изменений',sumDown:'слабее',sumPrs:'Рекорды',sumStall:'Застой (в следующий раз −10%)',
+  sumFirst:'Первая запись для этих упражнений. Со следующей тренировки будут сравнение и подсказки.',sumDeload:'Разгрузочная неделя: без сравнения, просто восстанавливайся.',sumOk:'OK',
+  oneDb:'(вес одной гантели)'},
+ tr:{up:'↑ Bugün {kg} kg dene (+{inc})',upSub:'Geçen sefer tüm setlerde {hi} tekrara ulaştın.',
+  stay:'Bugün: {kg} kg',staySub:'Hedef: tüm setlerde {lo}–{hi} tekrar. Sonra bir dahakine daha ağır.',
+  stayOne:'Bugün: {kg} kg',stayOneSub:'Hedef: tüm setlerde {hi} tekrar. Sonra bir dahakine daha ağır.',
+  deload:'Deload: {kg} kg (−%15)',deloadSub:'Hafif hafta, vücut toparlanıyor. Ağırlaştırma.',
+  stall:'⚠️ Durgunluk: 3 antrenmandır ilerleme yok',stallSub:'Bugün {kg} kg (−%10) ve yeniden yüksel. Uyku ve beslenmeyi kontrol et.',
+  bwUp:'↑ Hedef: geçen seferden fazla tekrar',bwUpSub:'Geçen sefer: {reps}.',
+  bwStall:'⚠️ Durgunluk: 3 antrenmandır ilerleme yok',bwStallSub:'Geçen sefer: {reps}. Daha yavaş indir veya 1 set ekle.',
+  first:'İlk kez: {lo}–{hi} temiz tekrar yapabileceğin ağırlığı seç',firstOne:'İlk kez: {hi} temiz tekrar yapabileceğin ağırlığı seç',
+  pr:'🏆 Yeni rekor: {txt}',
+  sumTitle:'Antrenman bitti 💪',sumThis:'Bu antrenman',sumWeek:'Bu hafta (Pzt–Paz)',sumWkts:'antrenman',sumSets:'set',sumVol:'kg toplam',
+  sumUp:'ilerleme',sumSame:'aynı',sumDown:'daha zayıf',sumPrs:'Rekorlar',sumStall:'Durgunluk (bir dahakine −%10)',
+  sumFirst:'Bu egzersizler için ilk kayıt. Bir sonraki antrenmandan itibaren karşılaştırma ve öneriler gelir.',sumDeload:'Deload haftası: karşılaştırma yok, sadece toparlan.',sumOk:'Tamam',
+  oneDb:'(tek dambıl ağırlığı)'}
+};
+function ct(k,v){let s=(COACH_TR[lang]&&COACH_TR[lang][k])||COACH_TR.en[k]||k;if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s;}
+function _cNum(x){return String(Math.round(x*10)/10).replace('.',lang==='en'?'.':',');}
+function _cRange(d){
+  const m=String(d||'').match(/[x×]\s*(\d+)(?:\s*[-–]\s*(\d+))?/i);
+  if(!m) return null;
+  const lo=+m[1], hi=m[2]?+m[2]:+m[1];
+  return (lo>0&&hi>=lo&&hi<=50)?{lo,hi}:null;
+}
+function _cIsLower(id){return /squat|deadlift|lunge|hip-thrust|thrust|leg-press|stiff-leg|rdl|good-morning|step-up|split|calf|glute-bridge/i.test(id||'');}
+function _cIsDb(id){return /dumbbell|db-|kettlebell/i.test(id||'');}
+function _cRound(kg,id){const st=(!_cIsDb(id)&&kg>=40)?2.5:(kg>=10?1:0.5);return Math.max(st,Math.round(kg/st)*st);}
+function _cInc(id,kg){
+  if(_cIsDb(id)) return kg>=20?2.5:2;          // bučice: +2 kg (manje) ili +2,5 kg
+  if(_cIsLower(id)) return kg>=40?5:2.5;       // noge / mrtvo dizanje šipkom
+  return 2.5;                                  // gornji dio šipkom ili sprava
+}
+function _cValidSets(sets){return (sets||[]).filter(z=>z&&(+z.reps)>0);}
+// Ocjena jedne sesije: procijenjeni 1RM najbolje serije (Epley); bez kg = najviše ponavljanja u seriji
+function _cScore(sets){
+  const v=_cValidSets(sets); if(!v.length) return null;
+  const w=v.filter(z=>(+z.kg)>0);
+  if(w.length) return Math.max(...w.map(z=>(+z.kg)*(1+(+z.reps)/30)));
+  return Math.max(...v.map(z=>+z.reps));
+}
+// Povijest vježbe: najnovije prvo, samo snaga s upisanim serijama
+function _cHist(exId){
+  if(!exId) return [];
+  const out=[];
+  for(const w of _histAll()){
+    for(const e of (w.exercises||[])){
+      if(e.exerciseId===exId && e.exerciseType==='strength' && _cValidSets(e.sets).length){
+        out.push({date:w.date,sets:e.sets,deload:e.deload===true,d:e.descriptor||''});
+        break;
+      }
+    }
+  }
+  return out;
+}
+function _cStalled(hist){
+  const h=hist.filter(x=>!x.deload).slice(0,3);
+  if(h.length<3) return false;
+  const s=h.map(x=>_cScore(x.sets));
+  if(s.some(x=>x==null)) return false;
+  return s[0]<=s[2]*1.005 && s[1]<=s[2]*1.005;
+}
+function _cSetsTxt(sets){return _cValidSets(sets).map(z=>(+z.kg)>0?`${z.reps}×${_cNum(+z.kg)}`:`${z.reps}`).join(', ');}
+let _coachKgMap={};     // wktStep -> predložena kg
+let _coachPR={};        // exerciseId -> tekst rekorda u ovom treningu
+function _coachEligible(s){
+  return s && (s.section==='main'||s.section==='core') && !(isTimeEx(s.d)&&s.challengeReps!==true) && !/\bMax\b/i.test(s.d||'');
+}
+function _coachAdvice(s){
+  if(!_coachEligible(s)) return null;
+  const hist=_cHist(s.exerciseId);
+  const range=_cRange(s.d);
+  const deload=!!(wktMeta&&wktMeta.deload);
+  const isBw=s.bw===true;
+  if(!hist.length){
+    if(isBw||!range) return null;
+    return {title:range.lo===range.hi?ct('firstOne',range):ct('first',range),sub:_cIsDb(s.exerciseId)?ct('oneDb'):'',tone:'info'};
+  }
+  const base=hist.find(x=>!x.deload)||hist[0];
+  const v=_cValidSets(base.sets);
+  if(isBw){
+    if(deload) return null;
+    const reps=_cSetsTxt(v);
+    if(_cStalled(hist)) return {title:ct('bwStall'),sub:ct('bwStallSub',{reps}),tone:'warn'};
+    return {title:ct('bwUp'),sub:ct('bwUpSub',{reps}),tone:'info'};
+  }
+  const kgs=v.map(z=>+z.kg).filter(x=>x>0);
+  if(!kgs.length) return null;
+  const top=Math.max(...kgs);
+  if(deload){const kg=_cRound(top*0.85,s.exerciseId);return {kg,title:ct('deload',{kg:_cNum(kg)}),sub:ct('deloadSub'),tone:'info'};}
+  if(_cStalled(hist)){const kg=_cRound(top*0.9,s.exerciseId);return {kg,title:ct('stall'),sub:ct('stallSub',{kg:_cNum(kg)}),tone:'warn'};}
+  if(range){
+    const atTop=v.filter(z=>(+z.kg)>=top);
+    const planned=parseSets(base.d||s.d);
+    const hr=_cRange(base.d)||range;
+    if(v.length>=planned && atTop.every(z=>(+z.reps)>=hr.hi)){
+      const inc=_cInc(s.exerciseId,top);
+      const kg=Math.round((top+inc)*10)/10;
+      return {kg,title:ct('up',{kg:_cNum(kg),inc:_cNum(inc)+' kg'}),sub:ct('upSub',range),tone:'up'};
+    }
+    return {kg:top,title:ct(range.lo===range.hi?'stayOne':'stay',{kg:_cNum(top)}),sub:ct(range.lo===range.hi?'stayOneSub':'staySub',range),tone:'info'};
+  }
+  return {kg:top,title:ct('stay',{kg:_cNum(top)}),sub:'',tone:'info'};
+}
+function _coachRender(s){
+  const el=document.getElementById('wkt-coach');
+  if(!el) return;
+  let a=null; try{a=_coachAdvice(s);}catch(e){a=null;}
+  if(a&&a.kg!=null) _coachKgMap[wktStep]=a.kg; else delete _coachKgMap[wktStep];
+  if(!a){el.style.display='none';el.innerHTML='';return;}
+  el.className='wkt-coach wkt-coach-'+a.tone;
+  el.innerHTML=`<div class="wkt-coach-t">🐉 ${a.title}</div>${a.sub?`<div class="wkt-coach-s">${a.sub}</div>`:''}`;
+  el.style.display='block';
+}
+// Rekord: usporedi upravo upisanu seriju sa svim prijašnjim treninzima i ranijim serijama danas
+function _coachCheckPR(s,set){
+  try{
+    if(!_coachEligible(s)||!set||!(+set.reps>0)) return;
+    const hist=_cHist(s.exerciseId);
+    if(!hist.length) return;
+    const isW=(+set.kg)>0;
+    const sc=z=>isW?((+z.kg)>0?(+z.kg)*(1+(+z.reps)/30):0):(+z.reps);
+    let best=0;
+    hist.forEach(h=>_cValidSets(h.sets).forEach(z=>{best=Math.max(best,sc(z));}));
+    (setLog[wktStep]||[]).slice(0,-1).forEach(z=>{if(+z.reps>0)best=Math.max(best,sc(z));});
+    if(best>0 && sc(set)>best*1.001){
+      const txt=isW?`${_cNum(+set.kg)} kg × ${set.reps}`:`${set.reps}×`;
+      const first=!_coachPR[s.exerciseId];
+      _coachPR[s.exerciseId]={name:s.n,txt};
+      if(first) toast(ct('pr',{txt}),'ok');
+    }
+  }catch(e){}
+}
+// Sažetak nakon treninga (prije spremanja) + tjedni pregled (nakon spremanja)
+function _coachCompare(exercises,deload){
+  const res={up:[],same:[],down:[],stall:[],first:0};
+  const seen=new Set();
+  exercises.forEach(e=>{
+    if(e.exerciseType!=='strength'||!(e.section==='main'||e.section==='core')) return;
+    if(!_cValidSets(e.sets).length||seen.has(e.exerciseId)) return;
+    seen.add(e.exerciseId);
+    const hist=_cHist(e.exerciseId);
+    const prev=hist.find(x=>!x.deload);
+    if(!prev){res.first++;return;}
+    if(deload) return;
+    const a=_cScore(e.sets), b=_cScore(prev.sets);
+    if(a==null||b==null) return;
+    if(a>b*1.005) res.up.push(e.exerciseName);
+    else if(a<b*0.98) res.down.push(e.exerciseName);
+    else res.same.push(e.exerciseName);
+    const h2=[{sets:e.sets,deload:false}].concat(hist);
+    if(_cStalled(h2)) res.stall.push(e.exerciseName);
+  });
+  return res;
+}
+function _coachWeek(){
+  const now=new Date(); const day=(now.getDay()+6)%7;
+  const mon=new Date(now.getFullYear(),now.getMonth(),now.getDate()-day).getTime();
+  let w=0,sets=0,vol=0;
+  _histAll().forEach(r=>{
+    const t=new Date(r.date).getTime(); if(!(t>=mon)) return;
+    w++;
+    (r.exercises||[]).forEach(e=>{if(e.exerciseType!=='strength')return;_cValidSets(e.sets).forEach(z=>{sets++;vol+=(+z.kg||0)*(+z.reps||0);});});
+  });
+  return {w,sets,vol:Math.round(vol)};
+}
+function _coachEsc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function _coachShowSummary(cmp,deload){
+  try{
+    const wk=_coachWeek();
+    const prs=Object.values(_coachPR);
+    const old=document.getElementById('coach-sum'); if(old) old.remove();
+    const box=document.createElement('div');
+    box.id='coach-sum';
+    const li=(arr,icon)=>arr.map(n=>`<div class="cs-li">${icon} ${_coachEsc(n)}</div>`).join('');
+    let body='';
+    if(deload){ body+=`<p class="cs-p">${ct('sumDeload')}</p>`; }
+    else if(!cmp.up.length&&!cmp.same.length&&!cmp.down.length){ body+=`<p class="cs-p">${ct('sumFirst')}</p>`; }
+    else{
+      body+=`<div class="cs-row"><div class="cs-n cs-up">${cmp.up.length}<small>${ct('sumUp')}</small></div><div class="cs-n">${cmp.same.length}<small>${ct('sumSame')}</small></div><div class="cs-n cs-down">${cmp.down.length}<small>${ct('sumDown')}</small></div></div>`;
+    }
+    if(prs.length) body+=`<div class="cs-h">🏆 ${ct('sumPrs')}</div>`+prs.map(p=>`<div class="cs-li">${_coachEsc(p.name)}: <b>${_coachEsc(p.txt)}</b></div>`).join('');
+    if(!deload&&cmp.stall.length) body+=`<div class="cs-h">⚠️ ${ct('sumStall')}</div>`+li(cmp.stall,'•');
+    box.innerHTML=`<div class="cs-card">
+      <div class="cs-title">${ct('sumTitle')}</div>
+      <div class="cs-h">${ct('sumThis')}</div>${body}
+      <div class="cs-h">${ct('sumWeek')}</div>
+      <div class="cs-row"><div class="cs-n">${wk.w}<small>${ct('sumWkts')}</small></div><div class="cs-n">${wk.sets}<small>${ct('sumSets')}</small></div><div class="cs-n">${wk.vol.toLocaleString(lang==='en'?'en-US':'de-DE')}<small>${ct('sumVol')}</small></div></div>
+      <button class="cs-btn" onclick="document.getElementById('coach-sum').remove()">${ct('sumOk')}</button></div>`;
+    document.body.appendChild(box);
+  }catch(e){}
+}
+function _coachIsDeloadWeek(w){
+  try{ const n=w&&w.progressionNote; if(!n) return false; return /deload/i.test(typeof n==='string'?n:(n.en||n.de||JSON.stringify(n))); }catch(e){ return false; }
+}
 
 // Return the most recent sets for a given exerciseId, or null
 function getPrevResult(exerciseId){
