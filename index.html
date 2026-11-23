@@ -288,6 +288,13 @@ input:focus,select:focus{border-color:var(--gold)}
 .bd-l{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase}
 .bd-n{font-size:22px;font-weight:900;color:#fff} .bd-n small{font-size:12px;color:#aaa}
 .bd-d{font-size:13px;font-weight:800;color:#ddd} .bd-d.down{color:#6fd39a} .bd-d.up{color:#f0a060} .bd-d span{font-weight:600;color:#888;font-size:11px}
+.bd-more{background:none;border:1px dashed rgba(201,168,76,.45);color:var(--gold2);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;width:100%;margin-top:10px;cursor:pointer;text-align:left}
+.bd-extra{margin-top:10px} .bd-extra label{min-width:calc(33% - 8px)}
+.bd-table{display:flex;flex-direction:column}
+.bd-row{display:grid;grid-template-columns:1fr auto 70px;gap:8px;align-items:center;padding:7px 0;border-top:1px solid #1e1e1e;font-size:14px}
+.bd-rl{color:#bbb;font-weight:700} .bd-rv{color:#fff;font-weight:900;text-align:right} .bd-row .bd-d{text-align:right}
+.bd-charthead{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
+.bd-csel{background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;padding:7px;font-size:14px;font-weight:700}
 .bd-del{background:none;border:none;color:#777;font-size:14px;cursor:pointer;margin-left:6px}
 .nut-sex{display:flex;gap:14px;align-items:center;font-size:13px;color:#ddd;font-weight:700;margin-bottom:10px;flex-wrap:wrap}
 .nut-sex label{display:flex;gap:6px;align-items:center;font-weight:600}
@@ -4518,22 +4525,22 @@ renderHome=function(){ const r=_gdRenderHomeOrig.apply(this,arguments); try{_ren
 
 // ══ TIJELO: KILAŽA I STRUK + KALKULATOR KALORIJA ═════════════
 const BODY_TR={
- hr:{title:'Tijelo: kilaža i struk',kg:'Kilaža',waist:'Struk',save:'Spremi',saved:'Spremljeno ✓',hint:'Važi se ujutro nakon WC-a. Struk mjeri u visini pupka. Dovoljno je jednom tjedno.',empty:'Upiši prvu kilažu i struk – ovdje ćeš vidjeti kako se mijenjaju.',now:'Sada',start:'Početak',change:'Promjena',last:'Zadnji upisi',del:'Obriši',invalid:'Upiši barem kilažu ili struk.',
+ hr:{title:'Tijelo: kilaža i struk',kg:'Kilaža',waist:'Struk',save:'Spremi',saved:'Spremljeno ✓',hint:'Važi se ujutro nakon WC-a. Struk mjeri u visini pupka. Dovoljno je jednom tjedno.',empty:'Upiši prvu kilažu i struk – ovdje ćeš vidjeti kako se mijenjaju.',now:'Sada',start:'Početak',change:'Promjena',last:'Zadnji upisi',del:'Obriši',invalid:'Upiši barem jednu mjeru (u dopuštenom rasponu).',
   ntitle:'Kalorije i proteini',sex:'Spol',male:'Muško',female:'Žensko',age:'Godine',height:'Visina',weight:'Težina',job:'Posao / dan',jSit:'Sjedeći',jStand:'Stojeći / hodanje',jPhys:'Fizički težak',trn:'Treninga tjedno',goal:'Cilj',gCut:'Skinuti salo',gKeep:'Održavati',gGain:'Mišićna masa',calc:'Izračunaj',kcal:'kcal dnevno',prot:'Proteini',fat:'Masti',carb:'Ugljikohidrati',expCut:'Očekivano: oko −{x} kg tjedno',expKeep:'Kilaža ostaje ±1 kg',expGain:'Očekivano: oko +{x} kg tjedno',adjust:'Ako se kilaža 2 tjedna ne mijenja kako treba, promijeni za ±150 kcal.',disc:'Ovo je procjena, ne liječnički savjet. Kod bolesti, trudnoće ili ispod 18 godina pitaj liječnika.',
   recTitle:'🐉 Golden Dragon preporuka',recWhey:'Ako hranom ne dođeš do {p} g proteina: 1 mjerica Whey proteina daje oko 20–25 g. Proteini doprinose rastu i održavanju mišićne mase.',recCrea:'Kreatin monohidrat, 3–5 g dnevno. Kreatin povećava tjelesnu izvedbu kod uzastopnih kratkotrajnih intenzivnih vježbi (uz dnevni unos od 3 g).',shop:'Pogledaj u shopu →',fill:'Ispuni sva polja.'},
- de:{title:'Körper: Gewicht & Taille',kg:'Gewicht',waist:'Taille',save:'Speichern',saved:'Gespeichert ✓',hint:'Morgens nach dem Toilettengang wiegen. Taille auf Höhe des Bauchnabels messen. Einmal pro Woche reicht.',empty:'Trage dein erstes Gewicht und deine Taille ein – hier siehst du die Veränderung.',now:'Jetzt',start:'Start',change:'Veränderung',last:'Letzte Einträge',del:'Löschen',invalid:'Bitte mindestens Gewicht oder Taille eintragen.',
+ de:{title:'Körper: Gewicht & Taille',kg:'Gewicht',waist:'Taille',save:'Speichern',saved:'Gespeichert ✓',hint:'Morgens nach dem Toilettengang wiegen. Taille auf Höhe des Bauchnabels messen. Einmal pro Woche reicht.',empty:'Trage dein erstes Gewicht und deine Taille ein – hier siehst du die Veränderung.',now:'Jetzt',start:'Start',change:'Veränderung',last:'Letzte Einträge',del:'Löschen',invalid:'Bitte mindestens ein Maß eintragen (im gültigen Bereich).',
   ntitle:'Kalorien & Eiweiß',sex:'Geschlecht',male:'Mann',female:'Frau',age:'Alter',height:'Größe',weight:'Gewicht',job:'Beruf / Alltag',jSit:'Sitzend',jStand:'Stehend / gehend',jPhys:'Körperlich schwer',trn:'Trainings pro Woche',goal:'Ziel',gCut:'Fett verlieren',gKeep:'Halten',gGain:'Muskelaufbau',calc:'Berechnen',kcal:'kcal pro Tag',prot:'Eiweiß',fat:'Fett',carb:'Kohlenhydrate',expCut:'Erwartet: ca. −{x} kg pro Woche',expKeep:'Gewicht bleibt ±1 kg',expGain:'Erwartet: ca. +{x} kg pro Woche',adjust:'Wenn sich dein Gewicht 2 Wochen nicht wie geplant ändert, ±150 kcal anpassen.',disc:'Dies ist eine Schätzung, keine ärztliche Beratung. Bei Krankheit, Schwangerschaft oder unter 18 Jahren ärztlich beraten lassen.',
   recTitle:'🐉 Golden Dragon Empfehlung',recWhey:'Wenn du über das Essen keine {p} g Eiweiß schaffst: 1 Messlöffel Whey Protein liefert ca. 20–25 g. Eiweiß trägt zu einer Zunahme und zum Erhalt von Muskelmasse bei.',recCrea:'Kreatin Monohydrat, 3–5 g täglich. Kreatin erhöht die körperliche Leistung bei Schnellkrafttraining im Rahmen kurzzeitiger intensiver körperlicher Betätigung (bei einer täglichen Aufnahme von 3 g).',shop:'Im Shop ansehen →',fill:'Bitte alle Felder ausfüllen.'},
- en:{title:'Body: weight & waist',kg:'Weight',waist:'Waist',save:'Save',saved:'Saved ✓',hint:'Weigh yourself in the morning after the toilet. Measure your waist at belly-button height. Once a week is enough.',empty:'Enter your first weight and waist – this is where you will see them change.',now:'Now',start:'Start',change:'Change',last:'Recent entries',del:'Delete',invalid:'Enter at least weight or waist.',
+ en:{title:'Body: weight & waist',kg:'Weight',waist:'Waist',save:'Save',saved:'Saved ✓',hint:'Weigh yourself in the morning after the toilet. Measure your waist at belly-button height. Once a week is enough.',empty:'Enter your first weight and waist – this is where you will see them change.',now:'Now',start:'Start',change:'Change',last:'Recent entries',del:'Delete',invalid:'Enter at least one measurement (within a valid range).',
   ntitle:'Calories & protein',sex:'Sex',male:'Male',female:'Female',age:'Age',height:'Height',weight:'Weight',job:'Job / daily life',jSit:'Sitting',jStand:'Standing / walking',jPhys:'Heavy physical',trn:'Workouts per week',goal:'Goal',gCut:'Lose fat',gKeep:'Maintain',gGain:'Build muscle',calc:'Calculate',kcal:'kcal per day',prot:'Protein',fat:'Fat',carb:'Carbs',expCut:'Expected: about −{x} kg per week',expKeep:'Weight stays within ±1 kg',expGain:'Expected: about +{x} kg per week',adjust:'If your weight does not change as planned for 2 weeks, adjust by ±150 kcal.',disc:'This is an estimate, not medical advice. If you are ill, pregnant or under 18, ask a doctor.',
   recTitle:'🐉 Golden Dragon recommendation',recWhey:'If you cannot reach {p} g of protein from food: 1 scoop of whey protein gives about 20–25 g. Protein contributes to a growth in and maintenance of muscle mass.',recCrea:'Creatine monohydrate, 3–5 g daily. Creatine increases physical performance in successive bursts of short-term, high-intensity exercise (with a daily intake of 3 g).',shop:'View in shop →',fill:'Please fill in all fields.'},
- pl:{title:'Ciało: waga i talia',kg:'Waga',waist:'Talia',save:'Zapisz',saved:'Zapisano ✓',hint:'Waż się rano po toalecie. Talię mierz na wysokości pępka. Raz w tygodniu wystarczy.',empty:'Wpisz pierwszą wagę i obwód talii – tutaj zobaczysz zmiany.',now:'Teraz',start:'Start',change:'Zmiana',last:'Ostatnie wpisy',del:'Usuń',invalid:'Wpisz przynajmniej wagę lub talię.',
+ pl:{title:'Ciało: waga i talia',kg:'Waga',waist:'Talia',save:'Zapisz',saved:'Zapisano ✓',hint:'Waż się rano po toalecie. Talię mierz na wysokości pępka. Raz w tygodniu wystarczy.',empty:'Wpisz pierwszą wagę i obwód talii – tutaj zobaczysz zmiany.',now:'Teraz',start:'Start',change:'Zmiana',last:'Ostatnie wpisy',del:'Usuń',invalid:'Wpisz przynajmniej jeden pomiar (w poprawnym zakresie).',
   ntitle:'Kalorie i białko',sex:'Płeć',male:'Mężczyzna',female:'Kobieta',age:'Wiek',height:'Wzrost',weight:'Waga',job:'Praca / dzień',jSit:'Siedząca',jStand:'Stojąca / chodzenie',jPhys:'Ciężka fizyczna',trn:'Treningi w tygodniu',goal:'Cel',gCut:'Spalić tłuszcz',gKeep:'Utrzymać',gGain:'Masa mięśniowa',calc:'Oblicz',kcal:'kcal dziennie',prot:'Białko',fat:'Tłuszcz',carb:'Węglowodany',expCut:'Oczekiwane: ok. −{x} kg tygodniowo',expKeep:'Waga zostaje ±1 kg',expGain:'Oczekiwane: ok. +{x} kg tygodniowo',adjust:'Jeśli waga przez 2 tygodnie nie zmienia się zgodnie z planem, zmień o ±150 kcal.',disc:'To szacunek, nie porada lekarska. W razie choroby, ciąży lub poniżej 18 lat zapytaj lekarza.',
   recTitle:'🐉 Polecenie Golden Dragon',recWhey:'Jeśli z jedzenia nie dojdziesz do {p} g białka: 1 miarka białka Whey daje ok. 20–25 g. Białko przyczynia się do wzrostu i utrzymania masy mięśniowej.',recCrea:'Monohydrat kreatyny, 3–5 g dziennie. Kreatyna zwiększa wydolność fizyczną podczas krótkotrwałych, intensywnych ćwiczeń (przy dziennym spożyciu 3 g).',shop:'Zobacz w sklepie →',fill:'Wypełnij wszystkie pola.'},
- ru:{title:'Тело: вес и талия',kg:'Вес',waist:'Талия',save:'Сохранить',saved:'Сохранено ✓',hint:'Взвешивайся утром после туалета. Талию измеряй на уровне пупка. Достаточно раз в неделю.',empty:'Введи первый вес и талию – здесь увидишь, как они меняются.',now:'Сейчас',start:'Старт',change:'Изменение',last:'Последние записи',del:'Удалить',invalid:'Введи хотя бы вес или талию.',
+ ru:{title:'Тело: вес и талия',kg:'Вес',waist:'Талия',save:'Сохранить',saved:'Сохранено ✓',hint:'Взвешивайся утром после туалета. Талию измеряй на уровне пупка. Достаточно раз в неделю.',empty:'Введи первый вес и талию – здесь увидишь, как они меняются.',now:'Сейчас',start:'Старт',change:'Изменение',last:'Последние записи',del:'Удалить',invalid:'Введи хотя бы один замер (в допустимом диапазоне).',
   ntitle:'Калории и белок',sex:'Пол',male:'Мужской',female:'Женский',age:'Возраст',height:'Рост',weight:'Вес',job:'Работа / день',jSit:'Сидячая',jStand:'Стоя / ходьба',jPhys:'Тяжёлая физическая',trn:'Тренировок в неделю',goal:'Цель',gCut:'Сбросить жир',gKeep:'Поддерживать',gGain:'Набор мышц',calc:'Рассчитать',kcal:'ккал в день',prot:'Белок',fat:'Жиры',carb:'Углеводы',expCut:'Ожидается: около −{x} кг в неделю',expKeep:'Вес держится ±1 кг',expGain:'Ожидается: около +{x} кг в неделю',adjust:'Если вес 2 недели не меняется как нужно, измени на ±150 ккал.',disc:'Это оценка, а не медицинский совет. При болезни, беременности или до 18 лет посоветуйся с врачом.',
   recTitle:'🐉 Рекомендация Golden Dragon',recWhey:'Если с едой не набираешь {p} г белка: 1 мерная ложка Whey протеина даёт около 20–25 г. Белок способствует росту и сохранению мышечной массы.',recCrea:'Креатин моногидрат, 3–5 г в день. Креатин повышает физическую работоспособность при кратковременных интенсивных нагрузках (при ежедневном приёме 3 г).',shop:'Смотреть в магазине →',fill:'Заполни все поля.'},
- tr:{title:'Vücut: kilo ve bel',kg:'Kilo',waist:'Bel',save:'Kaydet',saved:'Kaydedildi ✓',hint:'Sabah tuvaletten sonra tartıl. Beli göbek hizasından ölç. Haftada bir yeterli.',empty:'İlk kilonu ve bel ölçünü gir – değişimi burada göreceksin.',now:'Şimdi',start:'Başlangıç',change:'Değişim',last:'Son kayıtlar',del:'Sil',invalid:'En az kilo veya bel gir.',
+ tr:{title:'Vücut: kilo ve bel',kg:'Kilo',waist:'Bel',save:'Kaydet',saved:'Kaydedildi ✓',hint:'Sabah tuvaletten sonra tartıl. Beli göbek hizasından ölç. Haftada bir yeterli.',empty:'İlk kilonu ve bel ölçünü gir – değişimi burada göreceksin.',now:'Şimdi',start:'Başlangıç',change:'Değişim',last:'Son kayıtlar',del:'Sil',invalid:'En az bir ölçü gir (geçerli aralıkta).',
   ntitle:'Kalori ve protein',sex:'Cinsiyet',male:'Erkek',female:'Kadın',age:'Yaş',height:'Boy',weight:'Kilo',job:'İş / gün',jSit:'Oturarak',jStand:'Ayakta / yürüyerek',jPhys:'Ağır fiziksel',trn:'Haftalık antrenman',goal:'Hedef',gCut:'Yağ yakmak',gKeep:'Korumak',gGain:'Kas kazanmak',calc:'Hesapla',kcal:'kcal / gün',prot:'Protein',fat:'Yağ',carb:'Karbonhidrat',expCut:'Beklenen: haftada yaklaşık −{x} kg',expKeep:'Kilo ±1 kg içinde kalır',expGain:'Beklenen: haftada yaklaşık +{x} kg',adjust:'Kilon 2 hafta boyunca planlandığı gibi değişmezse ±150 kcal ayarla.',disc:'Bu bir tahmindir, tıbbi tavsiye değildir. Hastalık, hamilelik veya 18 yaş altında doktora danış.',
   recTitle:'🐉 Golden Dragon önerisi',recWhey:'Yemekle {p} g proteine ulaşamıyorsan: 1 ölçek Whey protein yaklaşık 20–25 g verir. Protein, kas kütlesinin artmasına ve korunmasına katkıda bulunur.',recCrea:'Kreatin monohidrat, günde 3–5 g. Kreatin, kısa süreli yüksek yoğunluklu egzersizlerde fiziksel performansı artırır (günlük 3 g alımla).',shop:'Mağazada gör →',fill:'Lütfen tüm alanları doldur.'}
 };
@@ -4555,15 +4562,46 @@ function _bodyMergeRemote(remote){
   remote.forEach(e=>{if(e&&e.d&&(!map[e.d]||(e.t||0)>(map[e.d].t||0)))map[e.d]=e;});
   _bodySaveAll(Object.values(map),false);
 }
+// Mjere tijela: ključ, raspon (min,max), jedinica, boja
+const BODY_M=[
+ {k:'w', min:25,max:350,u:'kg',c:'#c9a84c'},
+ {k:'wa',min:40,max:250,u:'cm',c:'#6fd39a'},
+ {k:'nk',min:20,max:70, u:'cm',c:'#8fb0bf'},
+ {k:'ch',min:50,max:200,u:'cm',c:'#d9a443'},
+ {k:'ar',min:15,max:70, u:'cm',c:'#e07474'},
+ {k:'hp',min:50,max:200,u:'cm',c:'#b597de'},
+ {k:'th',min:30,max:110,u:'cm',c:'#91a6d8'},
+ {k:'ca',min:20,max:70, u:'cm',c:'#e39a5b'}
+];
+const BODY_MN={
+ hr:{w:'Kilaža',wa:'Struk',nk:'Vrat',ch:'Prsa',ar:'Nadlaktica',hp:'Bokovi',th:'Bedro',ca:'List',bf:'Masnoća (procjena)',more:'➕ Ostale mjere (vrat, prsa, ruka, bokovi, bedro, list)',less:'➖ Sakrij ostale mjere',how:'Kako mjeriti: vrat ispod grkljana · prsa preko bradavica · nadlaktica napeta, najdeblji dio · bokovi najširi dio stražnjice · bedro 15 cm iznad koljena · list najdeblji dio. Uvijek ista strana tijela.',chart:'Graf',bfNeed:'Za procjenu masnoće upiši vrat i struk (žene i bokove) i ispuni spol i visinu u kalkulatoru ispod.',all:'Sve mjere'},
+ de:{w:'Gewicht',wa:'Taille',nk:'Hals',ch:'Brust',ar:'Oberarm',hp:'Hüfte',th:'Oberschenkel',ca:'Wade',bf:'Körperfett (Schätzung)',more:'➕ Weitere Maße (Hals, Brust, Arm, Hüfte, Oberschenkel, Wade)',less:'➖ Weitere Maße ausblenden',how:'So misst du: Hals unter dem Kehlkopf · Brust über die Brustwarzen · Oberarm angespannt, dickste Stelle · Hüfte breiteste Stelle des Gesäßes · Oberschenkel 15 cm über dem Knie · Wade dickste Stelle. Immer dieselbe Körperseite.',chart:'Diagramm',bfNeed:'Für die Körperfett-Schätzung Hals und Taille (Frauen auch Hüfte) eintragen und Geschlecht und Größe im Rechner unten ausfüllen.',all:'Alle Maße'},
+ en:{w:'Weight',wa:'Waist',nk:'Neck',ch:'Chest',ar:'Upper arm',hp:'Hips',th:'Thigh',ca:'Calf',bf:'Body fat (estimate)',more:'➕ More measurements (neck, chest, arm, hips, thigh, calf)',less:'➖ Hide more measurements',how:'How to measure: neck below the larynx · chest across the nipples · upper arm flexed, thickest part · hips widest part of the buttocks · thigh 15 cm above the knee · calf thickest part. Always the same side of the body.',chart:'Chart',bfNeed:'For the body fat estimate enter neck and waist (women also hips) and fill in sex and height in the calculator below.',all:'All measurements'},
+ pl:{w:'Waga',wa:'Talia',nk:'Szyja',ch:'Klatka',ar:'Ramię',hp:'Biodra',th:'Udo',ca:'Łydka',bf:'Tkanka tłuszczowa (szac.)',more:'➕ Więcej pomiarów (szyja, klatka, ramię, biodra, udo, łydka)',less:'➖ Ukryj pozostałe pomiary',how:'Jak mierzyć: szyja pod krtanią · klatka na wysokości sutków · ramię napięte, najgrubsze miejsce · biodra najszersze miejsce pośladków · udo 15 cm nad kolanem · łydka najgrubsze miejsce. Zawsze ta sama strona ciała.',chart:'Wykres',bfNeed:'Aby oszacować tkankę tłuszczową, wpisz szyję i talię (kobiety także biodra) oraz płeć i wzrost w kalkulatorze poniżej.',all:'Wszystkie pomiary'},
+ ru:{w:'Вес',wa:'Талия',nk:'Шея',ch:'Грудь',ar:'Плечо',hp:'Бёдра',th:'Бедро',ca:'Икра',bf:'Жир (оценка)',more:'➕ Другие замеры (шея, грудь, рука, бёдра, бедро, икра)',less:'➖ Скрыть другие замеры',how:'Как мерить: шея под кадыком · грудь по соскам · плечо напряжённое, самое толстое место · бёдра самая широкая часть ягодиц · бедро на 15 см выше колена · икра самое толстое место. Всегда одна и та же сторона тела.',chart:'График',bfNeed:'Для оценки жира введи шею и талию (женщинам и бёдра), а также пол и рост в калькуляторе ниже.',all:'Все замеры'},
+ tr:{w:'Kilo',wa:'Bel',nk:'Boyun',ch:'Göğüs',ar:'Pazu',hp:'Kalça',th:'Uyluk',ca:'Baldır',bf:'Yağ oranı (tahmin)',more:'➕ Diğer ölçüler (boyun, göğüs, kol, kalça, uyluk, baldır)',less:'➖ Diğer ölçüleri gizle',how:'Nasıl ölçülür: boyun gırtlağın altından · göğüs meme hizasından · pazu kasılı, en kalın yer · kalça kalçanın en geniş yeri · uyluk dizin 15 cm üstü · baldır en kalın yer. Her zaman vücudun aynı tarafı.',chart:'Grafik',bfNeed:'Yağ oranı tahmini için boyun ve bel (kadınlar kalça da) gir, aşağıdaki hesaplayıcıda cinsiyet ve boyu doldur.',all:'Tüm ölçüler'}
+};
+function bmn(k){return (BODY_MN[lang]&&BODY_MN[lang][k])||BODY_MN.en[k]||k;}
+// procjena masnoće (US Navy formula), treba spol i visinu iz kalkulatora
+function _bodyFat(e){
+  const o=_nutriGet(); if(!o||!o.sex||!o.h||!e||e.nk==null||e.wa==null) return null;
+  let bf;
+  if(o.sex==='f'){ if(e.hp==null) return null; const x=e.wa+e.hp-e.nk; if(x<=0) return null; bf=495/(1.29579-0.35004*Math.log10(x)+0.22100*Math.log10(o.h))-450; }
+  else { const x=e.wa-e.nk; if(x<=0) return null; bf=495/(1.0324-0.19077*Math.log10(x)+0.15456*Math.log10(o.h))-450; }
+  return (isFinite(bf)&&bf>2&&bf<70)?Math.round(bf*10)/10:null;
+}
+let _bodyMore=false, _bodyChartKey=null;
+function bodyToggleMore(){_bodyMore=!_bodyMore;try{localStorage.setItem('gd_body_more',_bodyMore?'1':'0');}catch(e){}_renderBody();}
+function bodySetChart(k){_bodyChartKey=k;try{localStorage.setItem('gd_body_chart',k);}catch(e){}_renderBody();}
 function bodySave(){
-  const w=_numIn('body-w'),wa=_numIn('body-wa');
-  const okW=w!=null&&w>=25&&w<=350, okWa=wa!=null&&wa>=40&&wa<=250;
-  if(!okW&&!okWa){toast(bt('invalid'),'err');return;}
-  const a=_bodyAll();const d=_todayStr();const old=a.find(e=>e.d===d);
-  const e={d,w:okW?Math.round(w*10)/10:(old?old.w:null),wa:okWa?Math.round(wa*10)/10:(old?old.wa:null),t:Date.now()};
+  const vals={};let any=false,bad=false;
+  for(const m of BODY_M){const v=_numIn('body-'+m.k);if(v==null)continue;if(v<m.min||v>m.max){bad=true;continue;}vals[m.k]=Math.round(v*10)/10;any=true;}
+  if(!any){toast(bt('invalid'),'err');return;}
+  const a=_bodyAll();const d=_todayStr();const old=a.find(e=>e.d===d)||{};
+  const e={...old,...vals,d,t:Date.now()};
   _bodySaveAll(a.filter(x=>x.d!==d).concat([e]));
   toast(bt('saved'),'ok');_renderBody();
-  try{const nw=document.getElementById('nut-w');if(nw&&e.w)nw.value=_cNum(e.w);}catch(x){}
+  try{const nw=document.getElementById('nut-w');if(nw&&vals.w)nw.value=_cNum(vals.w);}catch(x){}
 }
 function bodyDel(d){_bodySaveAll(_bodyAll().filter(e=>e.d!==d));_renderBody();}
 function _miniChart(pts,unit,color){
@@ -4579,32 +4617,54 @@ function _miniChart(pts,unit,color){
   return `<svg viewBox="0 0 ${W} ${H}" width="100%">${g}<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>${dots}
     <text x="${pl}" y="${H-5}" font-size="10" fill="#888">${fd(pts[0].d)}</text><text x="${W-pr}" y="${H-5}" text-anchor="end" font-size="10" fill="#888">${fd(pts[pts.length-1].d)}</text></svg>`;
 }
-function _bodyStat(arr,key,unit,label){
-  const v=arr.filter(e=>e[key]!=null);if(!v.length)return '';
-  const f=v[0][key],l=v[v.length-1][key],diff=Math.round((l-f)*10)/10;
-  const cls=diff<0?'down':(diff>0?'up':'');
-  return `<div class="bd-stat"><div class="bd-l">${label}</div><div class="bd-n">${_cNum(l)} <small>${_u(unit)}</small></div>${v.length>1?`<div class="bd-d ${cls}">${diff>0?'+':''}${_cNum(diff)} ${_u(unit)} <span>${bt('change')}</span></div>`:''}</div>`;
+function _bodySeries(a,k){
+  if(k==='bf') return a.map(e=>({d:e.d,y:_bodyFat(e)})).filter(p=>p.y!=null);
+  return a.filter(e=>e[k]!=null).map(e=>({d:e.d,y:e[k]}));
+}
+function _bodyStatRow(a,k,unit){
+  const v=_bodySeries(a,k);if(!v.length)return '';
+  const f=v[0].y,l=v[v.length-1].y,diff=Math.round((l-f)*10)/10;
+  // zeleno = dobar smjer: kilaža/struk/bokovi/masnoća dolje, ruka/prsa/vrat/bedro/list gore (kod mršavljenja i dalje informativno)
+  // zeleno = dobar smjer; vrat, prsa, bedro i list ovise o cilju pa ostaju neutralni
+  const goodDown=['w','wa','hp','bf'].includes(k), goodUp=(k==='ar');
+  const cls=diff===0?'':(goodDown?(diff<0?'down':'up'):(goodUp?(diff>0?'down':'up'):''));
+  return `<div class="bd-row"><span class="bd-rl">${bmn(k)}</span><span class="bd-rv">${_cNum(l)} ${unit==='%'?'%':_u(unit)}</span><span class="bd-d ${cls}">${v.length>1?(diff>0?'+':'')+_cNum(diff):'·'}</span></div>`;
 }
 function _renderBody(){
   const el=document.getElementById('body-wrap');if(!el)return;
   document.getElementById('pl-body').textContent=bt('title');
+  try{_bodyMore=localStorage.getItem('gd_body_more')==='1';}catch(e){}
+  try{_bodyChartKey=_bodyChartKey||localStorage.getItem('gd_body_chart')||'w';}catch(e){_bodyChartKey=_bodyChartKey||'w';}
   const a=_bodyAll();const last=a[a.length-1]||{};
-  const wPts=a.filter(e=>e.w!=null).map(e=>({d:e.d,y:e.w})),waPts=a.filter(e=>e.wa!=null).map(e=>({d:e.d,y:e.wa}));
+  const lastOf=k=>{for(let i=a.length-1;i>=0;i--)if(a[i][k]!=null)return a[i][k];return null;};
+  const inp=m=>`<label><span>${bmn(m.k)} (${_u(m.u)})</span><input id="body-${m.k}" inputmode="decimal" placeholder="${lastOf(m.k)!=null?_cNum(lastOf(m.k)):''}"></label>`;
+  const main=BODY_M.slice(0,2), extra=BODY_M.slice(2);
+  const keys=BODY_M.map(m=>m.k).filter(k=>_bodySeries(a,k).length);
+  const hasBf=_bodySeries(a,'bf').length>0;
+  const chartKeys=[...keys,...(hasBf?['bf']:[])];
+  if(!chartKeys.includes(_bodyChartKey)) _bodyChartKey=chartKeys[0]||'w';
+  const cm=BODY_M.find(m=>m.k===_bodyChartKey)||{u:'%',c:'#f0a060'};
+  const series=_bodySeries(a,_bodyChartKey);
+  const anyExtra=a.some(e=>extra.some(m=>e[m.k]!=null));
   el.innerHTML=`<div class="exc-card">
-    <div class="bd-form">
-      <label><span>${bt('kg')} (${_u('kg')})</span><input id="body-w" inputmode="decimal" placeholder="${last.w!=null?_cNum(last.w):'80'}"></label>
-      <label><span>${bt('waist')} (${_u('cm')})</span><input id="body-wa" inputmode="decimal" placeholder="${last.wa!=null?_cNum(last.wa):'90'}"></label>
-      <button class="bd-btn" onclick="bodySave()">${bt('save')}</button>
-    </div>
+    <div class="bd-form">${main.map(inp).join('')}<button class="bd-btn" onclick="bodySave()">${bt('save')}</button></div>
+    <button class="bd-more" onclick="bodyToggleMore()">${_bodyMore?bmn('less'):bmn('more')}</button>
+    ${_bodyMore?`<div class="bd-form bd-extra">${extra.map(inp).join('')}</div><div class="bd-hint">${bmn('how')}</div>`:''}
     <div class="bd-hint">${bt('hint')}</div>
-    ${a.length?`<div class="bd-stats">${_bodyStat(a,'w','kg',bt('kg'))}${_bodyStat(a,'wa','cm',bt('waist'))}</div>
-      ${wPts.length>1?`<div class="exc-metric">${bt('kg')} (${_u('kg')})</div>${_miniChart(wPts,'kg','#c9a84c')}`:''}
-      ${waPts.length>1?`<div class="exc-metric" style="margin-top:6px">${bt('waist')} (${_u('cm')})</div>${_miniChart(waPts,'cm','#6fd39a')}`:''}
+    ${a.length?`
+      <div class="exc-h">${bmn('all')}</div>
+      <div class="bd-table">${keys.map(k=>_bodyStatRow(a,k,(BODY_M.find(m=>m.k===k)||{}).u)).join('')}${hasBf?_bodyStatRow(a,'bf','%'):''}</div>
+      ${(anyExtra||_bodyMore)&&!hasBf?`<div class="bd-hint">${bmn('bfNeed')}</div>`:''}
+      ${chartKeys.length?`<div class="bd-charthead"><span class="exc-metric">${bmn('chart')}</span>
+        <select class="bd-csel" onchange="bodySetChart(this.value)">${chartKeys.map(k=>`<option value="${k}"${k===_bodyChartKey?' selected':''}>${bmn(k)}</option>`).join('')}</select></div>
+        ${series.length>1?_miniChart(series,cm.u,cm.c):''}`:''}
       <div class="exc-h">${bt('last')}</div>
-      ${a.slice(-5).reverse().map(e=>`<div class="exc-row"><span>${e.d.slice(8,10)}.${e.d.slice(5,7)}.${e.d.slice(0,4)}</span><span>${e.w!=null?_cNum(e.w)+' '+_u('kg'):'–'} · ${e.wa!=null?_cNum(e.wa)+' '+_u('cm'):'–'} <button class="bd-del" onclick="bodyDel('${e.d}')" aria-label="${bt('del')}">✕</button></span></div>`).join('')}`
+      ${a.slice(-5).reverse().map(e=>{const parts=BODY_M.filter(m=>e[m.k]!=null).map(m=>(m.k==='w'||m.k==='wa'?'':bmn(m.k)+' ')+_cNum(e[m.k])+' '+_u(m.u));
+        return `<div class="exc-row"><span>${e.d.slice(8,10)}.${e.d.slice(5,7)}.${e.d.slice(0,4)}</span><span>${parts.join(' · ')} <button class="bd-del" onclick="bodyDel('${e.d}')" aria-label="${bt('del')}">✕</button></span></div>`;}).join('')}`
     :`<div class="exc-empty" style="margin-top:10px">📏 ${bt('empty')}</div>`}
   </div>`;
 }
+
 // ── kalkulator ──
 function _nutriGet(){try{return JSON.parse(localStorage.getItem('gd_nutri')||'null')||{};}catch(e){return {};}}
 function _nutriSet(o,sync){try{localStorage.setItem('gd_nutri',JSON.stringify(o));}catch(e){}
