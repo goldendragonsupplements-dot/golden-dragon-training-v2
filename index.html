@@ -184,6 +184,17 @@ input:focus,select:focus{border-color:var(--gold)}
 .wkt-coach-warn{background:rgba(220,120,40,.13);border-color:rgba(220,120,40,.55)}
 .wkt-coach-t{font-size:14px;font-weight:800;color:#fff;line-height:1.35}
 .wkt-coach-s{font-size:12.5px;color:#cfcfcf;line-height:1.4;margin-top:3px}
+.stk-card{background:linear-gradient(135deg,#1a1000,#0d0d0d);border:1px solid rgba(201,168,76,.3);border-radius:16px;padding:14px 16px}
+.stk-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stk-title{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px}
+.stk-btn{background:none;border:1px solid rgba(201,168,76,.35);color:#bbb;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer}
+.stk-dots{display:flex;gap:8px;margin:12px 0 8px}
+.stk-dot{flex:1;height:10px;border-radius:6px;background:#2a2a2a}
+.stk-dot.on{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.stk-of{font-size:15px;font-weight:800;color:#fff}
+.stk-streak{font-size:17px;font-weight:900;color:var(--gold2);margin-top:6px}
+.stk-best{font-size:12px;font-weight:700;color:#999}
+.stk-sub{font-size:13px;color:#aaa;margin-top:4px}
 #coach-sum{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px}
 #coach-sum .cs-card{width:100%;max-width:420px;max-height:90vh;overflow-y:auto;background:linear-gradient(160deg,#151515,#1a1200);border:1.5px solid var(--gold,#c9a84c);border-radius:16px;padding:18px}
 #coach-sum .cs-title{font-size:20px;font-weight:900;color:var(--gold2,#e8c86a);text-align:center;margin-bottom:6px}
@@ -502,6 +513,9 @@ input:focus,select:focus{border-color:var(--gold)}
     <div class="stat-box"><div class="stat-n" id="st-d">0</div><div class="stat-l" id="stl-d">Tage</div></div>
     <div class="stat-box"><div class="stat-n" id="st-m">0</div><div class="stat-l" id="stl-m">Minuten</div></div>
   </div>
+
+  <!-- TJEDNI CILJ / NIZ -->
+  <div style="padding:0 16px 14px" id="home-streak"></div>
 
   <!-- NASTAVI TRENING (dinamično) -->
   <div style="padding:0 16px" id="home-continue-wrap"></div>
@@ -2845,7 +2859,7 @@ function startWorkout(){
   day.cooldown.forEach(e=>wktPlan.push({phase:t('cooldown'),n:e.n,d:e.d,emoji:'🧘',time:30}));
   wktStep=0;
   setLog={};
-  wktSource='legacy'; _coachPR={}; _coachKgMap={};
+  wktSource='legacy'; _coachPR={}; _coachKgMap={}; _wlOn();
   const sw=document.getElementById('s-workout');
   sw.style.display='flex'; sw.classList.add('on');
   loadWktStep();
@@ -2902,7 +2916,7 @@ function startWorkoutFromDay(progId, weekIdx, dayIdx, showIntro){
     });
   }catch(e){}
   wktStartTime=Date.now();
-  _coachPR={}; _coachKgMap={};
+  _coachPR={}; _coachKgMap={}; _wlOn();
   wktMeta={progId, weekIdx, dayIdx,
     deload:_coachIsDeloadWeek(wd.bloks ? wd.bloks[_bi]?.weeks?.[weekIdx] : wd.weeks?.[weekIdx]),
     progName:WORKOUT_NAME_LOOKUP(progId),
@@ -3907,6 +3921,7 @@ function closeWorkout(){
   const sw=document.getElementById('s-workout');
   sw.style.display='none'; sw.classList.remove('on');
   setLog={};
+  _wlOff();
 }
 function finishWorkout(){
   const durationMin = wktStartTime ? Math.round((Date.now()-wktStartTime)/60000) : 45;
@@ -4267,6 +4282,7 @@ function _coachShowSummary(cmp,deload){
       <div class="cs-h">${ct('sumThis')}</div>${body}
       <div class="cs-h">${ct('sumWeek')}</div>
       <div class="cs-row"><div class="cs-n">${wk.w}<small>${ct('sumWkts')}</small></div><div class="cs-n">${wk.sets}<small>${ct('sumSets')}</small></div><div class="cs-n">${wk.vol.toLocaleString(lang==='en'?'en-US':'de-DE')}<small>${ct('sumVol')}</small></div></div>
+      ${(()=>{try{const st=_streakInfo();return st.n>0?`<div class="cs-li" style="text-align:center;margin-top:10px;font-size:16px;font-weight:900;color:var(--gold2)">${stt('streak',{n:st.n,w:_stWeeksWord(st.n)})}</div>`:'';}catch(e){return '';}})()}
       <button class="cs-btn" onclick="document.getElementById('coach-sum').remove()">${ct('sumOk')}</button></div>`;
     document.body.appendChild(box);
   }catch(e){}
@@ -4333,6 +4349,74 @@ function _renderExChart(){
       <div class="exc-h">${cht('last')}</div>${rows}
     </div>`;
 }
+
+// ══ EKRAN UPALJEN TIJEKOM TRENINGA (Wake Lock) ═══════════════
+let _wakeLock=null;
+async function _wlOn(){
+  try{
+    if(!('wakeLock' in navigator)) return;
+    if(_wakeLock && !_wakeLock.released) return;
+    _wakeLock=await navigator.wakeLock.request('screen');
+  }catch(e){ _wakeLock=null; }
+}
+function _wlOff(){ try{ if(_wakeLock){ _wakeLock.release(); } }catch(e){} _wakeLock=null; }
+document.addEventListener('visibilitychange',()=>{
+  try{ const sw=document.getElementById('s-workout');
+    if(document.visibilityState==='visible' && sw && sw.classList.contains('on')) _wlOn(); }catch(e){}
+});
+
+// ══ TJEDNI CILJ I NIZ (Streak) ═══════════════════════════════
+const STREAK_TR={
+ hr:{title:'Tjedni cilj',of:'{c}/{g} treninga ovaj tjedan',done:'✅ Cilj ispunjen ovaj tjedan!',streak:'🔥 {n} {w} zaredom',w1:'tjedan',w2:'tjedna',w5:'tjedana',start:'Ispuni cilj ovaj tjedan i pokreni niz 🔥',keep:'Još {r} do cilja – ne prekidaj niz!',best:'Rekord: {n}',goal:'Cilj: {g}× tjedno',change:'Promijeni'},
+ de:{title:'Wochenziel',of:'{c}/{g} Trainings diese Woche',done:'✅ Wochenziel erreicht!',streak:'🔥 {n} {w} in Folge',w1:'Woche',w2:'Wochen',w5:'Wochen',start:'Erreiche diese Woche dein Ziel und starte eine Serie 🔥',keep:'Noch {r} bis zum Ziel – Serie nicht unterbrechen!',best:'Rekord: {n}',goal:'Ziel: {g}× pro Woche',change:'Ändern'},
+ en:{title:'Weekly goal',of:'{c}/{g} workouts this week',done:'✅ Goal reached this week!',streak:'🔥 {n} {w} in a row',w1:'week',w2:'weeks',w5:'weeks',start:'Hit your goal this week and start a streak 🔥',keep:'{r} more to go – keep the streak alive!',best:'Best: {n}',goal:'Goal: {g}× per week',change:'Change'},
+ pl:{title:'Cel tygodniowy',of:'{c}/{g} treningów w tym tygodniu',done:'✅ Cel osiągnięty w tym tygodniu!',streak:'🔥 {n} {w} z rzędu',w1:'tydzień',w2:'tygodnie',w5:'tygodni',start:'Osiągnij cel w tym tygodniu i zacznij serię 🔥',keep:'Jeszcze {r} do celu – nie przerywaj serii!',best:'Rekord: {n}',goal:'Cel: {g}× w tygodniu',change:'Zmień'},
+ ru:{title:'Цель на неделю',of:'{c}/{g} тренировок на этой неделе',done:'✅ Цель недели выполнена!',streak:'🔥 {n} {w} подряд',w1:'неделя',w2:'недели',w5:'недель',start:'Выполни цель на этой неделе и начни серию 🔥',keep:'Ещё {r} до цели – не прерывай серию!',best:'Рекорд: {n}',goal:'Цель: {g}× в неделю',change:'Изменить'},
+ tr:{title:'Haftalık hedef',of:'Bu hafta {c}/{g} antrenman',done:'✅ Bu haftanın hedefi tamam!',streak:'🔥 Üst üste {n} {w}',w1:'hafta',w2:'hafta',w5:'hafta',start:'Bu hafta hedefini tamamla ve seriyi başlat 🔥',keep:'Hedefe {r} kaldı – seriyi bozma!',best:'Rekor: {n}',goal:'Hedef: haftada {g}×',change:'Değiştir'}
+};
+function stt(k,v){let s=(STREAK_TR[lang]&&STREAK_TR[lang][k])||STREAK_TR.en[k]||k;if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s;}
+function _stWeeksWord(n){
+  if(lang==='hr'||lang==='ru'){const m10=n%10,m100=n%100;if(m10===1&&m100!==11)return stt('w1');if(m10>=2&&m10<=4&&(m100<12||m100>14))return stt('w2');return stt('w5');}
+  if(lang==='pl'){if(n===1)return stt('w1');const m10=n%10,m100=n%100;if(m10>=2&&m10<=4&&(m100<12||m100>14))return stt('w2');return stt('w5');}
+  return n===1?stt('w1'):stt('w2');
+}
+function _stGoal(){let g=3;try{g=parseInt(localStorage.getItem('gd_week_goal'))||3;}catch(e){}return Math.min(7,Math.max(1,g));}
+function _stMonday(t){const d=new Date(t);const day=(d.getDay()+6)%7;return new Date(d.getFullYear(),d.getMonth(),d.getDate()-day).getTime();}
+function _streakInfo(){
+  const g=_stGoal(); const cnt={};
+  _histAll().forEach(r=>{const t=new Date(r.date).getTime();if(!isFinite(t))return;const m=_stMonday(t);cnt[m]=(cnt[m]||0)+1;});
+  const thisMon=_stMonday(Date.now()); const W=7*864e5;
+  const c=cnt[thisMon]||0;
+  // niz: prethodni tjedni zaredom s ispunjenim ciljem (+ ovaj tjedan ako je već ispunjen)
+  let n=0; let m=thisMon-W;
+  // DST-safe: korak preko _stMonday(m+12h)
+  const prevMon=x=>_stMonday(x-3*864e5);
+  m=prevMon(thisMon);
+  while((cnt[m]||0)>=g){n++;m=prevMon(m);}
+  if(c>=g) n++;
+  // rekord
+  const mons=Object.keys(cnt).map(Number).sort((a,b)=>a-b);let best=0,run=0,last=null;
+  mons.forEach(x=>{const ok=cnt[x]>=g;if(ok){run=(last!==null&&prevMon(x)===last)?run+1:1;last=x;best=Math.max(best,run);}else{run=0;last=null;}});
+  return {g,c,n,best:Math.max(best,n)};
+}
+function _renderStreak(){
+  const el=document.getElementById('home-streak'); if(!el) return;
+  let s; try{ s=_streakInfo(); }catch(e){ el.innerHTML=''; return; }
+  const dots=Array.from({length:s.g},(_,i)=>`<span class="stk-dot${i<s.c?' on':''}"></span>`).join('');
+  const line2 = s.c>=s.g ? stt('done') : (s.n>0 ? stt('keep',{r:s.g-s.c}) : stt('start'));
+  el.innerHTML=`<div class="stk-card">
+    <div class="stk-top"><span class="stk-title">${stt('title')}</span><button class="stk-btn" onclick="_stCycleGoal()">${stt('goal',{g:s.g})} · ${stt('change')}</button></div>
+    <div class="stk-dots">${dots}</div>
+    <div class="stk-of">${stt('of',{c:s.c,g:s.g})}</div>
+    ${s.n>0?`<div class="stk-streak">${stt('streak',{n:s.n,w:_stWeeksWord(s.n)})}${s.best>s.n?` <span class="stk-best">· ${stt('best',{n:s.best})}</span>`:''}</div>`:''}
+    <div class="stk-sub">${line2}</div>
+  </div>`;
+}
+function _stCycleGoal(){const g=_stGoal();const n=g>=6?2:g+1;try{localStorage.setItem('gd_week_goal',String(n));}catch(e){}_renderStreak();}
+
+// renderHome + tjedni cilj
+const _gdRenderHomeOrig=renderHome;
+renderHome=function(){ const r=_gdRenderHomeOrig.apply(this,arguments); try{_renderStreak();}catch(e){} return r; };
 
 // Return the most recent sets for a given exerciseId, or null
 function getPrevResult(exerciseId){
