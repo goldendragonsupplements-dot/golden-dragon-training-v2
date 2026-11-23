@@ -1981,10 +1981,10 @@ const PROG_DATA = {
         id: 'home_noequip',
         label:{de:'Ohne Geräte',en:'No Equipment',hr:'Bez opreme',pl:'Bez sprzętu',ru:'Без оборудования',tr:'Ekipmansız'},
         programs:[
-          {id:'home_noequip_beginner',    name:{de:'Anfänger',       en:'Beginner',     hr:'Početnik',      pl:'Początkujący',        ru:'Начинающий',      tr:'Başlangıç'}},
-          {id:'home_noequip_intermediate',name:{de:'Fortgeschritten', en:'Intermediate', hr:'Srednja razina',pl:'Średniozaawansowany',  ru:'Средний уровень', tr:'Orta Seviye'}},
-          {id:'home_noequip_advanced',    name:{de:'Profi',           en:'Advanced',     hr:'Napredni',      pl:'Zaawansowany',        ru:'Продвинутый',     tr:'İleri Seviye'}},
-          {id:'home_noequip_fatloss',     name:{de:'Fettverbrennung', en:'Fat Loss',     hr:'Gubitak masti', pl:'Spalanie tłuszczu',   ru:'Сжигание жира',   tr:'Yağ Yakımı'}}
+          {id:'home_noequip_beginner',    name:{de:'Anfänger',       en:'Beginner',     hr:'Početnik',      pl:'Początkujący',        ru:'Начинающий',      tr:'Başlangıç'}, duration:'6'},
+          {id:'home_noequip_intermediate',name:{de:'Fortgeschritten', en:'Intermediate', hr:'Srednja razina',pl:'Średniozaawansowany',  ru:'Средний уровень', tr:'Orta Seviye'}, duration:'6'},
+          {id:'home_noequip_advanced',    name:{de:'Profi',           en:'Advanced',     hr:'Napredni',      pl:'Zaawansowany',        ru:'Продвинутый',     tr:'İleri Seviye'}, duration:'6'},
+          {id:'home_noequip_fatloss',     name:{de:'Fettverbrennung', en:'Fat Loss',     hr:'Gubitak masti', pl:'Spalanie tłuszczu',   ru:'Сжигание жира',   tr:'Yağ Yakımı'}, duration:'6'}
         ]
       },
       {
@@ -2233,7 +2233,7 @@ const PROG_LOAD_TR={
 function plt(k){ return (PROG_LOAD_TR[lang]&&PROG_LOAD_TR[lang][k])||PROG_LOAD_TR.en[k]; }
 
 const WORKOUT_DATA = {};
-const PROGRAM_FILES = {"gd_athlete_b1":"28abeb4a13","home_db_advanced":"3aaaa2ceed","home_db_beginner":"7f11ef0f21","home_db_intermediate":"ea5415e112","home_hg_advanced":"9144c5e6d0","home_hg_beginner":"29474f9162","home_hg_fatloss":"ac42b22682","home_hg_intermediate":"b5a4350d80","home_hg_transform":"ce3e96f58f"};
+const PROGRAM_FILES = {"gd_athlete_b1":"27d08df175","home_db_advanced":"3aaaa2ceed","home_db_beginner":"7f11ef0f21","home_db_intermediate":"ea5415e112","home_hg_advanced":"9144c5e6d0","home_hg_beginner":"29474f9162","home_hg_fatloss":"ac42b22682","home_hg_intermediate":"b5a4350d80","home_hg_transform":"ce3e96f58f","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75"};
 
 let activeProgDetail = null;
 
