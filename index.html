@@ -278,6 +278,28 @@ input:focus,select:focus{border-color:var(--gold)}
 
 /* PROGRESS / RANK */
 .progress-body{padding:16px;max-width:600px;margin:0 auto}
+.bd-form{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.bd-form label{flex:1;min-width:90px;display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.bd-form input,.bd-form select{background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:10px;padding:11px;font-size:16px;font-weight:700;width:100%;box-sizing:border-box}
+.bd-btn{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:900;cursor:pointer}
+.bd-hint{font-size:12px;color:#999;line-height:1.5;margin-top:8px}
+.bd-stats{display:flex;gap:8px;margin:12px 0 6px}
+.bd-stat{flex:1;background:rgba(255,255,255,.04);border-radius:10px;padding:10px}
+.bd-l{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase}
+.bd-n{font-size:22px;font-weight:900;color:#fff} .bd-n small{font-size:12px;color:#aaa}
+.bd-d{font-size:13px;font-weight:800;color:#ddd} .bd-d.down{color:#6fd39a} .bd-d.up{color:#f0a060} .bd-d span{font-weight:600;color:#888;font-size:11px}
+.bd-del{background:none;border:none;color:#777;font-size:14px;cursor:pointer;margin-left:6px}
+.nut-sex{display:flex;gap:14px;align-items:center;font-size:13px;color:#ddd;font-weight:700;margin-bottom:10px;flex-wrap:wrap}
+.nut-sex label{display:flex;gap:6px;align-items:center;font-weight:600}
+.nut-grid{margin-top:8px}
+.nut-row{display:flex;gap:8px;margin-top:10px}
+.nut-n{flex:1;background:rgba(255,255,255,.05);border-radius:10px;padding:10px 6px;text-align:center;font-size:22px;font-weight:900;color:#fff}
+.nut-n small{display:block;font-size:11px;font-weight:600;color:#aaa;margin-top:2px}
+.nut-big{font-size:30px;font-weight:900;color:var(--gold2);text-align:center;margin-top:14px} .nut-big small{font-size:13px;color:#aaa;font-weight:700}
+.nut-rec{margin-top:14px;border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:12px;background:rgba(201,168,76,.06)}
+.nut-rec-t{font-size:12px;font-weight:900;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.nut-rec-i{font-size:13px;color:#ddd;line-height:1.5;padding:8px 0;border-top:1px solid #222} .nut-rec-i:first-of-type{border-top:none}
+.nut-rec-i b{color:#fff} .nut-rec-i a{display:inline-block;margin-top:4px;color:var(--gold2);font-weight:800;text-decoration:none}
 .exc-sel{width:100%;background:#141414;color:#fff;border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:11px;font-size:15px;font-weight:700;margin-bottom:10px}
 .exc-card{background:#111;border:1px solid #222;border-radius:14px;padding:12px}
 .exc-metric{font-size:12px;color:var(--muted);margin-bottom:4px}
@@ -746,6 +768,10 @@ input:focus,select:focus{border-color:var(--gold)}
       <div class="rank-bar-big"><div class="rank-fill-big" id="pr-bar" style="width:5%"></div></div>
       <div style="font-size:12px;color:var(--muted);margin-top:4px" id="pr-next">Nächster Rang: 5 Trainings</div>
     </div>
+    <div class="sec-title" id="pl-body">TIJELO</div>
+    <div id="body-wrap"></div>
+    <div class="sec-title" id="pl-nutri">KALORIJE I PROTEINI</div>
+    <div id="nutri-wrap"></div>
     <div class="sec-title" id="pl-exchart">NAPREDAK PO VJEŽBI</div>
     <div id="ex-chart-wrap"></div>
     <div class="sec-title" id="pl-achieve">ACHIEVEMENTS</div>
@@ -1494,6 +1520,8 @@ function doLogout(){
   try{
     localStorage.removeItem('gd_workout_history');
     localStorage.removeItem('gd_last_day');
+    localStorage.removeItem('gd_body');
+    localStorage.removeItem('gd_nutri');
     sessionStorage.removeItem('gd_wh_backup');
   }catch(e){}
   auth.signOut();
@@ -1533,6 +1561,8 @@ async function doDeleteAccount(){
       localStorage.removeItem('gd_workout_history');
       localStorage.removeItem('gd_last_day');
       localStorage.removeItem('gd_deleted_workouts');
+      localStorage.removeItem('gd_body');
+      localStorage.removeItem('gd_nutri');
       localStorage.removeItem('gd_disc_ok');        // reset consent for next user on this device
       sessionStorage.removeItem('gd_wh_backup');   // also clear the protectHistory backup
     }catch(e){}
@@ -1644,6 +1674,8 @@ function _syncFirebaseHistory(){
     .then(snap=>{
       if(!snap.exists) return;
       const d = snap.data();
+      try{ if(Array.isArray(d.bodyLog)) _bodyMergeRemote(d.bodyLog); }catch(e){}
+      try{ if(d.nutri && typeof d.nutri==='object' && !localStorage.getItem('gd_nutri')) _nutriSet(d.nutri,false); }catch(e){}
       // merge remote tombstones into local
       if(Array.isArray(d.deletedWorkouts) && d.deletedWorkouts.length){
         const local = _tombstoneAll();
@@ -4484,6 +4516,168 @@ function _stCycleGoal(){const g=_stGoal();const n=g>=6?2:g+1;try{localStorage.se
 const _gdRenderHomeOrig=renderHome;
 renderHome=function(){ const r=_gdRenderHomeOrig.apply(this,arguments); try{_renderStreak();}catch(e){} return r; };
 
+// ══ TIJELO: KILAŽA I STRUK + KALKULATOR KALORIJA ═════════════
+const BODY_TR={
+ hr:{title:'Tijelo: kilaža i struk',kg:'Kilaža',waist:'Struk',save:'Spremi',saved:'Spremljeno ✓',hint:'Važi se ujutro nakon WC-a. Struk mjeri u visini pupka. Dovoljno je jednom tjedno.',empty:'Upiši prvu kilažu i struk – ovdje ćeš vidjeti kako se mijenjaju.',now:'Sada',start:'Početak',change:'Promjena',last:'Zadnji upisi',del:'Obriši',invalid:'Upiši barem kilažu ili struk.',
+  ntitle:'Kalorije i proteini',sex:'Spol',male:'Muško',female:'Žensko',age:'Godine',height:'Visina',weight:'Težina',job:'Posao / dan',jSit:'Sjedeći',jStand:'Stojeći / hodanje',jPhys:'Fizički težak',trn:'Treninga tjedno',goal:'Cilj',gCut:'Skinuti salo',gKeep:'Održavati',gGain:'Mišićna masa',calc:'Izračunaj',kcal:'kcal dnevno',prot:'Proteini',fat:'Masti',carb:'Ugljikohidrati',expCut:'Očekivano: oko −{x} kg tjedno',expKeep:'Kilaža ostaje ±1 kg',expGain:'Očekivano: oko +{x} kg tjedno',adjust:'Ako se kilaža 2 tjedna ne mijenja kako treba, promijeni za ±150 kcal.',disc:'Ovo je procjena, ne liječnički savjet. Kod bolesti, trudnoće ili ispod 18 godina pitaj liječnika.',
+  recTitle:'🐉 Golden Dragon preporuka',recWhey:'Ako hranom ne dođeš do {p} g proteina: 1 mjerica Whey proteina daje oko 20–25 g. Proteini doprinose rastu i održavanju mišićne mase.',recCrea:'Kreatin monohidrat, 3–5 g dnevno. Kreatin povećava tjelesnu izvedbu kod uzastopnih kratkotrajnih intenzivnih vježbi (uz dnevni unos od 3 g).',shop:'Pogledaj u shopu →',fill:'Ispuni sva polja.'},
+ de:{title:'Körper: Gewicht & Taille',kg:'Gewicht',waist:'Taille',save:'Speichern',saved:'Gespeichert ✓',hint:'Morgens nach dem Toilettengang wiegen. Taille auf Höhe des Bauchnabels messen. Einmal pro Woche reicht.',empty:'Trage dein erstes Gewicht und deine Taille ein – hier siehst du die Veränderung.',now:'Jetzt',start:'Start',change:'Veränderung',last:'Letzte Einträge',del:'Löschen',invalid:'Bitte mindestens Gewicht oder Taille eintragen.',
+  ntitle:'Kalorien & Eiweiß',sex:'Geschlecht',male:'Mann',female:'Frau',age:'Alter',height:'Größe',weight:'Gewicht',job:'Beruf / Alltag',jSit:'Sitzend',jStand:'Stehend / gehend',jPhys:'Körperlich schwer',trn:'Trainings pro Woche',goal:'Ziel',gCut:'Fett verlieren',gKeep:'Halten',gGain:'Muskelaufbau',calc:'Berechnen',kcal:'kcal pro Tag',prot:'Eiweiß',fat:'Fett',carb:'Kohlenhydrate',expCut:'Erwartet: ca. −{x} kg pro Woche',expKeep:'Gewicht bleibt ±1 kg',expGain:'Erwartet: ca. +{x} kg pro Woche',adjust:'Wenn sich dein Gewicht 2 Wochen nicht wie geplant ändert, ±150 kcal anpassen.',disc:'Dies ist eine Schätzung, keine ärztliche Beratung. Bei Krankheit, Schwangerschaft oder unter 18 Jahren ärztlich beraten lassen.',
+  recTitle:'🐉 Golden Dragon Empfehlung',recWhey:'Wenn du über das Essen keine {p} g Eiweiß schaffst: 1 Messlöffel Whey Protein liefert ca. 20–25 g. Eiweiß trägt zu einer Zunahme und zum Erhalt von Muskelmasse bei.',recCrea:'Kreatin Monohydrat, 3–5 g täglich. Kreatin erhöht die körperliche Leistung bei Schnellkrafttraining im Rahmen kurzzeitiger intensiver körperlicher Betätigung (bei einer täglichen Aufnahme von 3 g).',shop:'Im Shop ansehen →',fill:'Bitte alle Felder ausfüllen.'},
+ en:{title:'Body: weight & waist',kg:'Weight',waist:'Waist',save:'Save',saved:'Saved ✓',hint:'Weigh yourself in the morning after the toilet. Measure your waist at belly-button height. Once a week is enough.',empty:'Enter your first weight and waist – this is where you will see them change.',now:'Now',start:'Start',change:'Change',last:'Recent entries',del:'Delete',invalid:'Enter at least weight or waist.',
+  ntitle:'Calories & protein',sex:'Sex',male:'Male',female:'Female',age:'Age',height:'Height',weight:'Weight',job:'Job / daily life',jSit:'Sitting',jStand:'Standing / walking',jPhys:'Heavy physical',trn:'Workouts per week',goal:'Goal',gCut:'Lose fat',gKeep:'Maintain',gGain:'Build muscle',calc:'Calculate',kcal:'kcal per day',prot:'Protein',fat:'Fat',carb:'Carbs',expCut:'Expected: about −{x} kg per week',expKeep:'Weight stays within ±1 kg',expGain:'Expected: about +{x} kg per week',adjust:'If your weight does not change as planned for 2 weeks, adjust by ±150 kcal.',disc:'This is an estimate, not medical advice. If you are ill, pregnant or under 18, ask a doctor.',
+  recTitle:'🐉 Golden Dragon recommendation',recWhey:'If you cannot reach {p} g of protein from food: 1 scoop of whey protein gives about 20–25 g. Protein contributes to a growth in and maintenance of muscle mass.',recCrea:'Creatine monohydrate, 3–5 g daily. Creatine increases physical performance in successive bursts of short-term, high-intensity exercise (with a daily intake of 3 g).',shop:'View in shop →',fill:'Please fill in all fields.'},
+ pl:{title:'Ciało: waga i talia',kg:'Waga',waist:'Talia',save:'Zapisz',saved:'Zapisano ✓',hint:'Waż się rano po toalecie. Talię mierz na wysokości pępka. Raz w tygodniu wystarczy.',empty:'Wpisz pierwszą wagę i obwód talii – tutaj zobaczysz zmiany.',now:'Teraz',start:'Start',change:'Zmiana',last:'Ostatnie wpisy',del:'Usuń',invalid:'Wpisz przynajmniej wagę lub talię.',
+  ntitle:'Kalorie i białko',sex:'Płeć',male:'Mężczyzna',female:'Kobieta',age:'Wiek',height:'Wzrost',weight:'Waga',job:'Praca / dzień',jSit:'Siedząca',jStand:'Stojąca / chodzenie',jPhys:'Ciężka fizyczna',trn:'Treningi w tygodniu',goal:'Cel',gCut:'Spalić tłuszcz',gKeep:'Utrzymać',gGain:'Masa mięśniowa',calc:'Oblicz',kcal:'kcal dziennie',prot:'Białko',fat:'Tłuszcz',carb:'Węglowodany',expCut:'Oczekiwane: ok. −{x} kg tygodniowo',expKeep:'Waga zostaje ±1 kg',expGain:'Oczekiwane: ok. +{x} kg tygodniowo',adjust:'Jeśli waga przez 2 tygodnie nie zmienia się zgodnie z planem, zmień o ±150 kcal.',disc:'To szacunek, nie porada lekarska. W razie choroby, ciąży lub poniżej 18 lat zapytaj lekarza.',
+  recTitle:'🐉 Polecenie Golden Dragon',recWhey:'Jeśli z jedzenia nie dojdziesz do {p} g białka: 1 miarka białka Whey daje ok. 20–25 g. Białko przyczynia się do wzrostu i utrzymania masy mięśniowej.',recCrea:'Monohydrat kreatyny, 3–5 g dziennie. Kreatyna zwiększa wydolność fizyczną podczas krótkotrwałych, intensywnych ćwiczeń (przy dziennym spożyciu 3 g).',shop:'Zobacz w sklepie →',fill:'Wypełnij wszystkie pola.'},
+ ru:{title:'Тело: вес и талия',kg:'Вес',waist:'Талия',save:'Сохранить',saved:'Сохранено ✓',hint:'Взвешивайся утром после туалета. Талию измеряй на уровне пупка. Достаточно раз в неделю.',empty:'Введи первый вес и талию – здесь увидишь, как они меняются.',now:'Сейчас',start:'Старт',change:'Изменение',last:'Последние записи',del:'Удалить',invalid:'Введи хотя бы вес или талию.',
+  ntitle:'Калории и белок',sex:'Пол',male:'Мужской',female:'Женский',age:'Возраст',height:'Рост',weight:'Вес',job:'Работа / день',jSit:'Сидячая',jStand:'Стоя / ходьба',jPhys:'Тяжёлая физическая',trn:'Тренировок в неделю',goal:'Цель',gCut:'Сбросить жир',gKeep:'Поддерживать',gGain:'Набор мышц',calc:'Рассчитать',kcal:'ккал в день',prot:'Белок',fat:'Жиры',carb:'Углеводы',expCut:'Ожидается: около −{x} кг в неделю',expKeep:'Вес держится ±1 кг',expGain:'Ожидается: около +{x} кг в неделю',adjust:'Если вес 2 недели не меняется как нужно, измени на ±150 ккал.',disc:'Это оценка, а не медицинский совет. При болезни, беременности или до 18 лет посоветуйся с врачом.',
+  recTitle:'🐉 Рекомендация Golden Dragon',recWhey:'Если с едой не набираешь {p} г белка: 1 мерная ложка Whey протеина даёт около 20–25 г. Белок способствует росту и сохранению мышечной массы.',recCrea:'Креатин моногидрат, 3–5 г в день. Креатин повышает физическую работоспособность при кратковременных интенсивных нагрузках (при ежедневном приёме 3 г).',shop:'Смотреть в магазине →',fill:'Заполни все поля.'},
+ tr:{title:'Vücut: kilo ve bel',kg:'Kilo',waist:'Bel',save:'Kaydet',saved:'Kaydedildi ✓',hint:'Sabah tuvaletten sonra tartıl. Beli göbek hizasından ölç. Haftada bir yeterli.',empty:'İlk kilonu ve bel ölçünü gir – değişimi burada göreceksin.',now:'Şimdi',start:'Başlangıç',change:'Değişim',last:'Son kayıtlar',del:'Sil',invalid:'En az kilo veya bel gir.',
+  ntitle:'Kalori ve protein',sex:'Cinsiyet',male:'Erkek',female:'Kadın',age:'Yaş',height:'Boy',weight:'Kilo',job:'İş / gün',jSit:'Oturarak',jStand:'Ayakta / yürüyerek',jPhys:'Ağır fiziksel',trn:'Haftalık antrenman',goal:'Hedef',gCut:'Yağ yakmak',gKeep:'Korumak',gGain:'Kas kazanmak',calc:'Hesapla',kcal:'kcal / gün',prot:'Protein',fat:'Yağ',carb:'Karbonhidrat',expCut:'Beklenen: haftada yaklaşık −{x} kg',expKeep:'Kilo ±1 kg içinde kalır',expGain:'Beklenen: haftada yaklaşık +{x} kg',adjust:'Kilon 2 hafta boyunca planlandığı gibi değişmezse ±150 kcal ayarla.',disc:'Bu bir tahmindir, tıbbi tavsiye değildir. Hastalık, hamilelik veya 18 yaş altında doktora danış.',
+  recTitle:'🐉 Golden Dragon önerisi',recWhey:'Yemekle {p} g proteine ulaşamıyorsan: 1 ölçek Whey protein yaklaşık 20–25 g verir. Protein, kas kütlesinin artmasına ve korunmasına katkıda bulunur.',recCrea:'Kreatin monohidrat, günde 3–5 g. Kreatin, kısa süreli yüksek yoğunluklu egzersizlerde fiziksel performansı artırır (günlük 3 g alımla).',shop:'Mağazada gör →',fill:'Lütfen tüm alanları doldur.'}
+};
+function bt(k,v){let s=(BODY_TR[lang]&&BODY_TR[lang][k])||BODY_TR.en[k]||k;if(v)for(const x in v)s=s.split('{'+x+'}').join(v[x]);return s;}
+function _u(k){const ru={kg:'кг',cm:'см',g:'г',kcal:'ккал'};return lang==='ru'?(ru[k]||k):k;}
+const GD_SHOP={
+  whey:{name:'Golden Dragon Whey Protein',url:'https://www.goldendragonsupplements.com/products/golden-dragon-whey-protein-schokolade-1000g'},
+  crea:{name:'Golden Dragon Kreatin Monohydrat',url:'https://www.goldendragonsupplements.com/products/golden-dragon-kreatin-monohydrat-geschmacksneutral-500g'}
+};
+// ── podaci ──
+function _bodyAll(){try{const a=JSON.parse(localStorage.getItem('gd_body')||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function _bodySaveAll(a,sync){a.sort((x,y)=>x.d<y.d?-1:x.d>y.d?1:0);a=a.slice(-400);try{localStorage.setItem('gd_body',JSON.stringify(a));}catch(e){}
+  if(sync!==false&&typeof me!=='undefined'&&me&&typeof db!=='undefined'){db.collection('users').doc(me.uid).set({bodyLog:a},{merge:true}).catch(()=>{});}return a;}
+function _todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function _numIn(id){const el=document.getElementById(id);if(!el)return null;const v=parseFloat(String(el.value).replace(',','.'));return isFinite(v)?v:null;}
+function _bodyMergeRemote(remote){
+  if(!Array.isArray(remote)) return;
+  const map={};_bodyAll().forEach(e=>{map[e.d]=e;});
+  remote.forEach(e=>{if(e&&e.d&&(!map[e.d]||(e.t||0)>(map[e.d].t||0)))map[e.d]=e;});
+  _bodySaveAll(Object.values(map),false);
+}
+function bodySave(){
+  const w=_numIn('body-w'),wa=_numIn('body-wa');
+  const okW=w!=null&&w>=25&&w<=350, okWa=wa!=null&&wa>=40&&wa<=250;
+  if(!okW&&!okWa){toast(bt('invalid'),'err');return;}
+  const a=_bodyAll();const d=_todayStr();const old=a.find(e=>e.d===d);
+  const e={d,w:okW?Math.round(w*10)/10:(old?old.w:null),wa:okWa?Math.round(wa*10)/10:(old?old.wa:null),t:Date.now()};
+  _bodySaveAll(a.filter(x=>x.d!==d).concat([e]));
+  toast(bt('saved'),'ok');_renderBody();
+  try{const nw=document.getElementById('nut-w');if(nw&&e.w)nw.value=_cNum(e.w);}catch(x){}
+}
+function bodyDel(d){_bodySaveAll(_bodyAll().filter(e=>e.d!==d));_renderBody();}
+function _miniChart(pts,unit,color){
+  if(pts.length<2) return '';
+  const W=320,H=110,pl=34,pr=10,pt=12,pb=20;const ys=pts.map(p=>p.y);let lo=Math.min(...ys),hi=Math.max(...ys);
+  if(hi-lo<2){const m=(hi+lo)/2;lo=m-1;hi=m+1;}const pad=(hi-lo)*0.15;lo-=pad;hi+=pad;
+  const t0=new Date(pts[0].d).getTime(),t1=new Date(pts[pts.length-1].d).getTime()||t0+1;
+  const X=p=>pl+(W-pl-pr)*((new Date(p.d).getTime()-t0)/Math.max(1,t1-t0));const Y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
+  let g='';for(let k=0;k<=2;k++){const v=lo+(hi-lo)*k/2;g+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#2a2a2a"/><text x="${pl-5}" y="${Y(v)+3.5}" text-anchor="end" font-size="10" fill="#888">${_cNum(Math.round(v*10)/10)}</text>`;}
+  const fd=d=>d.slice(8,10)+'.'+d.slice(5,7)+'.';
+  const path=pts.map((p,i)=>`${i?'L':'M'}${X(p).toFixed(1)},${Y(p.y).toFixed(1)}`).join(' ');
+  const dots=pts.map(p=>`<circle cx="${X(p).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="3" fill="${color}"/>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%">${g}<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>${dots}
+    <text x="${pl}" y="${H-5}" font-size="10" fill="#888">${fd(pts[0].d)}</text><text x="${W-pr}" y="${H-5}" text-anchor="end" font-size="10" fill="#888">${fd(pts[pts.length-1].d)}</text></svg>`;
+}
+function _bodyStat(arr,key,unit,label){
+  const v=arr.filter(e=>e[key]!=null);if(!v.length)return '';
+  const f=v[0][key],l=v[v.length-1][key],diff=Math.round((l-f)*10)/10;
+  const cls=diff<0?'down':(diff>0?'up':'');
+  return `<div class="bd-stat"><div class="bd-l">${label}</div><div class="bd-n">${_cNum(l)} <small>${_u(unit)}</small></div>${v.length>1?`<div class="bd-d ${cls}">${diff>0?'+':''}${_cNum(diff)} ${_u(unit)} <span>${bt('change')}</span></div>`:''}</div>`;
+}
+function _renderBody(){
+  const el=document.getElementById('body-wrap');if(!el)return;
+  document.getElementById('pl-body').textContent=bt('title');
+  const a=_bodyAll();const last=a[a.length-1]||{};
+  const wPts=a.filter(e=>e.w!=null).map(e=>({d:e.d,y:e.w})),waPts=a.filter(e=>e.wa!=null).map(e=>({d:e.d,y:e.wa}));
+  el.innerHTML=`<div class="exc-card">
+    <div class="bd-form">
+      <label><span>${bt('kg')} (${_u('kg')})</span><input id="body-w" inputmode="decimal" placeholder="${last.w!=null?_cNum(last.w):'80'}"></label>
+      <label><span>${bt('waist')} (${_u('cm')})</span><input id="body-wa" inputmode="decimal" placeholder="${last.wa!=null?_cNum(last.wa):'90'}"></label>
+      <button class="bd-btn" onclick="bodySave()">${bt('save')}</button>
+    </div>
+    <div class="bd-hint">${bt('hint')}</div>
+    ${a.length?`<div class="bd-stats">${_bodyStat(a,'w','kg',bt('kg'))}${_bodyStat(a,'wa','cm',bt('waist'))}</div>
+      ${wPts.length>1?`<div class="exc-metric">${bt('kg')} (${_u('kg')})</div>${_miniChart(wPts,'kg','#c9a84c')}`:''}
+      ${waPts.length>1?`<div class="exc-metric" style="margin-top:6px">${bt('waist')} (${_u('cm')})</div>${_miniChart(waPts,'cm','#6fd39a')}`:''}
+      <div class="exc-h">${bt('last')}</div>
+      ${a.slice(-5).reverse().map(e=>`<div class="exc-row"><span>${e.d.slice(8,10)}.${e.d.slice(5,7)}.${e.d.slice(0,4)}</span><span>${e.w!=null?_cNum(e.w)+' '+_u('kg'):'–'} · ${e.wa!=null?_cNum(e.wa)+' '+_u('cm'):'–'} <button class="bd-del" onclick="bodyDel('${e.d}')" aria-label="${bt('del')}">✕</button></span></div>`).join('')}`
+    :`<div class="exc-empty" style="margin-top:10px">📏 ${bt('empty')}</div>`}
+  </div>`;
+}
+// ── kalkulator ──
+function _nutriGet(){try{return JSON.parse(localStorage.getItem('gd_nutri')||'null')||{};}catch(e){return {};}}
+function _nutriSet(o,sync){try{localStorage.setItem('gd_nutri',JSON.stringify(o));}catch(e){}
+  if(sync!==false&&typeof me!=='undefined'&&me&&typeof db!=='undefined')db.collection('users').doc(me.uid).set({nutri:o},{merge:true}).catch(()=>{});}
+function nutriCalc(o){
+  // Mifflin-St Jeor
+  const bmr=10*o.w+6.25*o.h-5*o.age+(o.sex==='f'?-161:5);
+  const job={sit:1.2,stand:1.3,phys:1.45}[o.job]||1.2;
+  const tr={0:0,1:0.04,2:0.075,3:0.11,4:0.15,5:0.19,6:0.22}[Math.min(6,o.trn|0)]||0;
+  const tdee=bmr*(job+tr);
+  let kcal=tdee;
+  if(o.goal==='cut') kcal=tdee-Math.min(500,tdee*0.2);
+  if(o.goal==='gain') kcal=tdee+Math.min(300,tdee*0.1);
+  const minK=o.sex==='f'?1200:1500; kcal=Math.max(minK,kcal);
+  kcal=Math.round(kcal/10)*10;
+  const pPerKg=o.goal==='cut'?2.0:1.8;
+  // kod visokog BMI proteine i masti računamo prema 'referentnoj' težini (BMI 27)
+  const refW=Math.min(o.w, 27*Math.pow(o.h/100,2));
+  const prot=Math.round(pPerKg*refW);
+  let fat=Math.round(Math.max(0.8*refW, kcal*0.22/9));
+  let carb=Math.round((kcal-prot*4-fat*9)/4);
+  if(carb<50){carb=50;fat=Math.max(30,Math.round((kcal-prot*4-carb*4)/9));}
+  const delta=kcal-tdee; const perWeek=Math.round(Math.abs(delta)*7/7700*10)/10;
+  return {tdee:Math.round(tdee),kcal,prot,fat,carb,perWeek,delta:Math.round(delta)};
+}
+function nutriRun(){
+  const sx=(document.querySelector('input[name="nut-sex"]:checked')||{}).value;
+  const o={sex:sx,age:_numIn('nut-age'),h:_numIn('nut-h'),w:_numIn('nut-w'),job:document.getElementById('nut-job').value,trn:parseInt(document.getElementById('nut-trn').value),goal:document.getElementById('nut-goal').value};
+  if(!o.sex||!(o.age>=14&&o.age<=99)||!(o.h>=120&&o.h<=230)||!(o.w>=30&&o.w<=300)){toast(bt('fill'),'err');return;}
+  _nutriSet(o);_renderNutriResult(o);
+}
+function _renderNutriResult(o){
+  const box=document.getElementById('nut-res');if(!box)return;
+  const r=nutriCalc(o);
+  const exp=(r.delta<-50&&r.perWeek>0)?bt('expCut',{x:_cNum(r.perWeek)}):((r.delta>50&&r.perWeek>0)?bt('expGain',{x:_cNum(r.perWeek)}):bt('expKeep'));
+  box.innerHTML=`<div class="nut-big">${r.kcal.toLocaleString(lang==='en'?'en-US':'de-DE')} <small>${bt('kcal')}</small></div>
+    <div class="nut-row">
+      <div class="nut-n">${r.prot}<small>${bt('prot')} (${_u('g')})</small></div>
+      <div class="nut-n">${r.fat}<small>${bt('fat')} (${_u('g')})</small></div>
+      <div class="nut-n">${r.carb}<small>${bt('carb')} (${_u('g')})</small></div></div>
+    <div class="bd-hint" style="margin-top:8px">${exp}. ${bt('adjust')}</div>
+    <div class="nut-rec"><div class="nut-rec-t">${bt('recTitle')}</div>
+      <div class="nut-rec-i"><b>${GD_SHOP.whey.name}</b><div>${bt('recWhey',{p:r.prot})}</div><a href="${GD_SHOP.whey.url}" target="_blank" rel="noopener">${bt('shop')}</a></div>
+      <div class="nut-rec-i"><b>${GD_SHOP.crea.name}</b><div>${bt('recCrea')}</div><a href="${GD_SHOP.crea.url}" target="_blank" rel="noopener">${bt('shop')}</a></div></div>
+    <div class="bd-hint" style="margin-top:8px;font-size:11px">${bt('disc')}</div>`;
+}
+function _renderNutri(){
+  const el=document.getElementById('nutri-wrap');if(!el)return;
+  document.getElementById('pl-nutri').textContent=bt('ntitle');
+  const o=_nutriGet();const lastW=(_bodyAll().filter(e=>e.w!=null).slice(-1)[0]||{}).w;
+  let goal=o.goal;
+  if(!goal){let lp=null;try{lp=(JSON.parse(localStorage.getItem('gd_last_prog')||'null')||{}).progId;}catch(e){}goal=(lp==='home_hg_fatloss'||lp==='home_hg_transform')?'cut':'keep';}
+  const sel=(v,c)=>v===c?' selected':'';const w=lastW||o.w||'';
+  el.innerHTML=`<div class="exc-card">
+    <div class="nut-sex">${bt('sex')}: <label><input type="radio" name="nut-sex" value="m"${o.sex==='m'?' checked':''}> ${bt('male')}</label><label><input type="radio" name="nut-sex" value="f"${o.sex==='f'?' checked':''}> ${bt('female')}</label></div>
+    <div class="bd-form nut-grid">
+      <label><span>${bt('age')}</span><input id="nut-age" inputmode="numeric" value="${o.age||''}"></label>
+      <label><span>${bt('height')} (${_u('cm')})</span><input id="nut-h" inputmode="numeric" value="${o.h||''}"></label>
+      <label><span>${bt('weight')} (${_u('kg')})</span><input id="nut-w" inputmode="decimal" value="${w!==''?_cNum(w):''}"></label>
+    </div>
+    <div class="bd-form nut-grid">
+      <label><span>${bt('job')}</span><select id="nut-job"><option value="sit"${sel(o.job,'sit')}>${bt('jSit')}</option><option value="stand"${sel(o.job,'stand')}>${bt('jStand')}</option><option value="phys"${sel(o.job,'phys')}>${bt('jPhys')}</option></select></label>
+      <label><span>${bt('trn')}</span><select id="nut-trn">${[1,2,3,4,5,6].map(n=>`<option value="${n}"${(o.trn||3)===n?' selected':''}>${n}</option>`).join('')}</select></label>
+    </div>
+    <div class="bd-form nut-grid">
+      <label><span>${bt('goal')}</span><select id="nut-goal"><option value="cut"${sel(goal,'cut')}>${bt('gCut')}</option><option value="keep"${sel(goal,'keep')}>${bt('gKeep')}</option><option value="gain"${sel(goal,'gain')}>${bt('gGain')}</option></select></label>
+    </div>
+    <button class="bd-btn" style="width:100%;margin-top:10px" onclick="nutriRun()">${bt('calc')}</button>
+    <div id="nut-res"></div>
+  </div>`;
+  if(o.sex&&o.age&&o.h&&(o.w||lastW)) _renderNutriResult({...o,w:lastW||o.w,goal});
+}
+
 // Return the most recent sets for a given exerciseId, or null
 function getPrevResult(exerciseId){
   if(!exerciseId) return null;
@@ -4497,6 +4691,8 @@ function getPrevResult(exerciseId){
 
 // ══ PROGRESS / RANK ══════════════════════════════════════════
 function renderProgress(){
+  try{ _renderBody(); }catch(e){}
+  try{ _renderNutri(); }catch(e){}
   try{ _renderExChart(); }catch(e){}
   const all = _histAll();
   const wkts = all.length;
