@@ -2139,16 +2139,16 @@ const PROG_DATA = {
   },
   fitness_military: {
     programs:[
-      {id:'military_basic',    name:{de:'Militär Grundlagen', en:'Basic Military',  hr:'Osnovna vojna',   pl:'Podstawowy wojskowy',ru:'Базовая военная',    tr:'Temel Askeri'}},
-      {id:'military_tactical', name:{de:'Taktische Fitness',  en:'Tactical Fitness',hr:'Taktička kondicija',pl:'Taktyczny fitness', ru:'Тактическая подготовка',tr:'Taktik Fitness'}},
-      {id:'military_elite',    name:{de:'Elite Militär',      en:'Elite Military',  hr:'Elitna vojna',    pl:'Elitarny wojskowy', ru:'Элитная военная',    tr:'Elit Askeri'}}
+      {id:'military_basic',    name:{de:'Militär Grundlagen', en:'Basic Military',  hr:'Osnovna vojna',   pl:'Podstawowy wojskowy',ru:'Базовая военная',    tr:'Temel Askeri'}, duration:'6'},
+      {id:'military_tactical', name:{de:'Taktische Fitness',  en:'Tactical Fitness',hr:'Taktička kondicija',pl:'Taktyczny fitness', ru:'Тактическая подготовка',tr:'Taktik Fitness'}, duration:'6'},
+      {id:'military_elite',    name:{de:'Elite Militär',      en:'Elite Military',  hr:'Elitna vojna',    pl:'Elitarny wojskowy', ru:'Элитная военная',    tr:'Elit Askeri'}, duration:'6'}
     ]
   },
   fitness_calisthenics: {
     programs:[
-      {id:'cali_beginner',    name:{de:'Anfänger',       en:'Beginner',     hr:'Početnik',      pl:'Początkujący',     ru:'Начинающий',      tr:'Başlangıç'}},
-      {id:'cali_intermediate',name:{de:'Fortgeschritten',en:'Intermediate', hr:'Srednja razina',pl:'Średniozaawansowany',ru:'Средний уровень',tr:'Orta Seviye'}},
-      {id:'cali_advanced',    name:{de:'Profi',          en:'Advanced',     hr:'Napredni',      pl:'Zaawansowany',     ru:'Продвинутый',     tr:'İleri Seviye'}}
+      {id:'cali_beginner',    name:{de:'Anfänger',       en:'Beginner',     hr:'Početnik',      pl:'Początkujący',     ru:'Начинающий',      tr:'Başlangıç'}, duration:'6'},
+      {id:'cali_intermediate',name:{de:'Fortgeschritten',en:'Intermediate', hr:'Srednja razina',pl:'Średniozaawansowany',ru:'Средний уровень',tr:'Orta Seviye'}, duration:'6'},
+      {id:'cali_advanced',    name:{de:'Profi',          en:'Advanced',     hr:'Napredni',      pl:'Zaawansowany',     ru:'Продвинутый',     tr:'İleri Seviye'}, duration:'6'}
     ]
   }
 };
@@ -2233,7 +2233,7 @@ const PROG_LOAD_TR={
 function plt(k){ return (PROG_LOAD_TR[lang]&&PROG_LOAD_TR[lang][k])||PROG_LOAD_TR.en[k]; }
 
 const WORKOUT_DATA = {};
-const PROGRAM_FILES = {"boxing_conditioning":"92673c27d0","boxing_explosiveness":"c21f3a8440","boxing_strength":"ab8c2b35a3","drivers_cabin":"d3b3da8fee","drivers_hotel":"d14448608e","drivers_parking":"fc3144e6e6","drv_bands_advanced":"9f7c1cbb0c","drv_bands_beginner":"11a53d21e8","drv_bands_intermediate":"1d15f9566f","drv_db_advanced":"9b22f9b617","drv_db_beginner":"5e13792883","drv_db_intermediate":"8140d35e68","drv_kb_advanced":"40ed500783","drv_kb_beginner":"0c101c5cf5","drv_kb_intermediate":"0d7fe0b996","gd_athlete_b1":"ffb7ff4b7c","gym_advanced":"ff4c8fc170","gym_beginner":"a013bb8dd2","gym_bodybuilding":"29602062eb","gym_fatloss":"984fc97bf7","gym_intermediate":"735a609f16","gym_muscle":"8ae0db5862","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"589c0e2a44","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"e122a3ccbd","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75","hotel_dumbbells":"9b1dddaf06","hotel_minigym":"32e99707b0","hotel_noequip":"4c3bbd6761","women_gym_beginner":"7e10b0dedd","women_gym_fatloss":"7af57beff7","women_gym_glutes":"728bb4351d","women_gym_strength":"76c433e236","women_home_beginner":"bf8f4d985a","women_home_fatloss":"71f5096001","women_home_glutes":"1116ec95cd","women_home_mobility":"aeb175c733"};
+const PROGRAM_FILES = {"boxing_conditioning":"92673c27d0","boxing_explosiveness":"c21f3a8440","boxing_strength":"ab8c2b35a3","cali_advanced":"5dd18497b3","cali_beginner":"0e083486a0","cali_intermediate":"140dc0152d","drivers_cabin":"d3b3da8fee","drivers_hotel":"d14448608e","drivers_parking":"fc3144e6e6","drv_bands_advanced":"9f7c1cbb0c","drv_bands_beginner":"11a53d21e8","drv_bands_intermediate":"1d15f9566f","drv_db_advanced":"9b22f9b617","drv_db_beginner":"5e13792883","drv_db_intermediate":"8140d35e68","drv_kb_advanced":"40ed500783","drv_kb_beginner":"0c101c5cf5","drv_kb_intermediate":"0d7fe0b996","gd_athlete_b1":"ffb7ff4b7c","gym_advanced":"ff4c8fc170","gym_beginner":"a013bb8dd2","gym_bodybuilding":"29602062eb","gym_fatloss":"984fc97bf7","gym_intermediate":"735a609f16","gym_muscle":"8ae0db5862","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"589c0e2a44","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"e122a3ccbd","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75","hotel_dumbbells":"9b1dddaf06","hotel_minigym":"32e99707b0","hotel_noequip":"4c3bbd6761","military_basic":"402f923c0b","military_elite":"ecc881a458","military_tactical":"6955b2546d","women_gym_beginner":"7e10b0dedd","women_gym_fatloss":"7af57beff7","women_gym_glutes":"728bb4351d","women_gym_strength":"76c433e236","women_home_beginner":"bf8f4d985a","women_home_fatloss":"71f5096001","women_home_glutes":"1116ec95cd","women_home_mobility":"aeb175c733"};
 
 let activeProgDetail = null;
 
