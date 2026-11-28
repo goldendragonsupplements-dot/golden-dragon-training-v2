@@ -2034,9 +2034,9 @@ const PROG_DATA = {
             id:'home_equip_mobility',
             label:{de:'Mobilität & Core',en:'Mobility & Core',hr:'Mobilnost & Core',pl:'Mobilność & Core',ru:'Подвижность & Кор',tr:'Mobilite & Core'},
             programs:[
-              {id:'home_mob_mobility',name:{de:'Mobilität',    en:'Mobility',     hr:'Mobilnost',   pl:'Mobilność',  ru:'Подвижность', tr:'Mobilite'}},
-              {id:'home_mob_core',    name:{de:'Core Strength',en:'Core Strength',hr:'Snaga corea', pl:'Siła core',  ru:'Сила кора',   tr:'Core Gücü'}},
-              {id:'home_mob_posture', name:{de:'Haltung',      en:'Posture',      hr:'Držanje',     pl:'Postawa',    ru:'Осанка',      tr:'Duruş'}}
+              {id:'home_mob_mobility',name:{de:'Mobilität',    en:'Mobility',     hr:'Mobilnost',   pl:'Mobilność',  ru:'Подвижность', tr:'Mobilite'}, duration:'3'},
+              {id:'home_mob_core',    name:{de:'Core Strength',en:'Core Strength',hr:'Snaga corea', pl:'Siła core',  ru:'Сила кора',   tr:'Core Gücü'}, duration:'3'},
+              {id:'home_mob_posture', name:{de:'Haltung',      en:'Posture',      hr:'Držanje',     pl:'Postawa',    ru:'Осанка',      tr:'Duruş'}, duration:'3'}
             ]
           }
         ]
@@ -2233,7 +2233,7 @@ const PROG_LOAD_TR={
 function plt(k){ return (PROG_LOAD_TR[lang]&&PROG_LOAD_TR[lang][k])||PROG_LOAD_TR.en[k]; }
 
 const WORKOUT_DATA = {};
-const PROGRAM_FILES = {"gd_athlete_b1":"ffb7ff4b7c","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"9144c5e6d0","home_hg_beginner":"29474f9162","home_hg_fatloss":"7050123d43","home_hg_intermediate":"b5a4350d80","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75"};
+const PROGRAM_FILES = {"gd_athlete_b1":"ffb7ff4b7c","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"4e5d7dec34","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"b5a4350d80","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75"};
 
 let activeProgDetail = null;
 
