@@ -2045,12 +2045,12 @@ const PROG_DATA = {
   },
   fitness_gym: {
     programs:[
-      {id:'gym_beginner',    name:{de:'Anfänger',             en:'Beginner',          hr:'Početnik',          pl:'Początkujący',        ru:'Начинающий',          tr:'Başlangıç'}},
-      {id:'gym_intermediate',name:{de:'Fortgeschritten',      en:'Intermediate',      hr:'Srednja razina',    pl:'Średniozaawansowany', ru:'Средний уровень',     tr:'Orta Seviye'}},
-      {id:'gym_advanced',    name:{de:'Profi',                en:'Advanced',          hr:'Napredni',          pl:'Zaawansowany',        ru:'Продвинутый',         tr:'İleri Seviye'}},
-      {id:'gym_muscle',      name:{de:'Muskeln & Kraft',      en:'Muscle & Strength', hr:'Mišići & Snaga',    pl:'Mięśnie & Siła',      ru:'Мышцы & Сила',        tr:'Kas & Güç'}},
-      {id:'gym_fatloss',     name:{de:'Fettverbrennung',      en:'Fat Loss',          hr:'Gubitak masti',     pl:'Spalanie tłuszczu',   ru:'Сжигание жира',       tr:'Yağ Yakımı'}},
-      {id:'gym_bodybuilding',name:{de:'Bodybuilding',         en:'Bodybuilding',      hr:'Bodybuilding',      pl:'Kulturystyka',        ru:'Бодибилдинг',         tr:'Vücut Geliştirme'}}
+      {id:'gym_beginner',    name:{de:'Anfänger',             en:'Beginner',          hr:'Početnik',          pl:'Początkujący',        ru:'Начинающий',          tr:'Başlangıç'}, duration:'6'},
+      {id:'gym_intermediate',name:{de:'Fortgeschritten',      en:'Intermediate',      hr:'Srednja razina',    pl:'Średniozaawansowany', ru:'Средний уровень',     tr:'Orta Seviye'}, duration:'6'},
+      {id:'gym_advanced',    name:{de:'Profi',                en:'Advanced',          hr:'Napredni',          pl:'Zaawansowany',        ru:'Продвинутый',         tr:'İleri Seviye'}, duration:'6'},
+      {id:'gym_muscle',      name:{de:'Muskeln & Kraft',      en:'Muscle & Strength', hr:'Mišići & Snaga',    pl:'Mięśnie & Siła',      ru:'Мышцы & Сила',        tr:'Kas & Güç'}, duration:'6'},
+      {id:'gym_fatloss',     name:{de:'Fettverbrennung',      en:'Fat Loss',          hr:'Gubitak masti',     pl:'Spalanie tłuszczu',   ru:'Сжигание жира',       tr:'Yağ Yakımı'}, duration:'6'},
+      {id:'gym_bodybuilding',name:{de:'Bodybuilding',         en:'Bodybuilding',      hr:'Bodybuilding',      pl:'Kulturystyka',        ru:'Бодибилдинг',         tr:'Vücut Geliştirme'}, duration:'6'}
     ]
   },
   fitness_women: {
@@ -2233,7 +2233,7 @@ const PROG_LOAD_TR={
 function plt(k){ return (PROG_LOAD_TR[lang]&&PROG_LOAD_TR[lang][k])||PROG_LOAD_TR.en[k]; }
 
 const WORKOUT_DATA = {};
-const PROGRAM_FILES = {"gd_athlete_b1":"ffb7ff4b7c","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"4e5d7dec34","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"b5a4350d80","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75"};
+const PROGRAM_FILES = {"gd_athlete_b1":"ffb7ff4b7c","gym_advanced":"ff4c8fc170","gym_beginner":"a013bb8dd2","gym_bodybuilding":"29602062eb","gym_fatloss":"984fc97bf7","gym_intermediate":"735a609f16","gym_muscle":"8ae0db5862","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"4e5d7dec34","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"b5a4350d80","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75"};
 
 let activeProgDetail = null;
 
