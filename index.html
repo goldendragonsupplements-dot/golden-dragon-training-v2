@@ -2059,20 +2059,20 @@ const PROG_DATA = {
         id:'women_home',
         label:{de:'Zuhause',en:'Home',hr:'Kod kuće',pl:'W domu',ru:'Дома',tr:'Evde'},
         programs:[
-          {id:'women_home_beginner', name:{de:'Frauen Anfänger Zuhause',     en:'Women Beginner Home',      hr:'Žene Početnica Kuća',     pl:'Kobiety Początkujące Dom', ru:'Женщины Начинающий Дома',  tr:'Kadın Başlangıç Ev'}},
-          {id:'women_home_fatloss',  name:{de:'Frauen Fettverbrennung Haus', en:'Women Fat Loss Home',      hr:'Žene Mršavljenje Kuća',   pl:'Kobiety Spalanie Tłuszczu Dom', ru:'Женщины Сжигание Жира Дома', tr:'Kadın Yağ Yakım Ev'}},
-          {id:'women_home_glutes',   name:{de:'Frauen Gesäß & Beine Haus',  en:'Women Glutes & Legs Home', hr:'Žene Stražnjica & Noge Kuća',pl:'Kobiety Pośladki & Nogi Dom',ru:'Женщины Ягодицы & Ноги Дома',tr:'Kadın Kalça & Bacak Ev'}},
-          {id:'women_home_mobility', name:{de:'Frauen Mobilität & Core Haus',en:'Women Mobility & Core Home',hr:'Žene Mobilnost & Core Kuća',pl:'Kobiety Mobilność & Core Dom',ru:'Женщины Подвижность & Кор Дома',tr:'Kadın Mobilite & Core Ev'}}
+          {id:'women_home_beginner', name:{de:'Frauen Anfänger Zuhause',     en:'Women Beginner Home',      hr:'Žene Početnica Kuća',     pl:'Kobiety Początkujące Dom', ru:'Женщины Начинающий Дома',  tr:'Kadın Başlangıç Ev'}, duration:'6'},
+          {id:'women_home_fatloss',  name:{de:'Frauen Fettverbrennung Haus', en:'Women Fat Loss Home',      hr:'Žene Mršavljenje Kuća',   pl:'Kobiety Spalanie Tłuszczu Dom', ru:'Женщины Сжигание Жира Дома', tr:'Kadın Yağ Yakım Ev'}, duration:'6'},
+          {id:'women_home_glutes',   name:{de:'Frauen Gesäß & Beine Haus',  en:'Women Glutes & Legs Home', hr:'Žene Stražnjica & Noge Kuća',pl:'Kobiety Pośladki & Nogi Dom',ru:'Женщины Ягодицы & Ноги Дома',tr:'Kadın Kalça & Bacak Ev'}, duration:'6'},
+          {id:'women_home_mobility', name:{de:'Frauen Mobilität & Core Haus',en:'Women Mobility & Core Home',hr:'Žene Mobilnost & Core Kuća',pl:'Kobiety Mobilność & Core Dom',ru:'Женщины Подвижность & Кор Дома',tr:'Kadın Mobilite & Core Ev'}, duration:'3'}
         ]
       },
       {
         id:'women_gym',
         label:{de:'Fitnessstudio',en:'Gym',hr:'Teretana',pl:'Siłownia',ru:'Зал',tr:'Spor Salonu'},
         programs:[
-          {id:'women_gym_beginner', name:{de:'Frauen Anfänger Studio',       en:'Women Beginner Gym',           hr:'Žene Početnica Teretana',     pl:'Kobiety Początkujące Siłownia', ru:'Женщины Начинающий Зал',    tr:'Kadın Başlangıç Salon'}},
-          {id:'women_gym_fatloss',  name:{de:'Frauen Fettverbrennung Studio',en:'Women Fat Loss Gym',           hr:'Žene Mršavljenje Teretana',   pl:'Kobiety Spalanie Tłuszczu Siłownia',ru:'Женщины Сжигание Жира Зал',tr:'Kadın Yağ Yakım Salon'}},
-          {id:'women_gym_glutes',   name:{de:'Frauen Gesäß & Beine Studio', en:'Women Glutes & Legs Gym',      hr:'Žene Stražnjica & Noge Teretana',pl:'Kobiety Pośladki & Nogi Siłownia',ru:'Женщины Ягодицы & Ноги Зал',tr:'Kadın Kalça & Bacak Salon'}},
-          {id:'women_gym_strength', name:{de:'Frauen Kraft & Straffung Studio',en:'Women Strength & Toning Gym',hr:'Žene Snaga & Tonus Teretana',pl:'Kobiety Siła & Ujędrnianie Siłownia',ru:'Женщины Сила & Тонус Зал',tr:'Kadın Güç & Sıkılaştırma Salon'}}
+          {id:'women_gym_beginner', name:{de:'Frauen Anfänger Studio',       en:'Women Beginner Gym',           hr:'Žene Početnica Teretana',     pl:'Kobiety Początkujące Siłownia', ru:'Женщины Начинающий Зал',    tr:'Kadın Başlangıç Salon'}, duration:'6'},
+          {id:'women_gym_fatloss',  name:{de:'Frauen Fettverbrennung Studio',en:'Women Fat Loss Gym',           hr:'Žene Mršavljenje Teretana',   pl:'Kobiety Spalanie Tłuszczu Siłownia',ru:'Женщины Сжигание Жира Зал',tr:'Kadın Yağ Yakım Salon'}, duration:'6'},
+          {id:'women_gym_glutes',   name:{de:'Frauen Gesäß & Beine Studio', en:'Women Glutes & Legs Gym',      hr:'Žene Stražnjica & Noge Teretana',pl:'Kobiety Pośladki & Nogi Siłownia',ru:'Женщины Ягодицы & Ноги Зал',tr:'Kadın Kalça & Bacak Salon'}, duration:'6'},
+          {id:'women_gym_strength', name:{de:'Frauen Kraft & Straffung Studio',en:'Women Strength & Toning Gym',hr:'Žene Snaga & Tonus Teretana',pl:'Kobiety Siła & Ujędrnianie Siłownia',ru:'Женщины Сила & Тонус Зал',tr:'Kadın Güç & Sıkılaştırma Salon'}, duration:'6'}
         ]
       }
     ]
@@ -2233,7 +2233,7 @@ const PROG_LOAD_TR={
 function plt(k){ return (PROG_LOAD_TR[lang]&&PROG_LOAD_TR[lang][k])||PROG_LOAD_TR.en[k]; }
 
 const WORKOUT_DATA = {};
-const PROGRAM_FILES = {"gd_athlete_b1":"ffb7ff4b7c","gym_advanced":"ff4c8fc170","gym_beginner":"a013bb8dd2","gym_bodybuilding":"29602062eb","gym_fatloss":"984fc97bf7","gym_intermediate":"735a609f16","gym_muscle":"8ae0db5862","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"4e5d7dec34","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"b5a4350d80","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75"};
+const PROGRAM_FILES = {"gd_athlete_b1":"ffb7ff4b7c","gym_advanced":"ff4c8fc170","gym_beginner":"a013bb8dd2","gym_bodybuilding":"29602062eb","gym_fatloss":"984fc97bf7","gym_intermediate":"735a609f16","gym_muscle":"8ae0db5862","home_bands_advanced":"97599a3c83","home_bands_beginner":"af500453cd","home_bands_intermediate":"207672aa9a","home_db_advanced":"b8c69ce469","home_db_beginner":"d46484d996","home_db_intermediate":"13bfb2fdc2","home_def_advanced":"cf65f8a27f","home_def_beginner":"9f1f676da5","home_def_intermediate":"8d851a8b34","home_hg_advanced":"4e5d7dec34","home_hg_beginner":"29474f9162","home_hg_fatloss":"9b65c57f4f","home_hg_intermediate":"b5a4350d80","home_hg_mass":"229f993fe4","home_hg_transform":"6f3082dd64","home_mob_core":"823d7228a3","home_mob_mobility":"73fd01f702","home_mob_posture":"82816c6a6e","home_noequip_advanced":"f8461d7bbf","home_noequip_beginner":"52de794020","home_noequip_fatloss":"1a7b10fc9f","home_noequip_intermediate":"17fed95d75","women_gym_beginner":"7e10b0dedd","women_gym_fatloss":"7af57beff7","women_gym_glutes":"728bb4351d","women_gym_strength":"76c433e236","women_home_beginner":"bf8f4d985a","women_home_fatloss":"71f5096001","women_home_glutes":"1116ec95cd","women_home_mobility":"aeb175c733"};
 
 let activeProgDetail = null;
 
